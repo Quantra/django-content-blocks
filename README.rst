@@ -8,21 +8,22 @@ Django Content Blocks is a reusable Django app that allows users to create and m
 
 Content blocks can contain any type of content, including text, images, videos, and more, and can be arranged in any order on a page. Additionally, Django Content Blocks includes support for drafts and previews, allowing users to see how their changes will look before publishing them.
 
-.. todo screenshot goes here
+.. image:: https://github.com/Quantra/django-content-blocks/raw/master/docs/images/content_block_editor_dark.png
 
-Installation instructions and detailed documentation can be found on ReadTheDocs.
+Installation instructions and detailed documentation can be found on `ReadTheDocs <https://django-content-blocks.readthedocs.io/en/latest/index.html>`_.
 
 Supported Django & Python Versions
 ----------------------------------
 
-Python >= 3.7
-Django >= 3.2
+* Python >= 3.7
+* Django >= 3.2
 
 Dependencies (and Thank You)
 ----------------------------
 
 * https://github.com/jrief/django-admin-sortable2
 * https://github.com/tj-django/django-clone - Additional thanks for tox.ini setup
+* https://github.com/python-pillow/Pillow
 
 Thank You
 ---------
@@ -32,6 +33,8 @@ Thank You
 * https://chat.openai.com/ - For documentation rewrites
 * https://github.com/django-hijack/django-hijack - For conf.py LazySettings idea
 * https://github.com/cookiecutter/cookiecutter-django - For many things include docker
+* Dmitry Sobolev for so graciously transferring the django-content-blocks name on pypi.
+* Margo Yaguda for linguistic assistance in contacting Dmitry.
 
 Contributing
 ------------
