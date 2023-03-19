@@ -1,0 +1,17 @@
+{% load static %}
+<div class="choices-widget">
+    {% include "django/forms/widgets/input.html" %}
+
+    <label>Value</label>
+    <label>Label</label>
+
+    <div class="inputs">
+        <div class="input-row">
+            <input type="text">
+            <input type="text">
+            <button class="delete-choice-row"><img src="{% static 'admin/img/inline-delete.svg' %}" /></button>
+        </div>
+    </div>
+
+    <button class="add-choice-row"><img src="{% static 'admin/img/icon-addlink.svg' %}" /> Add another choice</button>
+</div>

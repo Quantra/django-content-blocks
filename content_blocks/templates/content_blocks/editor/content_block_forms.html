@@ -1,0 +1,7 @@
+{#Used to render a list of content block forms. Used by editor page to show existing content blocks as well as import and reset features.#}
+{% load content_block_admin %}
+
+{% for content_block in parent.content_blocks.drafts %}
+    {% content_block_form content_block as new_form %}
+    {% include 'content_blocks/editor/content_block_form_wrapper.html' with content_block=content_block form=new_form saved=content_block.saved %}
+{% endfor %}

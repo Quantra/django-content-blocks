@@ -1,0 +1,12 @@
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+{% if widget.is_initial %}
+    {% if not widget.required %}
+        <label class="checkbox" for="{{ widget.checkbox_id }}">
+            <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
+            <span></span>{{ widget.clear_checkbox_label }}
+        </label>
+    {% endif %}
+    <label class="currently">
+        <a href="{{ widget.value.url }}" target="_blank">{{ widget.value }}</a>
+    </label>
+{% endif %}

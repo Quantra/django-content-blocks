@@ -1,0 +1,4 @@
+{{ field }}
+<label class="checkbox vCheckboxLabel" for="{{ field.auto_id }}">
+    {% firstof field.help_text|safe|linebreaksbr field.label %}
+</label>

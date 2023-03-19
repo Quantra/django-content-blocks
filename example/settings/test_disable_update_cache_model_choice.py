@@ -1,0 +1,3 @@
+from .base import *  # noqa
+
+CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = True

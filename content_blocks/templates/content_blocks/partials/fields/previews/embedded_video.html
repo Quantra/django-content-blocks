@@ -1,0 +1,9 @@
+{% extends 'content_blocks/partials/fields/previews/base.html' %}
+
+{% block main %}
+    {% if field.value %}
+        <iframe src="{{ field.value }}" class="embedded-preview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+    {% else %}
+        <i class="fa-solid fa-thin fa-film-slash fa-2x no-image-preview"></i>
+    {% endif %}
+{% endblock %}

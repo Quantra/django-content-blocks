@@ -1,0 +1,107 @@
+{#Wrapper for the content block form.  Used when adding new content blocks.#}
+{% load content_block_admin %}
+{% load admin_urls %}
+
+<div class="content-block-form pos-rel clearfix" id="cb_{{ content_block.id }}">
+
+    {% include 'content_blocks/partials/loader.html' with loader_id=content_block.id %}
+
+    <div class="preview" id="preview_{{ content_block.id }}">
+        <iframe data-src="{% url opts|admin_urlname:'content_block_preview' parent.id content_block.id %}"></iframe>
+    </div>
+
+    <div class="pos-rel">
+        <div class="controls">
+            <button class="expand"
+                    tabindex="-1"
+                    data-target=".expander_{{ content_block.id }}"
+            >
+                <i class="fa-solid fa-light fa-chevron-up"></i>
+            </button>
+
+            {% if content_block.can_render %}
+                <button class="preview"
+                        tabindex="-1"
+                        data-target="#preview_{{ content_block.id }}"
+                        data-save="#save_{{ content_block.id }}"
+                >
+                    <i class="fa-solid fa-light fa-image"></i>
+                </button>
+            {% endif %}
+
+            <button class="visible"
+                    tabindex="-1"
+                    data-ajax_url="{% url 'content_blocks:toggle_visible' content_block.id %}"
+                    data-label="#title_{{ content_block.id }}"
+            >
+                <i class="fa-solid fa-light {% if content_block.visible %}fa-eye{% else %}fa-eye-slash{% endif %}"></i>
+            </button>
+
+            <button class="delete"
+                    tabindex="-1"
+                    data-ajax_url="{% url 'content_blocks:content_block_delete' content_block.id %}"
+                    data-target="#cb_{{ content_block.id }}"
+                    data-label="#title_{{ content_block.id }}"
+                    data-loader="#loader_{{ content_block.id }}"
+            >
+                <i class="fa-solid fa-light {% if nested_num <= min_num %}fa-trash-slash{% else %}fa-trash{% endif %}"></i>
+            </button>
+
+            <button class="save {% if saved %}saved{% endif %}"
+                    tabindex="-1"
+                    id="save_{{ content_block.id }}"
+                    data-form="#cb_form_{{ content_block.id }}"
+                    data-loader="#loader_{{ content_block.id }}"
+            >
+                <i class="fa-solid fa-light {% if saved %}fa-floppy-disk{% else %}fa-floppy-disk-circle-xmark{% endif %}"></i>
+            </button>
+
+            <button class="move" tabindex="-1"><i class="fa-solid fa-light fa-sort"></i></button>
+        </div>
+
+        <div class="cb-form-wrapper" id="cb_form_wrapper_{{ content_block.id }}">
+            {% include 'content_blocks/editor/content_block_form.html' %}
+        </div>
+
+        <div class="expander expander_{{ content_block.id }}">
+			{#	Nested fields #}
+            {% for field in content_block.nested_fields.values %}
+                <div class="controls wrapper-controls">
+                    <button tabindex="-1" class="collapse-all" data-target="#nested_blocks_{{ field.id }}">
+                        <i class="fa-solid fa-light fa-chevrons-up"></i>
+                    </button>
+                    <button tabindex="-1" class="expand-all" data-target="#nested_blocks_{{ field.id }}">
+                        <i class="fa-solid fa-light fa-chevrons-down"></i>
+                    </button>
+                </div>
+
+                {% with field.content_blocks.all as field_content_blocks %}
+                    <div class="content-blocks pos-rel"
+                         id="nested_blocks_{{ field.id }}"
+                         data-min_num="{{ field.template_field.min_num }}"
+                         data-max_num="{{ field.template_field.max_num }}"
+                    >
+                        {% for nested_block in field_content_blocks %}
+                            {% content_block_form nested_block as content_block_form %}
+                            {% include 'content_blocks/editor/content_block_form_wrapper.html' with form=content_block_form content_block=nested_block saved=nested_block.saved nested_num=field_content_blocks|length min_num=field.template_field.min_num %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="cb-nested-create-form">
+                        {% new_nested_block_form field as new_nested_form %}
+                        <form action="{% url opts|admin_urlname:'nested_block_create' parent.id %}"
+                              method="post"
+                              class="nested-create-form {% if field_content_blocks|length >= field.template_field.max_num %}disabled{% endif %} clearfix"
+                              data-target="#nested_blocks_{{ field.id }}"
+                        >
+                            {% for f in new_nested_form %}
+                                {{ f }}
+                            {% endfor %}
+                            <button type="submit">Add <span class="nested-create-label"></span></button>
+                        </form>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

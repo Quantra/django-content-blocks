@@ -1,0 +1,32 @@
+/*
+Some icons do not exist in the free fa-solid set.
+So we replace them with icons that do exist here.
+This file should be loaded before fontawesome.css so when a pro fontawesome.css is used this is overridden.
+*/
+
+.fa-chevrons-down::before {
+  content: "\f078"; }
+.fa-chevrons-up::before {
+  content: "\f077"; }
+
+.fa-floppy-disk-circle-arrow-right::before {
+    content: "\f061";}
+
+.fa-floppy-disk-circle-xmark::before {
+    content: "\f0c7";}
+
+.fa-image-slash::before {
+    content: "\f03e";}
+
+.fa-film-slash::before {
+    content: "\f008";}
+
+.fa-trash-slash::before {
+    content: "\f1f8";}
+
+/* Because we can't always change icons now use opacity to differentiate states */
+
+.controls .fa-floppy-disk,
+.controls .fa-trash-slash {
+    opacity: 0.4;
+}

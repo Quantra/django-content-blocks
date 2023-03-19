@@ -1,0 +1,680 @@
+/* BASE DEFINITIONS */
+
+/*
+-------------------------------------
+POSITIONING ELEMENTS
+-------------------------------------
+*/
+
+.pos-rel {
+	position: relative;
+}
+
+.pos-abs {
+	position: absolute;
+}
+
+.pos-fixed {
+	position: fixed;
+}
+
+/*
+-------------------------------------
+FLOATING ELEMENTS
+-------------------------------------
+*/
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+.cl {
+	clear: left;
+}
+
+.cr {
+	clear: right;
+}
+
+/*
+-------------------------------------
+RESPONSIVE
+-------------------------------------
+*/
+
+
+@media (min-width: 1449px) {
+	.cl-4 {
+		clear: left;
+	}
+
+	.col {
+		width: 25%;
+	}
+}
+
+@media (max-width: 1448px) {
+	.cl-4 {
+		clear: none;
+	}
+
+	.cl-3 {
+		clear: left;
+	}
+
+	.col {
+		width: 33.3%;
+	}
+}
+
+@media (max-width: 1024px) {
+	.cl-3 {
+		clear:none;
+	}
+
+	.cl-2 {
+		clear: left;
+	}
+
+	.col {
+		width: 50%;
+	}
+
+	.title-bar .field-wrapper.title {
+		width: auto;
+	}
+}
+
+@media (max-width: 767px) {
+	.cl-2 {
+		clear: none;
+	}
+
+	.col {
+		width: 100%;
+	}
+
+	div.status {
+		display: none;
+	}
+
+	.publish-bar i {
+		display: none;
+	}
+
+	body .popup.small .popup-wrapper {
+		width: 100%;
+		box-sizing: border-box;
+	}
+}
+
+.cb-editor * {
+	box-sizing: border-box;
+}
+
+/*
+---------------------------------------
+CLEARFIX
+---------------------------------------
+*/
+
+.clearfix::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+/*
+-------------------------------------
+CENTRE HOVER
+-------------------------------------
+*/
+
+.cenrel {
+	position: relative;
+}
+
+.cenabs {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 500;
+}
+
+.cenabs.fr {
+	right: 0;
+	left: auto;
+	float: none;
+}
+
+.cenabs.fl {
+	left: 0;
+	right: auto;
+	float: none;
+}
+
+.centab {
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+
+.cencell {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+
+/*
+-------------------------------------
+Content Block Editor
+-------------------------------------
+*/
+
+.cb-import-form {
+	padding-top:20px;
+}
+
+.cb-import-form p {
+	text-align: center;
+}
+.cb-import-form form + p {
+	padding-top:10px;
+}
+
+.cb-create-form, .cb-nested-create-form {
+	clear: both;
+}
+.cb-create-form {
+	margin-top:20px;
+}
+
+.cb-import-form select,
+.cb-create-form select,
+.nested-create-form select {
+	width: 49.5% !important;
+	float: left;
+	margin:0;
+}
+
+.cb-import-form button[type="submit"],
+.cb-create-form button[type="submit"],
+.nested-create-form button[type="submit"] {
+	height: 30px;
+	width: 49.5%;
+	float: right;
+	border: none;
+	transition: all 0.3s;
+	margin:0;
+}
+
+.content-blocks {
+	border: solid var(--hairline-color);
+	border-width: 1px 1px 0 1px;
+	padding: 20px 20px 20px 20px;
+	overflow: auto;
+}
+#content-blocks-root {
+	border: none;
+	padding: 0;
+}
+
+.content-block-form {
+	border-bottom: 1px solid var(--hairline-color);
+	padding: 0 0 20px 0;
+	margin-top:20px;
+	left: auto !important;
+}
+
+#content-blocks-root > .content-block-form {
+	margin: 20px 0 0 0;
+	border-width: 0 0 1px 0;
+}
+
+.content-blocks .content-block-form:first-of-type,
+#content-blocks-root .cb-import-form + .content-block-form {
+	margin-top: 0;
+}
+
+/*
+-------------------------------------
+BUTTONS
+-------------------------------------
+*/
+
+button {
+	cursor: pointer;
+	vertical-align: middle;
+	font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+	font-weight: normal;
+	font-size: 13px;
+}
+
+/*
+-------------------------------------
+CONTROLS
+-------------------------------------
+*/
+
+.controls {
+	position: absolute;
+	top: 5px;
+	right: 0;
+}
+
+.controls button {
+	display: inline;
+	width: 30px;
+	height: 30px;
+	border: none;
+	outline: none;
+	padding:0;
+	margin: 0;
+	color: var(--header-link-color);
+	font-size: 17px;
+	background: none;
+}
+.controls button:hover {
+	color: var(--link-hover-color);
+}
+.controls button i,
+.controls button {
+	transition: all 0.1s;
+}
+
+.wrapper-controls {
+	position: relative;
+	text-align: right;
+	padding-right: 3px;
+	top: 0;
+	clear: both;
+}
+
+.content-blocks .wrapper-controls {
+	padding: 20px 0 0 0;
+}
+
+.root-wrapper-controls.controls {
+	padding-top:0;
+}
+
+/*
+-------------------------------------
+TITLE BAR
+-------------------------------------
+*/
+
+.title-bar {
+	background-color: var(--primary);
+}
+
+.title-bar h2 {
+	margin: 0;
+	font-size: 13px;
+	color: var(--header-link-color);
+}
+
+.title-bar .field-wrapper {
+	padding: 5px 10px 3px 10px;
+}
+
+.title-bar .field-wrapper.title {
+	padding: 12px 10px 0 10px;
+}
+
+/*
+-------------------------------------
+FORM
+-------------------------------------
+*/
+
+.field-wrapper {
+	padding: 10px 10px 0 10px;
+	max-width: 100%;
+}
+
+label {
+	width: 32%;
+	padding: 7px 28px 0 0;
+}
+.field {
+	width: 68%;
+}
+
+.col-1-1 label {
+	width: 7.7%;
+}
+.col-1-1 .field {
+	width:92.3%;
+}
+
+input, select, textarea {
+	width: 100%;
+}
+
+input[type="checkbox"] {
+	width: auto;
+}
+
+input[type="file"] {
+	height: 30px;
+	padding: 3px 0 0 0;
+}
+
+textarea {
+	border: 1px solid var(--hairline-color);
+	min-height: 90px;
+	padding: 5px 10px;
+	height: 0;
+	max-height: 250px;
+	resize: vertical;
+}
+
+label.checkbox {
+	width: 100%;
+	padding: 0;
+}
+label.checkbox span {
+	bottom: 0;
+	right: 0;
+	font-size: 12px;
+}
+
+.cb-nested-create-form {
+	padding: 0 20px 20px 20px;
+	border: solid var(--hairline-color);
+	border-width: 0 1px 1px 1px;
+}
+.cb-nested-create-form button {
+	height: 33px;
+	width: 100%;
+	/* margin-left: 10px; */
+	border: none;
+	text-align: left;
+	color: var(--link-fg);
+	border-bottom: 1px solid var(--hairline-color);
+	background: url(../../admin/img/icon-addlink.svg) 10px center no-repeat var(--darkened-bg);
+	padding-left: 26px;
+	font-size: 12px;
+}
+.cb-nested-create-form button:hover {
+	color: var(--link-hover-color);
+}
+.cb-nested-create-form .disabled button {
+	opacity: 0.4;
+}
+.cb-nested-create-form .disabled button:hover {
+	color: var(--link-fg);
+}
+
+label.css_class {
+	color: var(--header-link-color); /* Needed for light mode */
+}
+
+/*
+-------------------------------------
+FORM ERRORS
+-------------------------------------
+*/
+
+.field-errors {
+	margin: 0;
+}
+
+ul.errorlist {
+	padding: 0;
+	background-color: transparent;
+}
+
+ul.errorlist li {
+	padding: 0;
+	margin: 0;
+	text-align: right;
+}
+
+/*
+-------------------------------------
+IMAGE WIDGET
+-------------------------------------
+*/
+
+label.currently {
+	width: 100%;
+	padding:0;
+	display: block;
+}
+
+label.currently a {
+	word-break: break-all;
+}
+
+video.video-preview,
+img.image-preview {
+	width: auto;
+	max-width:100%;
+	max-height:90px;
+}
+
+iframe.embedded-preview {
+	width: 169px;
+	height: 90px;
+}
+
+.no-image-preview {
+	padding-top: 7px;
+	margin-left: -3px;
+}
+
+/*
+-------------------------------------
+HELP TEXT
+-------------------------------------
+*/
+.help-text {
+	top: 8px;
+	right:5px;
+	cursor: help;
+}
+
+/*
+-------------------------------------
+MENU BAR
+-------------------------------------
+*/
+
+/* Django admin padding for fixed publish bar */
+#content, #nav-sidebar {
+	padding-bottom: 56px;
+}
+
+div.status {
+	float: left;
+	color: var(--body-fg);
+	font-size: 13px;
+	height: 36px;
+	line-height: 36px;
+}
+
+.cb-wrapper {
+	margin-top: -25px;
+}
+
+.publish-bar {
+	position: fixed;
+	bottom: 0;
+	left:0;
+	width: 100%;
+	height: 56px;
+	background-color: var(--darkened-bg);
+	padding: 10px 15px;
+	z-index:100;
+	border-top: 1px solid var(--hairline-color);
+}
+
+.publish-bar button {
+	width: auto;
+	float: right;
+	position: relative;
+	padding: 10px 15px;
+	margin: 0 0 0 5px;
+}
+
+.publish-bar button i {
+	padding:0 3px 0 0;
+}
+
+/*
+-------------------------------------
+LOADERS
+-------------------------------------
+*/
+
+.loader {
+	display: none;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left:0;
+	z-index: 90;
+	text-align: center;
+	animation-name: loaderpulse;
+	animation-duration: 3.3s;
+	animation-iteration-count: infinite;
+	color: var(--darkened-bg);
+}
+
+.loader .bg {
+	display: none;
+	width:100%;
+	height:100%;
+	top:0;
+	left:0;
+	z-index: 90;
+}
+.loader .bg:before {
+	content:"";
+	position: absolute;
+	top: 0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--darkened-bg);
+	opacity: 0.8;
+}
+
+.loader#loader_root {
+	position: fixed;
+	z-index: 110;
+}
+
+@keyframes loaderpulse {
+	50% {
+		color: var(--link-fg);
+	}
+}
+
+.spinner {
+	position: relative;
+}
+
+.progress {
+	width: 169px;
+	height: 20px;
+	margin: 20px auto 0 auto;
+	border-radius: 3px;
+	z-index: 90;
+	position: relative;
+}
+.progress-bar {
+	width: 32%;
+	height:100%;
+	background-color: var(--link-fg);
+	transition: width 0.2s;
+}
+
+
+/*
+-------------------------------------
+PREVIEWS
+-------------------------------------
+*/
+
+.preview {
+	display: none;
+}
+
+.preview iframe {
+	width:100%;
+	max-width:100%;
+	padding:0 !important;
+	border: none;
+	min-height: 0;
+	background-color: #fff;
+}
+
+/*
+-------------------------------------
+POPUPS
+-------------------------------------
+*/
+
+html.noscroll {
+	position: fixed;
+	overflow-y: scroll;
+	width: 100%;
+}
+
+.popup {
+	position:fixed;
+	width: 100%;
+	height:100%;
+	top:0;
+	left:0;
+	z-index:9000;
+	display:none;
+}
+.popup:before {
+	content:"";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--darkened-bg);
+	opacity: 0.8;
+}
+.popup.small .popup-wrapper {
+	width:500px;
+	margin: 0 auto;
+}
+
+.popup-wrapper {
+	position: relative;
+	background-color: var(--body-bg);
+	padding: 50px;
+	border: 1px solid var(--hairline-color);
+}
+
+.popup-controls {
+	padding-top:20px;
+	text-align: center;
+}
+
+.popup-controls button.confirm {
+	margin-left:5px;
+}
+
+.popup h1, .popup h2, .popup h3, .popup p {
+	text-align: center;
+}
+
+
+.popup p {
+	font-size: 13px;
+}

@@ -1,0 +1,11 @@
+{% extends 'content_blocks/partials/fields/previews/base.html' %}
+
+{% block main %}
+    {% if field.value %}
+        <video class="video-preview" muted controls loop poster="">
+            <source src="{{ field.value.url }}" type="video/{{ field.value.file_extension }}">
+        </video>
+    {% else %}
+        <i class="fa-solid fa-thin fa-film-slash fa-2x no-image-preview"></i>
+    {% endif %}
+{% endblock %}

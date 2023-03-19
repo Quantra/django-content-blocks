@@ -1,0 +1,33 @@
+{#Base template for content block editor to define static files#}
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/fontawesome/css/procompatibility.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/fontawesome/css/fontawesome.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/fontawesome/css/solid.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/fontawesome/css/light.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/fontawesome/css/thin.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/jqueryui/jquery-ui.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'content_blocks/css/content_blocks.css' %}" media="screen" />
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/jqueryui/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/js/ajax_setup.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/jqueryform/jquery.form.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/iframeresizer/iframeResizer.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/js/popup.js' %}"></script>
+    <script type="text/javascript" src="{% static 'content_blocks/js/content_block_editor.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="cb-editor" id="content-main">
+        {% block object_tools %}{% endblock %}
+        {% block main %}{% endblock %}
+    </div>
+{% endblock %}

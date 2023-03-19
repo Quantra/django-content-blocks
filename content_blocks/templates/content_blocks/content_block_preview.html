@@ -1,0 +1,9 @@
+{# Used to show a preview of the content block. It requires a base template with a {% block body %} #}
+{# This is so the content block can be shown independent of any other page elements but using the same static assets. #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    {{ content_block.render }}
+    <script type="text/javascript" src="{% static 'content_blocks/iframeresizer/iframeResizer.contentWindow.js' %}"></script>
+{% endblock %}

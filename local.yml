@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+      args:
+        - ARCH
+    image: django-content-blocks_local_django
+    container_name: django-content-blocks-local-django
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+    ports:
+      - "8000:8000"
+    command: "python3 manage.py runserver 0.0.0.0:8000"
+
+  tox:
+    build:
+      context: .
+      dockerfile: ./compose/local/tox/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - .:/home/runner:z
+    command: tox run-parallel
+
+  docs:
+    image: django-content-blocks_local_docs
+    container_name: django-content-blocks-local-docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/app/docs:z
+      - ./example:/app/example:z
+      - ./content_blocks:/app/content_blocks:z
+    ports:
+      - "9000:9000"
+    command: /start-docs
+    platform: linux/arm64/v8

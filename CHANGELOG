@@ -1,0 +1,59 @@
+1.9
+Nested fields can use any number of content block templates.
+
+1.8
+Migrations fixed.
+Compatibility testing
+
+1.7
+Use of null = True reduced/removed so as not to need |default_if_none:"" in templates.
+Editor and admin site updates.
+Nested content blocks min num and max num added.
+Management commands updated.
+Preview on site feature added.
+Test coverage back to 100%.
+Responsive editor.
+Default status message setting.
+Chores, refactoring, etc.
+
+1.6
+CONTENT_BLOCKS_DISABLE_CACHE settings added.
+no_cache option added to ContentBlockTemplate.
+pyproject.toml
+Removed content_blocks/content_blocks templates.
+
+1.5
+Content block context variable name changed from block to content_block
+Signals bug fixes
+
+1.4
+Preview iframe functionality updated.
+dbtemplates now an optional dependency.
+URLs namespaced
+django-cleanup removed as dependency but support retained.
+fooforms removed as dependency.
+CONTENT_BLOCKS_CACHE setting added.
+CONTENT_BLOCKS_STORAGE settings added.
+grappelli removed as a dependency.
+Model multiple choice fields removed.
+WYSIWYG features removed.
+CSS Class field added to ContentBlockTemplateField.
+Choice field choices stored as json.
+Model choice fields use GenericForeignKey API.
+ContentBlockAvailability uses ContentType ForeignKey.
+
+1.3
+Tests added.
+Base removed as dependency.
+
+1.2
+Content block collections feature added.
+
+1.1
+Minor fixes.
+
+1.1
+Removed super admin checks in favour of moving this customisation to a content-blocks-extra app.
+
+1.0
+Content blocks app made into reusable package.

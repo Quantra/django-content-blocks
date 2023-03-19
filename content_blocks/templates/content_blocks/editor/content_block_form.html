@@ -1,0 +1,67 @@
+{#The content block form. Used by ajax when saving a content block and rendering the returned form.#}
+<form action="{% url 'content_blocks:content_block_save' content_block.id %}"
+      method="post"
+      enctype="multipart/form-data"
+      class="cb-form" id="cb_form_{{ content_block.id }}"
+      data-target="#cb_form_wrapper_{{ content_block.id }}"
+      data-btn="#save_{{ content_block.id }}"
+>
+    <div class="title-bar clearfix">
+        <div class="field-wrapper title col fl cl" id="title_{{ content_block.id }}">
+            <h2>{{ content_block.content_block_template }} #{{ content_block.id }}</h2>
+        </div>
+
+        <div class="field-wrapper col fl clearfix">
+            <label for="id_{{ form.css_class.html_name }}" class="{{ form.css_class.html_name }} fl pos-rel">
+                {{ form.css_class.label }}:
+                {% if form.css_class.help_text %}
+                    <i class="fa-solid fa-light fa-info-circle tooltip help-text pos-abs" title="{{ form.css_class.help_text }}"></i>
+                {% endif %}
+            </label>
+
+            <div class="field fl">
+                {{ form.css_class }}
+            </div>
+        </div>
+    </div>
+
+    <div class="fields clearfix expander expander_{{ content_block.id }}">
+        {% for field in form %}
+            {% if field.html_name != 'css_class' %}
+                {% cycle 'cl-4 4c1' '4c2' '4c3' '4c4' as col4 silent %}
+                {% cycle 'cl-3 3c1' '3c2' '3c3' as col3 silent %}
+                {% cycle 'cl-2 2c1' '2c2' as col2 silent %}
+
+                {% if field.field.cb_field.preview_template_name and col4 == '4c4' %}
+                    {% resetcycle col4 %}
+                    {% cycle col4 %}
+                {% endif %}
+
+                {% if field.field.cb_field.preview_template_name and col3 == '3c3' %}
+                    {% resetcycle col3 %}
+                    {% cycle col3 %}
+                {% endif %}
+
+                {% if field.field.cb_field.preview_template_name and col2 == '2c2' %}
+                    {% resetcycle col2 %}
+                    {% cycle col2 %}
+                {% endif %}
+
+                <div class="field-wrapper {{ field.field.cb_field.field_type|slugify }} {% firstof field.field.widget.input_type "textarea" %} fl clearfix {{ col2 }} {{ col3 }} {{ col4 }} col {{ field.field.cb_field.template_field.css_class }}">
+
+                    {% include field.field.cb_field.template_name %}
+                </div>
+
+                {% if field.field.cb_field.preview_template_name %}
+                    {% cycle col4 %}
+                    {% cycle col3 %}
+                    {% cycle col2 %}
+                    <div class="field-wrapper {% firstof field.field.widget.name field.field.widget.input_type %} col fl clearfix {{ col2 }} {{ col3 }} {{ col4 }}">
+                        {% include field.field.cb_field.preview_template_name %}
+                    </div>
+                {% endif %}
+
+            {% endif %}
+        {% endfor %}
+    </div>
+</form>

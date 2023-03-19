@@ -1,0 +1,6 @@
+{#Used by content_block_collection template tag to render a content block collection.#}
+{% for content_block in content_block_collection.content_blocks.visible %}
+    {{ content_block.render }}
+{% empty %}
+    <!-- No content blocks for "{{ slug }}" -->
+{% endfor %}

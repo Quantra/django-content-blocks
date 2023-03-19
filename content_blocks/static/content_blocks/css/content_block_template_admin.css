@@ -1,0 +1,41 @@
+/*CSS for Content Block Template admin change page*/
+
+/* Choices widget */
+
+.choices-widget {
+    padding-left:170px;
+}
+
+.choices-widget .inputs {
+    clear:left;
+}
+
+.choices-widget .input-row {
+    padding-bottom:5px;
+}
+
+.choices-widget .input-row input:first-child {
+    margin-right:18px;
+}
+
+.choices-widget button {
+    outline: none;
+    border:none;
+    background-color: transparent;
+    color: var(--link-fg);
+    cursor: pointer;
+    font-size: 12px;
+    transition: color 0.15s, background 0.15s;
+}
+.choices-widget button:hover {
+    color: var(--link-hover-color);
+}
+
+.choices-widget button.add-choice-row {
+    padding-left:0;
+}
+
+/* Smaller help text textarea */
+.field-help_text textarea {
+    height: 50px;
+}

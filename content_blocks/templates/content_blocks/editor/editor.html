@@ -1,0 +1,135 @@
+{% extends 'content_blocks/editor/base.html' %}
+{% load admin_urls %}
+{% load i18n %}
+{% load content_block_admin %}
+
+{% block title %}Change Content Blocks for {{ parent }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.cb-wrapper').ContentBlockEditor({
+                update_position_url: "{% url 'content_blocks:update_position' %}",
+                parent_model: "{% app_model_label parent %}",
+                parent_id: "{{ parent.id }}"
+            });
+        });
+    </script>
+{% endblock %}
+
+<!-- BREADCRUMBS -->
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+            <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
+            {% url opts|admin_urlname:'changelist' as changelist_url %}
+            <a href="{% add_preserved_filters changelist_url %}">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
+            <a href="{% url opts|admin_urlname:'change' parent.id %}">{{ parent }}</a> &rsaquo;
+            Change content blocks
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block messages %}{% endblock %}
+
+{% block object_tools %}
+    {% if parent.preview_url %}
+        <ul class="object-tools">
+            <li>
+                <a href="{{ parent.preview_url }}" target="_blank" class="viewsitelink">Preview on site</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block content_title %}
+    <h1>Change Content Blocks for {{ parent }}</h1>
+{% endblock %}
+
+{% block main %}
+    {% include 'content_blocks/partials/loader.html' with loader_id='root' %}
+
+    <div class="cb-wrapper">
+        <div class="controls wrapper-controls root-wrapper-controls">
+            <button tabindex="-1" class="collapse-all" data-target="#content-blocks-root">
+                <i class="fa-solid fa-light fa-chevrons-up"></i>
+            </button>
+            <button tabindex="-1" class="expand-all" data-target="#content-blocks-root">
+                <i class="fa-solid fa-light fa-chevrons-down"></i>
+            </button>
+        </div>
+
+        <div class="content-blocks pos-rel" id="content-blocks-root">
+            <div class="cb-import-form" {% if parent.content_blocks.drafts %}style="display: none;"{% endif %}>
+                {% if import_content_blocks_form.get_master_queryset %}
+
+                    <form
+                          action="{% url opts|admin_urlname:'import_content_blocks' parent.id %}"
+                          method="post"
+                          class="import-form clearfix"
+                          data-loader="#loader_root"
+                    >
+                        {% for field in import_content_blocks_form %}
+                            {{ field }}
+                        {% endfor %}
+                        <button class="button" type="submit">Import Blocks From <span id="cb_import_label"></span></button>
+                    </form>
+                    <p>-or-</p>
+                {% endif %}
+                <p><i class="fa-solid fa-light fa-arrow-down"></i> Start adding new blocks below <i class="fa-solid fa-light fa-arrow-down"></i></p>
+            </div>
+
+            {% include 'content_blocks/editor/content_block_forms.html' %}
+        </div>
+
+        <div class="cb-create-form clearfix">
+            <form action="{% url opts|admin_urlname:'content_block_create' parent.id %}" method="post" class="create-form">
+                {% for field in new_content_block_form %}
+                    {{ field }}
+                {% endfor %}
+                <button class="button" type="submit">Add <span id="cb_create_label"></span></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="publish-bar">
+
+        <div class="status">{{ status_message|safe }}</div>
+
+        <button class="button" id="save_exit" data-return_url="{{ return_url }}" data-loader="#loader_root">
+            <i class="fa-solid fa-light fa-floppy-disk-circle-arrow-right"></i> Exit
+        </button>
+
+        <form action="{% url opts|admin_urlname:'discard_changes' parent.id %}"
+              method="post"
+              id="discard_form"
+              data-return_url="{{ return_url }}"
+              data-loader="#loader_root"
+        >
+            {% for field in discard_form %}
+                {{ field }}
+            {% endfor %}
+            <button class="button" type="submit"><i class="fa-solid fa-light fa-arrow-rotate-left"></i> Reset</button>
+        </form>
+
+        <form action="{% url opts|admin_urlname:'publish_content_blocks' parent.id %}"
+              method="post"
+              id="publish_form"
+              data-return_url="{{ return_url }}"
+              data-loader="#loader_root"
+        >
+            {% for field in publish_form %}
+                {{ field }}
+            {% endfor %}
+            <button class="button" type="submit"><i class="fa-solid fa-light fa-cloud-arrow-up"></i> Publish</button>
+        </form>
+
+        <button class="button" id="save_continue" data-loader="#loader_root"><i class="fa-solid fa-light fa-floppy-disk"></i> Save</button>
+    </div>
+
+    {% include 'content_blocks/partials/popup.html' %}
+    {% include 'content_blocks/partials/delete_popup.html' %}
+    {% include 'content_blocks/partials/reset_popup.html' %}
+{% endblock %}
