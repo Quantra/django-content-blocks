@@ -116,16 +116,21 @@ class TestContentBlock:
         }
 
     @pytest.mark.django_db
-    def test_content_block_context(self, content_block, content_block_field_factory):
+    def test_content_block_context(
+        self, content_block_factory, content_block_field_factory
+    ):
         """
-        The context property should return a dictionary of content block field key and field object context.
+        The context property should return a dictionary of content block field key and field object context plus the
+        css_class context.
         We also test the value is cached on the object.
         """
+        content_block = content_block_factory.create(css_class=faker.text(256))
         content_block_field = content_block_field_factory.create(
             content_block=content_block, text=faker.text(256)
         )
         assert content_block.context == {
-            content_block_field.key: content_block_field.context_value
+            content_block_field.key: content_block_field.context_value,
+            "css_class": content_block.css_class,
         }
 
     @pytest.mark.django_db

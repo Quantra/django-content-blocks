@@ -589,7 +589,9 @@ class ContentBlock(
         """
         Return dictionary of template context for this content block
         """
-        return {key: field.context_value for key, field in self.fields.items()}
+        context = {key: field.context_value for key, field in self.fields.items()}
+        context["css_class"] = self.css_class
+        return context
 
     def render(self):
         """
