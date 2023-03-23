@@ -1,4 +1,4 @@
-.. todo shield.io badges
+.. todo shields.io badges
 
 =====================
 Django Content Blocks
@@ -10,7 +10,7 @@ Content blocks can contain any type of content, including text, images, videos, 
 
 .. image:: https://github.com/Quantra/django-content-blocks/raw/master/docs/images/content_block_editor_dark.png
 
-Installation instructions and detailed documentation can be found on `ReadTheDocs <https://django-content-blocks.readthedocs.io/en/latest/index.html>`_.
+Installation instructions and detailed documentation can be found on `ReadTheDocs <https://django-content-blocks.readthedocs.io>`_.
 
 Supported Django & Python Versions
 ----------------------------------
@@ -32,9 +32,9 @@ Thank You
 * https://opalstack.com/?lmref=A2GlhA - For great value hosting and superb support over the years (affiliate link)
 * https://chat.openai.com/ - For documentation rewrites
 * https://github.com/django-hijack/django-hijack - For conf.py LazySettings idea
-* https://github.com/cookiecutter/cookiecutter-django - For many things include docker
-* Dmitry Sobolev for so graciously transferring the django-content-blocks name on pypi.
-* Margo Yaguda for linguistic assistance in contacting Dmitry.
+* https://github.com/cookiecutter/cookiecutter-django - For many things including docker
+* Dmitry Sobolev for so graciously transferring the django-content-blocks name on pypi
+* Margo Yaguda for linguistic assistance in contacting Dmitry
 
 Contributing
 ------------

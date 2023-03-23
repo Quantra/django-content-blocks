@@ -275,7 +275,7 @@ The following additional options are available for :py:class:`ContentBlockTempla
 
 We can set a list of choices to choose from in the content block editor. Can be useful for providing style options via css classes.
 
-.. py:class:: ModelChoiceField
+.. py:class:: ChoiceField
 
     .. py:property:: form_field
 
@@ -299,7 +299,7 @@ The following additional options are available for :py:class:`ContentBlockTempla
 
 We can also add a checkbox for providing further customisation options.
 
-.. py:class:: ModelChoiceField
+.. py:class:: CheckboxField
 
     .. py:property:: form_field
 
