@@ -220,14 +220,14 @@ The following additional options are available for :py:class:`ContentBlockTempla
 
     {# If the nested content block template has a template_filename you can use render. #}
 
-    {% for nested_content_block in nested_content_blocks %}
+    {% for nested_content_block in content_block.nested_content_blocks %}
         {{ nested_content_block.render }}
     {% endfor %}
 
     {# Or you can reference the context of the nested content block. #}
     {# In this example our nested content block has a field with a key of "text" #}
 
-    {% for nested_content_block in nested_content_blocks %}
+    {% for nested_content_block in content_block.nested_content_blocks %}
         <h3>{{ nested_content_block.context.text }}</h3>
     {% endfor %}
 
