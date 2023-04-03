@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: django-content-blocks
-Version: 1.1.0
+Version: 1.1.1
 Summary: HTML content blocks for Django.
 Home-page: https://github.com/Quantra/django-content-blocks
 Author: Vince Coleman
