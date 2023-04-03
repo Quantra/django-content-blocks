@@ -52,13 +52,13 @@ class TestContentBlocks:
         self, content_block_collection, text_content_block
     ):
         content_block_collection.content_blocks.add(text_content_block)
-        context = content_block_collection_tag(content_block_collection.slug)
+        context = content_block_collection_tag({}, content_block_collection.slug)
         assert context["slug"] == content_block_collection.slug
         assert context["content_block_collection"] == content_block_collection
 
     @pytest.mark.django_db
     def test_content_block_collection_fails_silently(self):
         slug = "non-existent-slug"
-        context = content_block_collection_tag(slug)
+        context = content_block_collection_tag({}, slug)
         assert context["slug"] == slug
         assert "content_block_collection" not in context.keys()
