@@ -71,7 +71,7 @@ class NewContentBlockFormBase(forms.Form):
                 for j in range(template_field.min_num):
                     self.create_content_block(
                         template_field.nested_templates.first(),
-                        draft=draft,
+                        draft=False,
                         parent=content_block_field,
                     )
 
