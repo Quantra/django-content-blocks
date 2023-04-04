@@ -168,6 +168,11 @@ def content_block_save(request, content_block_id):
             request, content_block, CHANGE, [{"changed": {"fields": form.changed_data}}]
         )
 
+        # Refetch content block from db due to model choice fields not being rendered with correct context when
+        # saving a field with previous value of None. In this case the field was being rendered with the value None
+        # instead of the newly saved value.  Curiously this behaviour only exists when the previous value is None.
+        content_block = ContentBlock.objects.get(id=content_block_id)
+
     content_block_form_html = render_to_string(
         "content_blocks/editor/content_block_form.html",
         {

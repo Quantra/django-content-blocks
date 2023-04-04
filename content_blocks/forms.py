@@ -157,8 +157,9 @@ class ContentBlockForm(forms.Form):
 
     def set_fields(self):
         for key, field in self.content_block.fields.items():
-            if field.form_field:
-                self.fields[key] = field.form_field
+            form_field = field.form_field
+            if form_field:
+                self.fields[key] = form_field
 
     def save(self):
         with transaction.atomic():
