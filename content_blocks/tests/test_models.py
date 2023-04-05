@@ -587,8 +587,12 @@ class TestContentBlockField:
         """
         Nested field context value should be list of context of child content blocks.
         """
-        nested_block_1 = content_block_factory.create(parent=content_block_field)
-        nested_block_2 = content_block_factory.create(parent=content_block_field)
+        nested_block_1 = content_block_factory.create(
+            parent=content_block_field, saved=True
+        )
+        nested_block_2 = content_block_factory.create(
+            parent=content_block_field, saved=True
+        )
 
         content_block_field_factory.create(
             content_block=nested_block_1, text=faker.text(256)

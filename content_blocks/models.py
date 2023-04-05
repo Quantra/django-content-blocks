@@ -474,7 +474,7 @@ class NestedField(ContentBlockField):
         """
         :return: Nested content blocks which we can then call render or access context on.
         """
-        return self.content_blocks.visible()
+        return self.content_blocks.nested()
 
 
 class ContentBlockManager(VisibleManager):
@@ -501,6 +501,13 @@ class ContentBlockManager(VisibleManager):
         :return:
         """
         return super().visible().filter(draft=True, saved=True)
+
+    def nested(self):
+        """
+        Used in the context for NestedField objects. Visible but with unsaved excluded.
+        :return:
+        """
+        return super().visible().filter(draft=False, saved=True)
 
     def published(self):
         """

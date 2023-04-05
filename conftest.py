@@ -245,7 +245,7 @@ def nested_content_block(
         template_filename=nested_template.name
     )
     content_block = content_block_factory.create(
-        content_block_template=content_block_template
+        content_block_template=content_block_template, saved=True
     )
     nested_field = nested_content_block_field_factory.create(
         content_block=content_block
@@ -256,7 +256,9 @@ def nested_content_block(
         template_filename=text_template.name
     )
     nested_content_block = content_block_factory.create(
-        content_block_template=nested_content_block_template, parent=nested_field
+        content_block_template=nested_content_block_template,
+        parent=nested_field,
+        saved=True,
     )
     content_block_field_factory.create(
         text=faker.text(256),
