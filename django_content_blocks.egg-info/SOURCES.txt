@@ -24,6 +24,7 @@ content_blocks/management/commands/__init__.py
 content_blocks/management/commands/clear_content_blocks_cache.py
 content_blocks/management/commands/update_content_blocks_cache.py
 content_blocks/migrations/0001_initial.py
+content_blocks/migrations/0002_alter_contentblock_css_class_and_more.py
 content_blocks/migrations/__init__.py
 content_blocks/static/content_blocks/.DS_Store
 content_blocks/static/content_blocks/css/.DS_Store
