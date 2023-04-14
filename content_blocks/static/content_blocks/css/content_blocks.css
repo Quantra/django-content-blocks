@@ -304,6 +304,15 @@ CONTROLS
 	padding-top:0;
 }
 
+@media (prefers-color-scheme: light) {
+	.wrapper-controls button {
+		color: var(--link-fg);
+	}
+}
+html[data-theme="light"] .wrapper-controls button {
+	color: var(--link-fg);
+}
+
 /*
 -------------------------------------
 TITLE BAR
