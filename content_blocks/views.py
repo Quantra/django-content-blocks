@@ -40,6 +40,7 @@ def create_log_entry(request, obj, action_flag, change_message, **kwargs):
 
 
 def render_with_admin_context(request, template, context, model_admin):
+    # todo make this a decorator
     context.update(**model_admin.admin_site.each_context(request))
     return render(request, template, context)
 

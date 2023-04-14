@@ -125,8 +125,7 @@ class ContentBlockField(models.Model, CloneMixin):
 
     # duplicate from template_field here because it can't be changed on template field and seems impossible to have
     # select_related working in the __init__
-    # todo fix the maxlength here 32 is more like it
-    field_type = models.CharField(max_length=256)
+    field_type = models.CharField(max_length=32)
 
     text = models.CharField(max_length=256, blank=True)
     content = models.TextField(blank=True)
@@ -157,14 +156,10 @@ class ContentBlockField(models.Model, CloneMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # todo remove this try
-        try:
-            for _class in ContentBlockField.__subclasses__():
-                if self.field_type == _class.__name__:
-                    self.__class__ = _class
-                    break
-        except:  # pragma: no cover # noqa
-            logger.error("Polymorphism failed")  # pragma: no cover
+        for _class in ContentBlockField.__subclasses__():
+            if self.field_type == _class.__name__:
+                self.__class__ = _class
+                break
 
     class Meta:
         ordering = ["template_field__position"]
@@ -547,8 +542,7 @@ class ContentBlock(
         null=True,
     )
 
-    # todo max_length=64
-    css_class = models.CharField(max_length=256, blank=True)
+    css_class = models.CharField(max_length=64, blank=True)
 
     draft = models.BooleanField(blank=True, default=False)
 
@@ -699,12 +693,10 @@ class ContentBlockTemplateField(PositionModel):
         related_name="content_block_template_fields",
     )
 
-    # todo max_length=32
-    field_type = models.CharField(max_length=256, choices=ContentBlockFields.CHOICES)
+    field_type = models.CharField(max_length=32, choices=ContentBlockFields.CHOICES)
 
-    # todo max_length=64
     key = models.SlugField(
-        max_length=256,
+        max_length=64,
         validators=[
             RegexValidator(
                 "[a-z0-9_]+", "Lowercase letters, numbers and underscores only."
@@ -716,9 +708,8 @@ class ContentBlockTemplateField(PositionModel):
     help_text = models.TextField(blank=True)
     required = models.BooleanField(blank=True, default=False)
 
-    # todo max_length=64
     css_class = models.CharField(
-        max_length=256,
+        max_length=64,
         blank=True,
         help_text="Set a custom CSS class for this field in the editor.",
     )
