@@ -39,12 +39,6 @@ def create_log_entry(request, obj, action_flag, change_message, **kwargs):
     LogEntry.objects.log_action(**params)
 
 
-def render_with_admin_context(request, template, context, model_admin):
-    # todo make this a decorator
-    context.update(**model_admin.admin_site.each_context(request))
-    return render(request, template, context)
-
-
 @staff_member_required
 @ensure_csrf_cookie
 def content_block_editor(request, object_id, model_admin=None):
@@ -76,21 +70,19 @@ def content_block_editor(request, object_id, model_admin=None):
     if callable(status_message):
         status_message = status_message()
 
-    return render_with_admin_context(
-        request,
-        "content_blocks/editor/editor.html",
-        {
-            "import_content_blocks_form": import_content_blocks_form,
-            "new_content_block_form": new_content_block_form,
-            "parent": parent,
-            "publish_form": publish_form,
-            "discard_form": discard_changes_form,
-            "return_url": return_url,
-            "opts": parent._meta,
-            "status_message": status_message,
-        },
-        model_admin,
-    )
+    context = {
+        "import_content_blocks_form": import_content_blocks_form,
+        "new_content_block_form": new_content_block_form,
+        "parent": parent,
+        "publish_form": publish_form,
+        "discard_form": discard_changes_form,
+        "return_url": return_url,
+        "opts": parent._meta,
+        "status_message": status_message,
+    }
+    context.update(**model_admin.admin_site.each_context(request))
+
+    return render(request, "content_blocks/editor/editor.html", context)
 
 
 def content_block_create_base(request, form, parent, log_name="content block"):

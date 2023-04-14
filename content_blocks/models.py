@@ -139,7 +139,13 @@ class ContentBlockField(models.Model, CloneMixin):
     template_name = "content_blocks/partials/fields/default.html"
     preview_template_name = None
 
+    class Meta:
+        ordering = ["template_field__position"]
+
     def __init__(self, *args, **kwargs):
+        """
+        Polymorph to the appropriate subclass proxy model.
+        """
         super().__init__(*args, **kwargs)
 
         for _class in ContentBlockField.__subclasses__():
@@ -147,8 +153,37 @@ class ContentBlockField(models.Model, CloneMixin):
                 self.__class__ = _class
                 break
 
-    class Meta:
-        ordering = ["template_field__position"]
+    def __init_subclass__(subcls):
+        """
+        Wrap all subclass form_field.__get__ methods with form_field_wrapper
+        """
+        super.__init_subclass__()
+
+        new_property = property(
+            ContentBlockField.form_field_wrapper(subcls.form_field.__get__),
+            subcls.form_field.__set__,
+        )
+        setattr(
+            subcls,
+            "form_field",
+            new_property,
+        )
+
+    @staticmethod
+    def form_field_wrapper(form_field):
+        """
+        Wraps the form_field.__get__ method and adds common attributes to all fields.
+        :param form_field: the form_field.__get__ method we are wrapping
+        """
+
+        def wrapper(self):
+            field = form_field(self)
+            if field is not None:
+                field.cb_field = self
+
+            return field
+
+        return wrapper
 
     @property
     def form_field(self):
@@ -157,15 +192,6 @@ class ContentBlockField(models.Model, CloneMixin):
         This method should return _form_field() with the desired forms.Field.
         """
         raise NotImplementedError  # pragma: no cover
-
-    def _form_field(self, field):
-        """
-        Adds content_block_field attribute to field
-        :return:
-        """
-        # todo can this be replace with a decorator?
-        field.cb_field = self
-        return field
 
     @property
     def context_value(self):
@@ -202,13 +228,11 @@ class TextField(ContentBlockField):
             else forms.TextInput
         )
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.CharField(
-                initial=self.text,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=widget,
-            )
+        return forms.CharField(
+            initial=self.text,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=widget,
         )
 
 
@@ -230,13 +254,11 @@ class ContentField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.CharField(
-                initial=self.content,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=forms.Textarea(),
-            )
+        return forms.CharField(
+            initial=self.content,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=forms.Textarea(),
         )
 
 
@@ -258,12 +280,10 @@ class CheckboxField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.BooleanField(
-                initial=self.checkbox,
-                required=False,
-                help_text=self.template_field.help_text,
-            )
+        return forms.BooleanField(
+            initial=self.checkbox,
+            required=False,
+            help_text=self.template_field.help_text,
         )
 
 
@@ -286,13 +306,11 @@ class ImageField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            SVGAndImageFieldFormField(
-                initial=self.image,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=FileWidget(),
-            )
+        return SVGAndImageFieldFormField(
+            initial=self.image,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=FileWidget(),
         )
 
 
@@ -313,13 +331,11 @@ class FileField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.FileField(
-                initial=self.file,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=FileWidget(),
-            )
+        return forms.FileField(
+            initial=self.file,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=FileWidget(),
         )
 
 
@@ -342,13 +358,11 @@ class VideoField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.FileField(
-                initial=self.video,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=FileWidget(),
-            )
+        return forms.FileField(
+            initial=self.video,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=FileWidget(),
         )
 
 
@@ -372,12 +386,10 @@ class EmbeddedVideoField(ContentBlockField):
     @property
     def form_field(self):
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.CharField(
-                initial=self.embedded_video,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-            )
+        return forms.CharField(
+            initial=self.embedded_video,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
         )
 
 
@@ -398,13 +410,11 @@ class ChoiceField(ContentBlockField):
     def form_field(self):
         choices = [[None, "-" * 9]] + json.loads(self.template_field.choices)
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.CharField(
-                initial=self.choice,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-                widget=forms.Select(choices=choices),
-            )
+        return forms.CharField(
+            initial=self.choice,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            widget=forms.Select(choices=choices),
         )
 
 
@@ -418,13 +428,11 @@ class ModelChoiceField(ContentBlockField):
         model = self.model_choice_content_type.model_class()
         queryset = model.objects.all()
         # noinspection PyTypeChecker
-        return self._form_field(
-            forms.ModelChoiceField(
-                queryset,
-                initial=self.model_choice,
-                required=self.template_field.required,
-                help_text=self.template_field.help_text,
-            )
+        return forms.ModelChoiceField(
+            queryset,
+            initial=self.model_choice,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
         )
 
     @property
