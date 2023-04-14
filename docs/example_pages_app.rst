@@ -112,6 +112,24 @@ This ``page_detail.html`` template shows an example of what is required to rende
         {% endfor %}
     {% endblock %}
 
+.. note::
+    If the template used to render a content block contains a template tag which relies on the request context you can use the :py:func:`render_content_block` template tag to make the request context available.
+
+.. code-block:: django
+    :caption: pages/templates/pages/page_detail.html
+
+    {% extends 'base.html' %}
+    {% load content_blocks %}
+
+    {% block main %}
+        {% for content_block in content_blocks %}
+            {% render_content_block content_block %}
+        {% endfor %}
+    {% endblock %}
+
+.. warning::
+    Any content block that relies on the request context in this way should have ``no_cache = True`` to prevent unexpected behaviour.
+
 Urls
 ----
 

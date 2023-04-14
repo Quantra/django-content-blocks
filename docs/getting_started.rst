@@ -158,7 +158,8 @@ The :py:meth:`render` method of the :py:class:`ContentBlock` model returns the H
 
 After adding this code, you should be able to view your content block on your site by visiting the detail view for your object.
 
-It's important to note that you will need to provide CSS and JavaScript to style your content blocks and bring them to life.
+.. note::
+    You will need to provide CSS and JavaScript to style your content blocks and bring them to life.
 
 For more information and examples of rendering content blocks, see the :doc:`example_pages_app` documentation.
 

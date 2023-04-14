@@ -36,5 +36,15 @@ def render_content_block(context, content_block):
     :param content_block:
     :return:
     """
-    # todo test, docs
-    return content_block.render(request=context.get("request"))
+
+    # Because our context might have RequestContext already in it flatten ourselves
+    context_dict = {}
+    for d in context.dicts:
+        try:
+            d = d.flatten()
+        except AttributeError:
+            pass
+
+        context_dict.update(d)
+
+    return content_block.render(context=context_dict)

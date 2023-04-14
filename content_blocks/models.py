@@ -588,12 +588,18 @@ class ContentBlock(
         context["css_class"] = self.css_class
         return context
 
-    def render(self, request=None):
+    def render(self, context=None, request=None):
         """
         Render html for this block and cache
         """
         if not self.can_render:
             return ""
+
+        context = context or {}
+        request = request or context.get("request")
+
+        context[self.context_name] = self.context
+        context["request"] = request
 
         cache_enabled = (
             not self.content_block_template.no_cache
@@ -607,7 +613,7 @@ class ContentBlock(
         if html is None:
             html = render_to_string(
                 self.template,
-                {self.context_name: self.context, "request": request},
+                context,
                 request=request,
             )
 

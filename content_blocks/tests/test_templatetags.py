@@ -2,6 +2,7 @@
 Content blocks test_templatetags.py
 """
 import pytest
+from django.template import Context
 from faker import Faker
 
 from content_blocks.forms import ContentBlockForm, NewNestedBlockForm
@@ -12,6 +13,9 @@ from content_blocks.templatetags.content_block_admin import (
 )
 from content_blocks.templatetags.content_blocks import (
     content_block_collection as content_block_collection_tag,
+)
+from content_blocks.templatetags.content_blocks import (
+    render_content_block as render_content_block_tag,
 )
 
 faker = Faker()
@@ -62,3 +66,8 @@ class TestContentBlocks:
         context = content_block_collection_tag({}, slug)
         assert context["slug"] == slug
         assert "content_block_collection" not in context.keys()
+
+    @pytest.mark.django_db
+    def test_render_content_block(self, text_content_block):
+        rendered = render_content_block_tag(Context(), text_content_block)
+        assert rendered == text_content_block.render()
