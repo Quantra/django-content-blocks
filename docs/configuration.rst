@@ -21,11 +21,9 @@ Content Block Previews
 
 Content block previews are shown via iframes. This is such that the content block can be rendered using your base template and shown in the content block editor without conflict.
 
-This assumes you have a base template called ``base.html`` in the root of your project templates directory. And this template contains a ``{% block body %}`` just inside the ``<body>`` tag.  It also assumes you will load all necessary static assets required to properly render the content block in the base template. See `base.html <http://todo.com>`_ in the repo example project for a minimal example.
+This assumes you have a base template called ``base.html`` in the root of your project templates directory. And this template contains a ``{% block body %}`` just inside the ``<body>`` tag.  It also assumes you will load all necessary static assets required to properly render the content block in the base template. See `base.html <https://github.com/Quantra/django-content-blocks/blob/master/example/templates/base.html>`_ in the repo example project for a minimal example.
 
-.. todo links above and below to the file in github.
-
-If you do not have a base template or it does not define a ``{% block body %}`` you can override the template at ``content_blocks/content_block_preview.html`` to suit your needs. See the packaged `content_block_preview.html <http://todo.com>`_ for reference.
+If you do not have a base template or it does not define a ``{% block body %}`` you can override the template at ``content_blocks/content_block_preview.html`` to suit your needs. See the packaged `content_block_preview.html <https://github.com/Quantra/django-content-blocks/blob/master/content_blocks/templates/content_blocks/content_block_preview.html>`_ for reference.
 
 .. _PagePreviews:
 
