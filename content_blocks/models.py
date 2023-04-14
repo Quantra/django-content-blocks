@@ -10,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import get_storage_class
 from django.core.validators import RegexValidator
 from django.db import models
+from django.forms.utils import pretty_name
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -457,6 +458,10 @@ class NestedField(ContentBlockField):
 
     def save_value(self, value):
         return None
+
+    @property
+    def label(self):
+        return pretty_name(self.template_field.key)
 
     @property
     def context_value(self):

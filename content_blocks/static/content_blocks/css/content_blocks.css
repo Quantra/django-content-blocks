@@ -319,8 +319,7 @@ NESTED TITLE
 -------------------------------------
 */
 
-h4.nested-title {
-	/*float:left;*/
+h3.nested-title {
 	position: absolute;
 	bottom:0;
 	left:0;
