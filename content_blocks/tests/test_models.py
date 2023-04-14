@@ -40,7 +40,7 @@ class TestContentBlockTemplateField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_template_field__field_type",
-        [c[0] for c in ContentBlockFields.CHOICES],
+        [c[0] for c in ContentBlockFields.choices],
     )
     def test_create_content_block_template_field(self, content_block_template_field):
         assert ContentBlockTemplateField.objects.count() == 1
@@ -334,7 +334,7 @@ class TestContentBlockField:
     def content_block_field(
         self, request, content_block_field_factory, content_block_template_field_factory
     ):
-        field_type = request.param.get("field_type", ContentBlockFields.CHOICES[0][0])
+        field_type = request.param.get("field_type", ContentBlockFields.choices[0][0])
         kwargs = {}
         if field_type == ContentBlockFields.MODEL_CHOICE_FIELD:
             kwargs["model_choice_content_type"] = ContentType.objects.get_for_model(
@@ -349,7 +349,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_create_content_block_field(self, content_block_field):
@@ -365,7 +365,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_content_block_field_polymorphism(self, content_block_field):
@@ -377,7 +377,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_content_block_field_template_name(self, content_block_field):
@@ -396,7 +396,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_content_block_field_preview_template_name(self, content_block_field):
@@ -416,7 +416,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_content_block_field_form_field_class(self, content_block_field):
@@ -475,7 +475,7 @@ class TestContentBlockField:
         "content_block_field",
         [
             {"field_type": c[0]}
-            for c in ContentBlockFields.CHOICES
+            for c in ContentBlockFields.choices
             if c[0]
             not in [
                 ContentBlockFields.NESTED_FIELD,
@@ -533,7 +533,7 @@ class TestContentBlockField:
         "content_block_field",
         [
             {"field_type": c[0]}
-            for c in ContentBlockFields.CHOICES
+            for c in ContentBlockFields.choices
             if c[0]
             not in [
                 ContentBlockFields.NESTED_FIELD,
@@ -551,7 +551,7 @@ class TestContentBlockField:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "content_block_field",
-        [{"field_type": c[0]} for c in ContentBlockFields.CHOICES],
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
         indirect=True,
     )
     def test_content_block_context_value_none(self, content_block_field):

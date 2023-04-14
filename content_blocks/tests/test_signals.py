@@ -25,7 +25,7 @@ class TestModelChoiceSignals:
     def content_block_field(
         self, request, content_block_field_factory, content_block_template_field_factory
     ):
-        field_type = request.param.get("field_type", ContentBlockFields.CHOICES[0][0])
+        field_type = request.param.get("field_type", ContentBlockFields.choices[0][0])
         return content_block_field_factory(
             template_field=content_block_template_field_factory(
                 field_type=field_type, key=field_type.lower()

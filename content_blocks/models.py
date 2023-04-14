@@ -44,8 +44,7 @@ else:
         return cls
 
 
-class ContentBlockFields:
-    # todo replace this with models.TextChoices
+class ContentBlockFields(models.TextChoices):
     TEXT_FIELD = "TextField"
     CONTENT_FIELD = "ContentField"
     IMAGE_FIELD = "ImageField"
@@ -56,19 +55,6 @@ class ContentBlockFields:
     FILE_FIELD = "FileField"
     VIDEO_FIELD = "VideoField"
     EMBEDDED_VIDEO_FIELD = "EmbeddedVideoField"
-
-    CHOICES = (
-        (TEXT_FIELD, "Text Field"),
-        (CONTENT_FIELD, "Content Field"),
-        (IMAGE_FIELD, "Image Field"),
-        (VIDEO_FIELD, "Video Field"),
-        (FILE_FIELD, "File Field"),
-        (EMBEDDED_VIDEO_FIELD, "Embedded Video Field"),
-        (NESTED_FIELD, "Nested Field"),
-        (MODEL_CHOICE_FIELD, "Model Choice Field"),
-        (CHOICE_FIELD, "Choice Field"),
-        (CHECKBOX_FIELD, "Checkbox Field"),
-    )
 
 
 class ContentBlockFieldManager(models.Manager):
@@ -693,7 +679,7 @@ class ContentBlockTemplateField(PositionModel):
         related_name="content_block_template_fields",
     )
 
-    field_type = models.CharField(max_length=32, choices=ContentBlockFields.CHOICES)
+    field_type = models.CharField(max_length=32, choices=ContentBlockFields.choices)
 
     key = models.SlugField(
         max_length=64,
