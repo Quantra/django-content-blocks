@@ -2,7 +2,6 @@ import json
 
 from django import forms
 
-from content_blocks.fields import ChoicesWidget
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
@@ -10,7 +9,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.widgets import TemplateFilenameAutocompleteWidget
+from content_blocks.widgets import ChoicesWidget, TemplateFilenameAutocompleteWidget
 
 REQUIRED_ERROR_MSG = "This field is required"
 

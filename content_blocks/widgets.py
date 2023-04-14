@@ -51,3 +51,12 @@ class TemplateFilenameAutocompleteWidget(AdminTextInputWidget):
         context["widget"]["data_list_id"] = self.data_list_id
         context["widget"]["template_list"] = self.template_list
         return context
+
+
+class ChoicesWidget(forms.HiddenInput):
+    template_name = "content_blocks/widgets/choices.html"
+
+    @property
+    def is_hidden(self):
+        # Show the label in the admin change page.
+        return False

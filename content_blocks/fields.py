@@ -67,13 +67,3 @@ class VideoField(FileField):
         self.validators.append(
             FileExtensionValidator(allowed_extensions=["mp4", "webm", "ogg"])
         )
-
-
-# todo move this to widgets.py
-class ChoicesWidget(forms.HiddenInput):
-    template_name = "content_blocks/widgets/choices.html"
-
-    @property
-    def is_hidden(self):
-        # Show the label in the admin change page.
-        return False
