@@ -542,7 +542,11 @@ class TestContentBlockField:
         ],
         indirect=True,
     )
-    def test_content_block_field_context_value(self, content_block_field, field_types):
+    @pytest.mark.parametrize("content_blocks_mark_safe", [False, True])
+    def test_content_block_field_context_value(
+        self, content_block_field, field_types, settings, content_blocks_mark_safe
+    ):
+        settings.CONTENT_BLOCKS_MARK_SAFE = content_blocks_mark_safe
         field_type = field_types.get(content_block_field.field_type)
         field, value = field_type["field"], field_type["value"]
         setattr(content_block_field, field, value)
