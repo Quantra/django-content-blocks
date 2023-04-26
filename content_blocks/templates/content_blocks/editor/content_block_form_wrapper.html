@@ -67,7 +67,11 @@
             {#	Nested fields #}
             {% for field in content_block.nested_fields.values %}
                 <div class="controls wrapper-controls">
-                    <h3 class="nested-title">{{ field.label }}</h3>
+                    <h3 class="nested-title">
+                        {{ field.label }}
+
+                        <i class="fa-solid fa-question-circle help-text" title="{% if field.template_field.help_text %}{{ field.template_field.help_text }}{% else %}Min: {{ field.template_field.min_num }} Max: {{ field.template_field.max_num }}{% endif %}"></i>
+                    </h3>
 
                     <button tabindex="-1" class="collapse-all" data-target="#nested_blocks_{{ field.id }}">
                         <i class="fa-solid fa-light fa-chevrons-up"></i>

@@ -33,7 +33,7 @@ window.addEventListener("load", function () {
     let options = {};
     options[FIELD_TYPES.NESTED_FIELD] = {
         show: [FIELDS.NESTED_TEMPLATE, FIELDS.MIN_NUM, FIELDS.MAX_NUM],
-        hide: [FIELDS.REQUIRED, FIELDS.HELP_TEXT]
+        hide: [FIELDS.REQUIRED]
     };
     options[FIELD_TYPES.CHECKBOX_FIELD] = {hide: [FIELDS.REQUIRED]};
     options[FIELD_TYPES.CHOICE_FIELD] = {show: [FIELDS.CHOICES]};

@@ -15,7 +15,7 @@
             <label for="id_{{ form.css_class.html_name }}" class="{{ form.css_class.html_name }} fl pos-rel">
                 {{ form.css_class.label }}:
                 {% if form.css_class.help_text %}
-                    <i class="fa-solid fa-light fa-info-circle tooltip help-text pos-abs" title="{{ form.css_class.help_text }}"></i>
+                    <i class="fa-solid fa-question-circle tooltip help-text pos-abs" title="{{ form.css_class.help_text }}"></i>
                 {% endif %}
             </label>
 
@@ -51,6 +51,7 @@
 
                     {% include field.field.cb_field.template_name %}
                 </div>
+
 
                 {% if field.field.cb_field.preview_template_name %}
                     {% cycle col4 %}
