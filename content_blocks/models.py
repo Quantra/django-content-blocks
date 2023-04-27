@@ -660,13 +660,18 @@ class ContentBlock(
         return new_content_block
 
 
+class ContentBlockTemplateManager(VisibleManager):
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
+
 class ContentBlockTemplate(PositionModel, AutoDateModel, VisibleModel):
     """
     Content Block Template model.
     Used to define content block types.
     """
 
-    objects = VisibleManager()
+    objects = ContentBlockTemplateManager()
 
     name = models.CharField(max_length=256, unique=True)
 
@@ -680,10 +685,18 @@ class ContentBlockTemplate(PositionModel, AutoDateModel, VisibleModel):
     def __str__(self):
         return self.name
 
+    def natural_key(self):
+        return (self.name,)
+
     @property
     def template(self):
         if self.template_filename:
             return f"content_blocks/content_blocks/{self.template_filename}"
+
+
+class ContentBlockTemplateFieldManager(models.Manager):
+    def get_by_natural_key(self, key, content_block_template):
+        return self.get(key=key, content_block_template=content_block_template)
 
 
 class ContentBlockTemplateField(PositionModel):
@@ -691,6 +704,8 @@ class ContentBlockTemplateField(PositionModel):
     Content Block Template Field model.
     Used to define content block types.
     """
+
+    objects = ContentBlockTemplateFieldManager()
 
     content_block_template = models.ForeignKey(
         ContentBlockTemplate,
@@ -741,10 +756,21 @@ class ContentBlockTemplateField(PositionModel):
     )
 
     class Meta(PositionModel.Meta):
-        unique_together = ("key", "content_block_template")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["key", "content_block_template"],
+                name="unique_key_content_block_template",
+            )
+        ]
 
     def __str__(self):
         return self.key or super().__str__()
+
+    def natural_key(self):
+        return (
+            self.key,
+            self.content_block_template,
+        )
 
 
 class ContentBlockAvailability(AutoDateModel):
