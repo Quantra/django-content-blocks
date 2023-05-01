@@ -1,4 +1,0 @@
-Django>=3.2
-django-admin-sortable2
-django-clone
-Pillow
