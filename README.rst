@@ -1,4 +1,9 @@
-.. todo shields.io badges
+|coverage|
+|package version|
+|python versions supported|
+|django versions supported|
+|code style black|
+|license|
 
 =====================
 Django Content Blocks
@@ -40,3 +45,23 @@ Contributing
 ------------
 
 Contributions, advice and guidance are welcome. Please make contact **before** writing any code!
+
+
+.. shields.io badges
+
+.. |package version| image:: https://img.shields.io/pypi/v/django-content-blocks
+   :target: https://pypi.python.org/pypi/django-content-blocks/
+
+.. |python versions supported| image:: https://img.shields.io/pypi/pyversions/django-content-blocks
+   :target: https://pypi.python.org/pypi/django-content-blocks/
+
+.. |django versions supported| image:: https://img.shields.io/pypi/frameworkversions/django/django-content-blocks
+   :target: https://pypi.python.org/pypi/django-content-blocks/
+
+.. |coverage| image:: https://img.shields.io/badge/dynamic/xml?color=success&label=coverage&query=round%28%2F%2Fcoverage%2F%40line-rate%20%2A%20100%29&suffix=%25&url=https%3A%2F%2Fraw.githubusercontent.com%2FQuantra%2Fdjango-content-blocks%2Fmaster%2Fcoverage.xml
+
+.. |code style black| image:: https://img.shields.io/badge/code%20style-black-black
+    :target: https://github.com/psf/black
+
+.. |license| image:: https://img.shields.io/github/license/Quantra/django-content-blocks
+    :target: https://github.com/Quantra/django-content-blocks/blob/master/LICENSE
