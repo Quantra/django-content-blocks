@@ -1,7 +1,19 @@
--r requirements.txt
-
-django>=4.2.0  # https://www.djangoproject.com/
-django-admin-sortable2  # https://github.com/jrief/django-admin-sortable2
-django-clone  # https://github.com/tj-django/django-clone Content blocks dep
-Pillow  # https://github.com/python-pillow/Pillow
-django-storages[google]
+pylint
+django-debug-toolbar
+django-extensions
+pytest
+pytest-sugar
+pytest-django
+pytest-factoryboy
+pytest-lazy-fixture
+coverage
+django-coverage-plugin
+pytest-cov
+django-cleanup
+django-dbtemplates
+tox
+sphinx
+sphinx-autobuild
+sphinx-rtd-theme
+furo
+sphinxcontrib-images
