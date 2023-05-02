@@ -20,7 +20,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.tests.storages import TestStorage
+from content_blocks.tests.storages import SettingsTestStorage
 
 faker = Faker()
 
@@ -691,7 +691,7 @@ class TestStorageSettings:
         assert (
             content_block_field.file.storage.__class__
             == content_block_field.video.storage.__class__
-            == TestStorage
+            == SettingsTestStorage
         )
         assert content_block_field.image.storage.__class__ == get_storage_class(
             "django.core.files.storage.FileSystemStorage"
