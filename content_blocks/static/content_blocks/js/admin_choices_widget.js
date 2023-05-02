@@ -1,4 +1,4 @@
-window.addEventListener("load", function () {
+window.addEventListener('load', function () {
   let $ = django.jQuery;
   // CHOICES WIDGET //
   let $row = $('.input-row').first();
@@ -26,12 +26,12 @@ window.addEventListener("load", function () {
   });
 
   function loadChoices($choices_widget) {
-    let $input = $choices_widget.find("input[type=hidden]");
+    let $input = $choices_widget.find('input[type=hidden]');
     let choices = $input.val();
 
-    if (!choices || choices === "[]") return;
+    if (!choices || choices === '[]') return;
 
-    $choices_widget.find(".input-row").remove();
+    $choices_widget.find('.input-row').remove();
 
     choices = JSON.parse(choices);
 
@@ -57,19 +57,19 @@ window.addEventListener("load", function () {
 
     choices = JSON.stringify(choices);
 
-    $choices_widget.find("input[type=hidden]").val(choices);
+    $choices_widget.find('input[type=hidden]').val(choices);
   }
 
   function addRow($choices_widget, values) {
     if (values === undefined) {
-      values = ["", ""]
+      values = ['', ''];
     }
 
     let $new_row = $row.clone();
-    $new_row.find("input").each(function (i) {
+    $new_row.find('input').each(function (i) {
       $(this).val(values[i]);
     });
 
-    $choices_widget.find(".inputs").append($new_row);
+    $choices_widget.find('.inputs').append($new_row);
   }
 });

@@ -146,9 +146,7 @@ class ContentBlockAvailabilityFactory(DjangoModelFactory):
         model = ContentBlockAvailability
 
 
-"""
-DB Templates Factories
-"""
+#  DB Templates Factories
 
 try:
     from dbtemplates.models import Template

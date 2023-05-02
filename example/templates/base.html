@@ -1,26 +1,26 @@
 <html lang="en">
-    <head>
-        <title>{% block title %}Imperium Example Project{% endblock %}</title>
+  <head>
+    <title>{% block title %}Imperium Example Project{% endblock %}</title>
 
-        {% block css %}{% endblock %}
+    {% block css %}{% endblock %}
 
-        {% block extra_css %}{% endblock %}
+    {% block extra_css %}{% endblock %}
 
-        {% block js %}{% endblock %}
+    {% block js %}{% endblock %}
 
-        {% block extra_js %}{% endblock %}
+    {% block extra_js %}{% endblock %}
 
-        {% block extra_head %}{% endblock %}
-    </head>
+    {% block extra_head %}{% endblock %}
+  </head>
 
-    <body>
-        {% block body %}
-            {% block header %}
-                {% include 'header.html' %}
-            {% endblock %}
+  <body>
+    {% block body %}
+      {% block header %}
+        {% include 'header.html' %}
+      {% endblock %}
 
-            {% block main %}{% endblock %}
-        {% endblock %}
-    </body>
+      {% block main %}{% endblock %}
+    {% endblock %}
+  </body>
 
 </html>

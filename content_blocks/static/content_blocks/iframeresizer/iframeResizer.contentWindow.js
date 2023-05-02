@@ -1299,5 +1299,5 @@
   addEventListener(window, 'readystatechange', chkLateLoaded)
   chkLateLoaded()
 
-  
+
 })()

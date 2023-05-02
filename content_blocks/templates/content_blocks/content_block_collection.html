@@ -1,7 +1,7 @@
 {% load content_blocks %}
 {#Used by content_block_collection template tag to render a content block collection.#}
 {% for content_block in content_block_collection.content_blocks.visible %}
-    {% render_content_block content_block %}
+  {% render_content_block content_block %}
 {% empty %}
     <!-- No content blocks for "{{ slug }}" -->
 {% endfor %}

@@ -30,9 +30,7 @@ from content_blocks.views import (
     publish_content_blocks,
 )
 
-"""
-Admin constants and base classes
-"""
+#  Admin constants and base classes
 
 # Auto dates
 AUTO_DATE_FIELDS = ["create_date", "mod_date"]
@@ -129,13 +127,12 @@ if "dbtemplates" in settings.INSTALLED_APPS:
         def content_block_template_fields(self):
             return super().content_block_template_fields + ["db_template_button"]
 
+        @admin.display(description="HTML Template")
         def db_template_button(self, obj):
             if not obj.template_filename:
                 return "-"
             button = '<input type="submit" value="Save and edit HTML template" name="_dbtemplate">'
             return mark_safe(button)
-
-        db_template_button.short_description = "HTML Template"
 
         def get_readonly_fields(self, request, obj=None):
             return [
@@ -187,6 +184,7 @@ class ContentBlockModelAdmin(admin.ModelAdmin):
     content_blocks_button which can then be added to the formset.
     """
 
+    @admin.display(description="Content blocks")
     def content_blocks_link(self, obj):
         """
         A link to the content block editor for this object.
@@ -199,8 +197,6 @@ class ContentBlockModelAdmin(admin.ModelAdmin):
         )
         link = f'<a href="{url}">Edit content blocks</a>'
         return mark_safe(link)
-
-    content_blocks_link.short_description = "Content blocks"
 
     def content_blocks_button(self, *args):
         """

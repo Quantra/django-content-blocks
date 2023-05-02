@@ -1,4 +1,4 @@
-import xml.etree.cElementTree as et
+import xml.etree.ElementTree as et
 from pathlib import Path
 
 from django import forms
