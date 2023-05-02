@@ -19,4 +19,6 @@ class Command(BaseCommand):
             natural_primary=True,
             natural_foreign=True,
             format="json",
+            *args,
+            **options
         )

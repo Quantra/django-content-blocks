@@ -48,3 +48,6 @@ dist: clean  ## builds source and wheel package
 release: coverage dist  ## package and upload a release, to make a new release first update the version number in setup.cfg
 	twine upload --config-file .pypirc dist/*
 	@echo "Package published to pypi! Now commit changes and tag with the new version number. Push to github and create a release via https://github.com/Quantra/django-content-blocks/releases/new."
+
+test_settings:  ## run tests with all test settings files
+	python3 content_blocks/tests/settings_runner.py

@@ -1,10 +1,13 @@
 """
 Content Blocks views.py
 """
+from io import StringIO
+
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
-from django.http import JsonResponse
+from django.core.management import call_command
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -330,3 +333,21 @@ def content_block_delete(request, content_block_id):
 
     content_block.delete()
     return JsonResponse({})
+
+
+@staff_member_required
+def content_block_template_export(request):
+    """
+    Export content block template view used in admin site.
+    Uses the export_content_block_templates management command and streams the result directly to a file download.
+    """
+    buffer = StringIO()
+    call_command("export_content_block_templates", stdout=buffer)
+    buffer.seek(0)
+
+    return StreamingHttpResponse(
+        buffer,
+        headers={
+            "Content-Disposition": 'attachment; filename="content_block_templates.json"'
+        },
+    )

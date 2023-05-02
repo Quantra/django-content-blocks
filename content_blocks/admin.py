@@ -1,6 +1,7 @@
 """
 Content blocks admin.py
 """
+
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 from django.conf import settings
 from django.contrib import admin, messages
@@ -24,6 +25,7 @@ from content_blocks.views import (
     content_block_create,
     content_block_editor,
     content_block_preview,
+    content_block_template_export,
     discard_changes,
     import_content_blocks,
     nested_block_create,
@@ -57,6 +59,9 @@ class ContentBlockTemplateFieldInline(SortableInlineAdminMixin, admin.StackedInl
 class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
     form = ContentBlockTemplateAdminForm
 
+    change_list_template = (
+        "content_blocks/admin/content_block_template_change_list.html"
+    )
     list_display = [
         "name",
         "template_filename",
@@ -114,6 +119,16 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
                 f'No template found at "{template_filename}".'
             )
             messages.warning(request, mark_safe(msg))
+
+    def get_urls(self):
+        urls = [
+            path(
+                "export/",
+                content_block_template_export,
+                name="content_block_template_export",
+            )
+        ]
+        return urls + super().get_urls()
 
 
 if "dbtemplates" in settings.INSTALLED_APPS:
