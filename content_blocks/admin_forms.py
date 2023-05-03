@@ -1,6 +1,9 @@
 import json
 
 from django import forms
+from django.core.exceptions import ValidationError
+from django.core.management import call_command
+from django.core.validators import FileExtensionValidator
 
 from content_blocks.models import (
     ContentBlock,
@@ -124,3 +127,39 @@ class ContentBlockTemplateFieldAdminForm(forms.ModelForm):
                 )
 
         return template_field
+
+
+class ContentBlockTemplateImportForm(forms.Form):
+    fixture_file = forms.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=["json"])]
+    )
+
+    def clean_fixture_file(self):
+        """
+        Validate the uploaded file is JSON.
+        """
+        fixture_file = self.cleaned_data["fixture_file"]
+        value = fixture_file.read()
+
+        try:
+            json.loads(value)
+        except json.JSONDecodeError:
+            fixture_file.close()
+            raise ValidationError("The file is not valid JSON.")
+
+        return fixture_file
+
+    def import_content_block_templates(self, fixture_file):
+        """
+        Only call this after testing is_valid()
+        :param fixture_file: The file from request.FILES
+        """
+        fixture_file.open()
+        call_command(
+            "import_content_block_templates",
+            "-",
+            format="json",
+            infile=fixture_file,
+            verbosity=0,
+        )
+        fixture_file.close()

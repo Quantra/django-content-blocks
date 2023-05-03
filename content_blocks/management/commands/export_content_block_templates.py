@@ -16,9 +16,9 @@ class Command(BaseCommand):
             "dumpdata",
             "content_blocks.ContentBlockTemplate",
             "content_blocks.ContentBlockTemplateField",
+            *args,
             natural_primary=True,
             natural_foreign=True,
             format="json",
-            *args,
             **options
         )

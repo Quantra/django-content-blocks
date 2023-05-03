@@ -1,0 +1,46 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_modify %}
+{% load admin_urls %}
+
+{% block title %}Import Content Block Templates {{ block.super }}{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+      &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+      &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+      &rsaquo; {% block breadcrumbs_last %}Import{% endblock %}
+    </div>
+  {% endblock %}
+{% endif %}
+
+{% block content %}
+  <div id="content-main">
+    <h1>Import Content Block Templates</h1>
+
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <fieldset class="module aligned">
+        {% for field in form %}
+          <div class="form-row">
+            {{ field.errors }}
+
+            {{ field.label_tag }}
+
+            {{ field }}
+
+            {% if field.field.help_text %}
+              <p class="help">{{ field.field.help_text|safe }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </fieldset>
+
+      <div class="submit-row">
+        <input type="submit" class="default" value="{% trans "Submit" %}">
+      </div>
+    </form>
+  </div>
+{% endblock %}

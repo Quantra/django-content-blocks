@@ -1,6 +1,9 @@
+import argparse
+
 from django.core.management import call_command
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.db import transaction
+from django.utils.functional import cached_property
 
 from content_blocks.models import (
     ContentBlock,
@@ -25,7 +28,19 @@ class Command(LoaddataCommand):
         ContentBlockTemplateField: [],
     }
 
+    infile = None
+
+    def add_arguments(self, parser):
+        """
+        Add the infile argument, so we can pass file_like objects in call_command.
+        """
+        super().add_arguments(parser)
+
+        parser.add_argument("--infile", type=argparse.FileType("r"))
+
     def handle(self, *fixture_labels, **options):
+        self.infile = options.get("infile")
+
         with transaction.atomic():
             super().handle(*fixture_labels, **options)
 
@@ -35,15 +50,15 @@ class Command(LoaddataCommand):
             self.delete_old_content_block_template_fields()
 
             # Reorder ContentBlockTemplate
-            call_command("reorder", "content_blocks.ContentBlockTemplate")
+            call_command(
+                "reorder", "content_blocks.ContentBlockTemplate", verbosity=verbosity
+            )
 
             # Update content blocks cache
-            call_command("update_content_blocks_cache")
+            call_command("update_content_blocks_cache", verbosity=verbosity)
 
             if verbosity > 0:
-                self.stdout.write(
-                    "Content block templates imported!"
-                )  # pragma: no cover
+                self.stdout.write("Content block templates imported!")
 
     def save_obj(self, obj):
         created = obj.object.pk is None
@@ -57,6 +72,18 @@ class Command(LoaddataCommand):
         self.imported_pks[obj.object.__class__].append(obj.object.pk)
 
         return saved
+
+    @cached_property
+    def compression_formats(self):
+        """
+        If an infile is supplied use this in place of stdin so file_like objects can be supplied in call_command.
+        """
+        compression_formats = super().compression_formats
+
+        if self.infile is not None:
+            compression_formats["stdin"] = (lambda *args: self.infile, None)
+
+        return compression_formats
 
     def add_new_content_block_template_field(self, content_block_template_field):
         """

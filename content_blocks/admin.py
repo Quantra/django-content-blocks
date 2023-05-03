@@ -26,6 +26,7 @@ from content_blocks.views import (
     content_block_editor,
     content_block_preview,
     content_block_template_export,
+    content_block_template_import,
     discard_changes,
     import_content_blocks,
     nested_block_create,
@@ -126,7 +127,13 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
                 "export/",
                 content_block_template_export,
                 name="content_block_template_export",
-            )
+            ),
+            path(
+                "import/",
+                content_block_template_import,
+                {"model_admin": self},
+                name="content_block_template_import",
+            ),
         ]
         return urls + super().get_urls()
 

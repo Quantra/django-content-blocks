@@ -3,12 +3,14 @@ Content Blocks views.py
 """
 from io import StringIO
 
+from admin_forms import ContentBlockTemplateImportForm
+from django.contrib import messages
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.http import JsonResponse, StreamingHttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -350,4 +352,37 @@ def content_block_template_export(request):
         headers={
             "Content-Disposition": 'attachment; filename="content_block_templates.json"'
         },
+    )
+
+
+@staff_member_required
+def content_block_template_import(request, model_admin=None):
+    """
+    Form for importing ContentBlockTemplate from json created by export_content_block_templates management command.
+    """
+    post_data = None
+    files_data = None
+
+    if request.method == "POST":
+        post_data = request.POST
+        files_data = request.FILES
+
+    form = ContentBlockTemplateImportForm(post_data, files_data)
+
+    if form.is_valid():
+        form.import_content_block_templates(files_data["fixture_file"])
+        messages.success(request, "Content block templates imported.")
+        return redirect("admin:content_blocks_contentblocktemplate_changelist")
+
+    context = {
+        "form": form,
+        "opts": model_admin.model._meta,
+    }
+
+    context.update(**model_admin.admin_site.each_context(request))
+
+    return render(
+        request,
+        "content_blocks/admin/content_block_template_import_form.html",
+        context,
     )
