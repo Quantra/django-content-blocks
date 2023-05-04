@@ -6,6 +6,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import get_storage_class
 from django.db import IntegrityError
+from django.forms.utils import pretty_name
 from faker import Faker
 
 from content_blocks.cache import cache
@@ -609,6 +610,16 @@ class TestContentBlockField:
             nested_block_1,
             nested_block_2,
         ]
+
+    @pytest.mark.django_db
+    def test_content_block_nested_field_label(self, content_block_field_factory):
+        content_block_field = content_block_field_factory.create(
+            field_type=ContentBlockFields.NESTED_FIELD
+        )
+
+        label = pretty_name(content_block_field.template_field.key)
+
+        assert content_block_field.label == label
 
 
 class TestContentBlockManager:
