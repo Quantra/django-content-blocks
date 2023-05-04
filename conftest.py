@@ -2,7 +2,10 @@
 Content blocks conf test.
 Load factories for use in all tests.
 """
+import itertools
+
 import pytest
+from django.core import serializers
 from faker import Faker
 from PIL import Image
 from pytest_factoryboy import register
@@ -313,3 +316,66 @@ def png_file(tmp_path_factory):
     image_content.save(image)
 
     return image
+
+
+@pytest.fixture
+def cbt_import_export_objects(
+    content_block_template,
+    content_block_template_field_factory,
+    content_block_factory,
+    content_block_field_factory,
+):
+    """
+    Create ContentBlockTemplate object with a ContentBlockTemplateField
+    Create an associated ContentBlock and ContentBlockField
+    :return: Tuple of objects created
+    """
+    content_block_template_field = content_block_template_field_factory.create(
+        content_block_template=content_block_template
+    )
+
+    content_block = content_block_factory.create(
+        content_block_template=content_block_template
+    )
+    content_block_field = content_block_field_factory.create(
+        content_block=content_block,
+        template_field=content_block_template_field,
+    )
+
+    return (
+        content_block_template,
+        content_block_template_field,
+        content_block,
+        content_block_field,
+    )
+
+
+@pytest.fixture
+def cbt_import_export_json(cbt_import_export_objects):
+    """
+    :return: json string which matches the above cbt_import_export objects
+    """
+    content_block_template = cbt_import_export_objects[0]
+    ContentBlockTemplate = type(content_block_template)
+
+    content_block_template_field = cbt_import_export_objects[1]
+    ContentBlockTemplateField = type(content_block_template_field)
+
+    json_string = serializers.serialize(
+        "json",
+        itertools.chain(
+            ContentBlockTemplate.objects.all(), ContentBlockTemplateField.objects.all()
+        ),
+    )
+    return json_string
+
+
+@pytest.fixture
+def cbt_import_export_json_file(tmp_path_factory, cbt_import_export_json):
+    """
+    :return: The json from cbt_import_export_json in a temporary file.
+    """
+    json_file = tmp_path_factory.getbasetemp() / "tmp-exports/_export.json"
+    json_file.parent.mkdir(parents=True, exist_ok=True)
+    json_file.write_text(cbt_import_export_json)
+    return json_file

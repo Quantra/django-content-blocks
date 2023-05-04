@@ -61,6 +61,15 @@ class Command(LoaddataCommand):
 
     def save_obj(self, obj):
         created = obj.object.pk is None
+
+        if not created:
+            # Tests show we need to make certain the obj is not in the db
+            model = type(obj.object)
+            try:
+                model.objects.get(pk=obj.object.pk)
+            except model.DoesNotExist:
+                created = True
+
         saved = super().save_obj(obj)
 
         if created and isinstance(obj.object, ContentBlockTemplateField):
