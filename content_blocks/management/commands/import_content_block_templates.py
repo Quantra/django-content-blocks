@@ -39,12 +39,11 @@ class Command(LoaddataCommand):
         parser.add_argument("--infile", type=argparse.FileType("r"))
 
     def handle(self, *fixture_labels, **options):
+        verbosity = int(options["verbosity"])
         self.infile = options.get("infile")
 
         with transaction.atomic():
             super().handle(*fixture_labels, **options)
-
-            verbosity = int(options["verbosity"])
 
             # Sync ContentBlockTemplateField objects with ContentBlockField objects.
             self.delete_old_content_block_template_fields()
@@ -57,14 +56,14 @@ class Command(LoaddataCommand):
             # Update content blocks cache
             call_command("update_content_blocks_cache", verbosity=verbosity)
 
-            if verbosity > 0:
-                self.stdout.write("Content block templates imported!")
+        if verbosity > 0:
+            self.stdout.write("Content block templates imported!")
 
     def save_obj(self, obj):
         created = obj.object.pk is None
         saved = super().save_obj(obj)
 
-        if created:
+        if created and isinstance(obj.object, ContentBlockTemplateField):
             # Create ContentBlockField objects
             self.add_new_content_block_template_field(obj.object)
 

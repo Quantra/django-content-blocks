@@ -349,6 +349,7 @@ def content_block_template_export(request):
 
     return StreamingHttpResponse(
         buffer,
+        content_type="application/json",
         headers={
             "Content-Disposition": 'attachment; filename="content_block_templates.json"'
         },

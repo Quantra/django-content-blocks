@@ -1,11 +1,14 @@
 """
 Content blocks admin.py
 """
+import itertools
+from io import StringIO
 
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 from django.conf import settings
 from django.contrib import admin, messages
-from django.http import HttpResponseRedirect
+from django.core import serializers
+from django.http import HttpResponseRedirect, StreamingHttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import path, reverse
@@ -74,6 +77,7 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     readonly_fields = AUTO_DATE_FIELDS
     inlines = [ContentBlockTemplateFieldInline]
+    actions = ["export_content_block_templates"]
 
     class Media:
         css = {"all": ["content_blocks/css/content_block_template_admin.css"]}
@@ -136,6 +140,37 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
             ),
         ]
         return urls + super().get_urls()
+
+    @admin.action(description="Export selected content block templates")
+    def export_content_block_templates(self, request, queryset):
+        """
+        Export the selected ContentBlockTemplate objects as JSON suitable for import.
+        """
+        queryset = queryset.order_by()
+
+        content_block_template_fields = ContentBlockTemplateField.objects.filter(
+            content_block_template__in=queryset
+        ).order_by()
+
+        buffer = StringIO()
+
+        serializers.serialize(
+            "json",
+            itertools.chain(queryset, content_block_template_fields),
+            stream=buffer,
+            use_natural_foreign_keys=True,
+            use_natural_primary_keys=True,
+        )
+
+        buffer.seek(0)
+
+        return StreamingHttpResponse(
+            buffer,
+            content_type="application/json",
+            headers={
+                "Content-Disposition": 'attachment; filename="content_block_templates.json"'
+            },
+        )
 
 
 if "dbtemplates" in settings.INSTALLED_APPS:
