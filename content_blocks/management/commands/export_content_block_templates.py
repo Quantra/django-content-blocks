@@ -1,4 +1,5 @@
-from django.core.management import BaseCommand, call_command
+from django.core.management import BaseCommand
+from import_export import ImportExportServices
 
 
 class Command(BaseCommand):
@@ -6,19 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        A convenience to run instead of:
-        $ python3 manage.py dumpdata \
-        content_blocks.ContentBlockTemplate content_blocks.ContentBlockTemplateField \
-        --natural-primary --natural-foreign --format json
+        Export ContentBlockTemplate and associated ContentBlockTemplateField to json via stdout.
         The output can be used for import_content_block_templates management command.
         """
-        call_command(
-            "dumpdata",
-            "content_blocks.ContentBlockTemplate",
-            "content_blocks.ContentBlockTemplateField",
-            *args,
-            natural_primary=True,
-            natural_foreign=True,
-            format="json",
-            **options
-        )
+        ImportExportServices.export_content_block_templates(file_like=self.stdout)

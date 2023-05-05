@@ -1,13 +1,11 @@
 """
 Content blocks admin.py
 """
-import itertools
 from io import StringIO
 
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 from django.conf import settings
 from django.contrib import admin, messages
-from django.core import serializers
 from django.http import HttpResponseRedirect, StreamingHttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -18,6 +16,7 @@ from content_blocks.admin_forms import (
     ContentBlockTemplateAdminForm,
     ContentBlockTemplateFieldAdminForm,
 )
+from content_blocks.import_export import ImportExportServices
 from content_blocks.models import (
     ContentBlockAvailability,
     ContentBlockCollection,
@@ -130,13 +129,13 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
             path(
                 "export/",
                 content_block_template_export,
-                name="content_block_template_export",
+                name="content_blocks_contentblocktemplate_export",
             ),
             path(
                 "import/",
                 content_block_template_import,
                 {"model_admin": self},
-                name="content_block_template_import",
+                name="content_blocks_contentblocktemplate_import",
             ),
         ]
         return urls + super().get_urls()
@@ -146,22 +145,8 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
         """
         Export the selected ContentBlockTemplate objects as JSON suitable for import.
         """
-        queryset = queryset.order_by()
-
-        content_block_template_fields = ContentBlockTemplateField.objects.filter(
-            content_block_template__in=queryset
-        ).order_by()
-
         buffer = StringIO()
-
-        serializers.serialize(
-            "json",
-            itertools.chain(queryset, content_block_template_fields),
-            stream=buffer,
-            use_natural_foreign_keys=True,
-            use_natural_primary_keys=True,
-        )
-
+        ImportExportServices.export_content_block_templates(queryset, buffer)
         buffer.seek(0)
 
         return StreamingHttpResponse(

@@ -2,9 +2,9 @@ import json
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.management import call_command
 from django.core.validators import FileExtensionValidator
 
+from content_blocks.import_export import ImportExportServices
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
@@ -154,12 +154,5 @@ class ContentBlockTemplateImportForm(forms.Form):
         Only call this after testing is_valid()
         :param fixture_file: The file from request.FILES
         """
-        fixture_file.open()
-        call_command(
-            "import_content_block_templates",
-            "-",
-            format="json",
-            infile=fixture_file,
-            verbosity=0,
-        )
-        fixture_file.close()
+        with fixture_file.open() as file:
+            ImportExportServices.import_content_block_templates(file)

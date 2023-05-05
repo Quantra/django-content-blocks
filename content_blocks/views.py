@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -25,6 +24,7 @@ from content_blocks.forms import (
     PublishContentBlocksForm,
     ResetContentBlocksForm,
 )
+from content_blocks.import_export import ImportExportServices
 from content_blocks.models import ContentBlock
 from content_blocks.permissions import require_ajax
 
@@ -32,16 +32,27 @@ from content_blocks.permissions import require_ajax
 def create_log_entry(request, obj, action_flag, change_message, **kwargs):
     params = {
         "user_id": request.user.id,
-        "content_type_id": ContentType.objects.get_for_model(obj.__class__).id,
-        "object_id": obj.id,
         "object_repr": obj.__str__(),
         "action_flag": action_flag,
         "change_message": change_message,
+        "content_type_id": None,
+        "object_id": None,
     }
+
+    if obj:
+        params.update(
+            {
+                "content_type_id": ContentType.objects.get_for_model(obj.__class__).id,
+                "object_id": obj.id,
+            }
+        )
 
     params.update(kwargs)
 
     LogEntry.objects.log_action(**params)
+
+
+# Content block editor views
 
 
 @staff_member_required
@@ -337,6 +348,9 @@ def content_block_delete(request, content_block_id):
     return JsonResponse({})
 
 
+# ContentBlockTemplate import export views
+
+
 @staff_member_required
 def content_block_template_export(request):
     """
@@ -344,7 +358,7 @@ def content_block_template_export(request):
     Uses the export_content_block_templates management command and streams the result directly to a file download.
     """
     buffer = StringIO()
-    call_command("export_content_block_templates", stdout=buffer)
+    ImportExportServices.export_content_block_templates(file_like=buffer)
     buffer.seek(0)
 
     return StreamingHttpResponse(
@@ -371,8 +385,15 @@ def content_block_template_import(request, model_admin=None):
     form = ContentBlockTemplateImportForm(post_data, files_data)
 
     if form.is_valid():
-        form.import_content_block_templates(files_data["fixture_file"])
+        fixture_file = files_data["fixture_file"]
+        form.import_content_block_templates(fixture_file)
         messages.success(request, "Content block templates imported.")
+        create_log_entry(
+            request,
+            None,
+            CHANGE,
+            f"Content block templates imported from {fixture_file.name}",
+        )
         return redirect("admin:content_blocks_contentblocktemplate_changelist")
 
     context = {

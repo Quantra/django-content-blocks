@@ -3,10 +3,10 @@
 
 {% block object-tools-items %}
   <li>
-    <a href="{% url 'admin:content_block_template_import' %}">Import</a>
+    <a href="{% url 'admin:content_blocks_contentblocktemplate_import' %}">Import</a>
   </li>
   <li>
-    <a href="{% url 'admin:content_block_template_export' %}">Export</a>
+    <a href="{% url 'admin:content_blocks_contentblocktemplate_export' %}">Export</a>
   </li>
   {{ block.super }}
 {% endblock %}
