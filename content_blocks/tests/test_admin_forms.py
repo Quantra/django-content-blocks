@@ -5,10 +5,12 @@ import json
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import model_to_dict
 
 from content_blocks.admin_forms import (
     ContentBlockTemplateFieldAdminForm,
+    ContentBlockTemplateImportForm,
     validate_choices,
 )
 from content_blocks.models import (
@@ -18,7 +20,7 @@ from content_blocks.models import (
 )
 
 
-class TestContentBlockTemplateFieldAdmin:
+class TestContentBlockTemplateFieldAdminForm:
     @pytest.mark.django_db
     @pytest.mark.parametrize("min_num", range(2, 4))
     def test_clean_nested_field(
@@ -174,3 +176,29 @@ class TestContentBlockTemplateFieldAdmin:
 
         choices = json.dumps([["good", "choices"]])
         assert validate_choices(choices)
+
+
+class TestContentBlockTemplateImportForm:
+    @pytest.mark.django_db
+    def test_clean_fixture_file(self, cbt_import_export_json_file, text_file):
+        json_file = SimpleUploadedFile(
+            cbt_import_export_json_file.name,
+            cbt_import_export_json_file.read_bytes(),
+            "application/json",
+        )
+
+        form_data = {"fixture_file": cbt_import_export_json_file.name}
+        form_files = {"fixture_file": json_file}
+
+        form = ContentBlockTemplateImportForm(form_data, form_files)
+
+        assert form.is_valid()
+
+        text_file = SimpleUploadedFile(text_file.name, text_file.read_bytes())
+
+        form_data["fixture_file"] = text_file
+
+        form = ContentBlockTemplateImportForm(form_data, form_files)
+
+        assert not form.is_valid()
+        assert "fixture_file" in form.errors.keys()

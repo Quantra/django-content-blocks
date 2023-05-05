@@ -1,29 +1,43 @@
 from io import StringIO
 
 import pytest
-from django.apps import apps
 from django.core import serializers
 from django.core.management import call_command
 from faker import Faker
 
 from content_blocks.cache import cache
+from content_blocks.models import (
+    ContentBlock,
+    ContentBlockField,
+    ContentBlockTemplate,
+    ContentBlockTemplateField,
+)
 
 faker = Faker()
 
 
+def _test_imported_json(json):
+    """
+    :param json: string or stream
+    """
+    export = serializers.deserialize("json", json)
+
+    for py_obj in export:
+        fields = py_obj.object.__dict__.copy()
+
+        try:
+            fields.pop("_state")
+            fields.pop("mod_date")
+            fields.pop("create_date")
+        except KeyError:
+            pass
+
+        model = type(py_obj.object)
+
+        model.objects.get(**fields)
+
+
 class TestManagementCommands:
-    @pytest.fixture
-    def content_block_template_model(self):
-        return apps.get_model("content_blocks.contentblocktemplate")
-
-    @pytest.fixture
-    def content_block_template_field_model(self):
-        return apps.get_model("content_blocks.contentblocktemplatefield")
-
-    @pytest.fixture
-    def content_block_field_model(self):
-        return apps.get_model("content_blocks.contentblockfield")
-
     @pytest.mark.django_db
     def test_clear_cache_management_command(
         self,
@@ -95,69 +109,47 @@ class TestManagementCommands:
         buffer = StringIO()
         call_command("export_content_block_templates", stdout=buffer)
         buffer.seek(0)
-        export = serializers.deserialize("json", buffer)
 
-        for py_obj in export:
-            fields = py_obj.object.__dict__.copy()
-
-            try:
-                fields.pop("_state")
-                fields.pop("mod_date")
-                fields.pop("create_date")
-            except KeyError:
-                pass
-
-            model = type(py_obj.object)
-
-            model.objects.get(**fields)
+        _test_imported_json(buffer)
 
     @pytest.mark.django_db
     def test_import_content_block_templates(
         self,
         cbt_import_export_json_file,
-        content_block_template_model,
-        content_block_template_field_model,
     ):
         call_command("import_content_block_templates", cbt_import_export_json_file)
 
-        content_block_templates = content_block_template_model.objects.all()
+        content_block_templates = ContentBlockTemplate.objects.all()
         assert content_block_templates.count() == 1
 
-        content_block_template_fields = content_block_template_field_model.objects.all()
+        content_block_template_fields = ContentBlockTemplateField.objects.all()
         assert content_block_template_fields.count() == 1
 
     @pytest.mark.django_db
     def test_import_content_block_templates_clean(
         self,
         cbt_import_export_json_file,
-        content_block_template_model,
-        content_block_template_field_model,
     ):
-        content_block_template_model.objects.all().delete()
-        content_block_template_field_model.objects.all().delete()
+        ContentBlockTemplate.objects.all().delete()
+        ContentBlockTemplateField.objects.all().delete()
 
         call_command("import_content_block_templates", cbt_import_export_json_file)
 
-        content_block_templates = content_block_template_model.objects.all()
+        content_block_templates = ContentBlockTemplate.objects.all()
         assert content_block_templates.count() == 1
 
-        content_block_template_fields = content_block_template_field_model.objects.all()
+        content_block_template_fields = ContentBlockTemplateField.objects.all()
         assert content_block_template_fields.count() == 1
 
     @pytest.mark.django_db
     def test_import_content_block_templates_add_fields(
         self,
         cbt_import_export_json_file,
-        content_block_template_model,
-        content_block_template_field_model,
-        content_block_field_model,
     ):
-        content_block_template_fields_query = (
-            content_block_template_field_model.objects.all()
-        )
-        content_block_templates_query = content_block_template_model.objects.all()
+        content_block_template_fields_query = ContentBlockTemplateField.objects.all()
+        content_block_templates_query = ContentBlockTemplate.objects.all()
 
-        content_block_fields_query = content_block_field_model.objects.all()
+        content_block_fields_query = ContentBlockField.objects.all()
 
         # check we have just one template field and field in the db
         assert content_block_template_fields_query.count() == 1
@@ -175,3 +167,21 @@ class TestManagementCommands:
         assert content_block_templates_query.count() == 1
         assert content_block_template_fields_query.count() == 1
         assert content_block_fields_query.count() == 1
+
+    @pytest.mark.django_db
+    def test_import_content_block_templates_bad_json(
+        self, cbt_import_export_bad_json_file
+    ):
+        content_blocks_query = ContentBlock.objects.all()
+        content_block_templates_query = ContentBlockTemplate.objects.all()
+        content_block_template_field_query = ContentBlockTemplateField.objects.all()
+
+        assert content_blocks_query.count() == 1
+        assert content_block_templates_query.count() == 1
+        assert content_block_template_field_query.count() == 0
+
+        call_command("import_content_block_templates", cbt_import_export_bad_json_file)
+
+        assert content_blocks_query.count() == 1
+        assert content_block_templates_query.count() == 1
+        assert content_block_template_field_query.count() == 0

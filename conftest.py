@@ -379,3 +379,21 @@ def cbt_import_export_json_file(tmp_path_factory, cbt_import_export_json):
     json_file.parent.mkdir(parents=True, exist_ok=True)
     json_file.write_text(cbt_import_export_json)
     return json_file
+
+
+@pytest.fixture
+def cbt_import_export_bad_json(content_block):
+    """
+    The json contains a ContentBlock instead of ContentBlockTemplate and ContentBlockTemplateField
+    """
+    ContentBlock = type(content_block)
+    json_string = serializers.serialize("json", ContentBlock.objects.all())
+    return json_string
+
+
+@pytest.fixture
+def cbt_import_export_bad_json_file(tmp_path_factory, cbt_import_export_bad_json):
+    json_file = tmp_path_factory.getbasetemp() / "tmp-exports/_export_bad.json"
+    json_file.parent.mkdir(parents=True, exist_ok=True)
+    json_file.write_text(cbt_import_export_bad_json)
+    return json_file

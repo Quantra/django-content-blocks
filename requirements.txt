@@ -1,6 +1,6 @@
 -r requirements_dev.txt
 
-django>=4.2.0  # https://www.djangoproject.com/
+django<5.0  # https://www.djangoproject.com/
 django-admin-sortable2  # https://github.com/jrief/django-admin-sortable2
 django-clone  # https://github.com/tj-django/django-clone Content blocks dep
 Pillow  # https://github.com/python-pillow/Pillow

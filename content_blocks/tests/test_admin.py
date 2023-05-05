@@ -2,8 +2,10 @@ import pytest
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from faker import Faker
+from tests.test_management_commands import _test_imported_json
 
 from content_blocks.models import (
     ContentBlockCollection,
@@ -156,6 +158,77 @@ class TestContentBlockTemplateAdmin:
         assert warning_message.level_tag == "warning"
 
         assert "No template found" in warning_message.message
+
+    @pytest.mark.django_db
+    def test_content_block_template_export(
+        self, admin_client, cbt_import_export_objects, base_admin_url
+    ):
+        response = admin_client.get(reverse(f"{base_admin_url}_export"))
+
+        assert response.status_code == 200
+
+        assert response.has_header("Content-Disposition")
+        assert "attachment" in response.headers["Content-Disposition"]
+
+        assert response.has_header("Content-Type")
+        assert response.headers["Content-Type"] == "application/json"
+
+        json_string = response.getvalue()
+        _test_imported_json(json_string)
+
+    @pytest.mark.django_db
+    def test_content_block_template_import_get(self, admin_client, base_admin_url):
+        response = admin_client.get(reverse(f"{base_admin_url}_import"))
+
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_content_block_template_import_post(
+        self, admin_client, cbt_import_export_json_file, base_admin_url
+    ):
+        content_block_template_query = ContentBlockTemplate.objects.all()
+        content_block_template_field_query = ContentBlockTemplateField.objects.all()
+
+        assert content_block_template_query.count() == 1
+        assert content_block_template_field_query.count() == 1
+
+        content_block_template_query.delete()
+
+        assert content_block_template_query.count() == 0
+        assert content_block_template_field_query.count() == 0
+
+        uploaded_json_file = SimpleUploadedFile(
+            cbt_import_export_json_file.name,
+            cbt_import_export_json_file.read_bytes(),
+            "application/json",
+        )
+        post_data = {"fixture_file": uploaded_json_file}
+
+        response = admin_client.post(reverse(f"{base_admin_url}_import"), post_data)
+
+        assert response.status_code == 302
+
+        assert content_block_template_query.count() == 1
+        assert content_block_template_field_query.count() == 1
+
+    @pytest.mark.django_db
+    def test_content_block_template_export_action(
+        self, content_block_template_model_admin, cbt_import_export_objects
+    ):
+        response = content_block_template_model_admin.export_content_block_templates(
+            None, ContentBlockTemplate.objects.all()
+        )
+
+        assert response.status_code == 200
+
+        assert response.has_header("Content-Disposition")
+        assert "attachment" in response.headers["Content-Disposition"]
+
+        assert response.has_header("Content-Type")
+        assert response.headers["Content-Type"] == "application/json"
+
+        json_string = response.getvalue()
+        _test_imported_json(json_string)
 
 
 class TestContentBlockAvailabilityAdmin:
