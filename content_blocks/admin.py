@@ -55,7 +55,7 @@ class ContentBlockTemplateFieldInline(SortableInlineAdminMixin, admin.StackedInl
     form = ContentBlockTemplateFieldAdminForm
     min_num = 0
     extra = 0
-    filter_horizontal = ["nested_templates"]
+    autocomplete_fields = ["nested_templates"]
 
 
 @admin.register(ContentBlockTemplate)
