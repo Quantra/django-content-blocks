@@ -4,7 +4,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
-from content_blocks.import_export import ImportExportServices
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
@@ -12,6 +11,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from content_blocks.services.import_export import ImportExportServices
 from content_blocks.widgets import ChoicesWidget, TemplateFilenameAutocompleteWidget
 
 REQUIRED_ERROR_MSG = "This field is required"

@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
-from import_export import ImportExportServices
 
 from content_blocks.models import ContentBlockTemplate, ContentBlockTemplateField
+from content_blocks.services.import_export import ImportExportServices
 
 
 class Command(BaseCommand):

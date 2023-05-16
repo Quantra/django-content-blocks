@@ -24,9 +24,9 @@ from content_blocks.forms import (
     PublishContentBlocksForm,
     ResetContentBlocksForm,
 )
-from content_blocks.import_export import ImportExportServices
 from content_blocks.models import ContentBlock
 from content_blocks.permissions import require_ajax
+from content_blocks.services.import_export import ImportExportServices
 
 
 def create_log_entry(request, obj, action_flag, change_message, **kwargs):
