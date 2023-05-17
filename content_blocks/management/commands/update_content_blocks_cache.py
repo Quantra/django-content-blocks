@@ -1,6 +1,7 @@
 from django.core.management import BaseCommand
 
-from content_blocks.models import ContentBlock
+from content_blocks.models import ContentBlockParentModel
+from content_blocks.services.content_block import CacheServices
 
 
 class Command(BaseCommand):
@@ -9,8 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         verbosity = int(options["verbosity"])
 
-        for content_block in ContentBlock.objects.all():
-            content_block.update_cache()
+        CacheServices.update_cache_all(ContentBlockParentModel)
 
         if verbosity > 0:
             self.stdout.write("Content blocks cache updated")  # pragma: no cover

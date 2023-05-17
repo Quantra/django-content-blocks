@@ -12,6 +12,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from content_blocks.services.content_block import CacheServices
 
 faker = Faker()
 
@@ -45,6 +46,7 @@ class TestManagementCommands:
         content_block_factory,
         content_block_field_factory,
         text_template,
+        content_block_collection,
     ):
         """
         Test clear cache management command.
@@ -58,13 +60,17 @@ class TestManagementCommands:
         text = faker.text(256)
         content_block_field_factory.create(text=text, content_block=content_block)
 
+        content_block_collection.content_blocks.add(content_block)
+
+        cache_key = CacheServices.cache_key(content_block)
+
         content_block.render()
 
-        assert cache.get(content_block.cache_key) == text
+        assert cache.get(cache_key) == text
 
         call_command("clear_content_blocks_cache", verbosity=0)
 
-        assert cache.get(content_block.cache_key) is None
+        assert cache.get(cache_key) is None
 
     @pytest.mark.django_db
     def test_update_cache_management_command(
@@ -73,6 +79,7 @@ class TestManagementCommands:
         content_block_factory,
         content_block_field_factory,
         text_template,
+        content_block_collection,
     ):
         """
         Test update cache management command.
@@ -88,18 +95,22 @@ class TestManagementCommands:
             text=text, content_block=content_block
         )
 
+        content_block_collection.content_blocks.add(content_block)
+
+        cache_key = CacheServices.cache_key(content_block)
+
         content_block.render()
 
-        assert cache.get(content_block.cache_key) == text
+        assert cache.get(cache_key) == text
 
         new_text = faker.text(256)
         content_block_field.save_value(new_text)
 
-        assert cache.get(content_block.cache_key) == text
+        assert cache.get(cache_key) == text
 
         call_command("update_content_blocks_cache", verbosity=0)
 
-        assert cache.get(content_block.cache_key) == new_text
+        assert cache.get(cache_key) == new_text
 
     @pytest.mark.django_db
     def test_export_content_block_templates(self, cbt_import_export_objects):

@@ -11,25 +11,23 @@ from django.core.files.storage import get_storage_class
 from django.core.validators import RegexValidator
 from django.db import models
 from django.forms.utils import pretty_name
-from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from model_clone import CloneMixin
 
 from content_blocks.abstract_models import (
     AutoDateModel,
-    CachedHtmlModel,
     PositionModel,
     VisibleManager,
     VisibleModel,
 )
-from content_blocks.cache import cache
 from content_blocks.conf import settings
 from content_blocks.fields import (
     SVGAndImageField,
     SVGAndImageFieldFormField,
     VideoField,
 )
+from content_blocks.services.content_block import RenderServices
 from content_blocks.widgets import FileWidget
 
 logger = logging.getLogger(__name__)
@@ -68,8 +66,6 @@ def get_storage(field_type):
     Get the storage class from dotted strings in settings.
     If the field storage class is in settings use that otherwise use the general storage class setting for content
     blocks, which will default to STORAGES["default"].
-    :param field_type:
-    :return:
     """
     storage_setting = getattr(settings, field_type, None)
     if storage_setting is not None:
@@ -484,7 +480,6 @@ class ContentBlockManager(VisibleManager):
         """
         Visible published only.
         Used in templates to render published content blocks.
-        :return:
         """
         return super().visible().filter(draft=False)
 
@@ -492,14 +487,12 @@ class ContentBlockManager(VisibleManager):
         """
         Visible drafts only. Exclude those which haven't been saved via the editor yet (empties).
         Can be used in page previews.
-        :return:
         """
         return super().visible().filter(draft=True, saved=True)
 
     def nested(self):
         """
         Used in the context for NestedField objects. Visible but with unsaved excluded.
-        :return:
         """
         return super().visible().filter(draft=False, saved=True)
 
@@ -507,7 +500,6 @@ class ContentBlockManager(VisibleManager):
         """
         All published including visible=False.
         Used by the publishing/reset mechanism.
-        :return:
         """
         return self.get_queryset().filter(draft=False)
 
@@ -515,14 +507,11 @@ class ContentBlockManager(VisibleManager):
         """
         All drafts including visible=False.
         Used by the editor and publishing/reset mechanism.
-        :return:
         """
         return self.get_queryset().filter(draft=True)
 
 
-class ContentBlock(
-    PositionModel, AutoDateModel, VisibleModel, CloneMixin, CachedHtmlModel
-):
+class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
     """
     Content Block Model
     Content block fields point here.  Those created are based on the content block template.
@@ -548,7 +537,7 @@ class ContentBlock(
     saved = models.BooleanField(blank=True, default=False)
 
     context_name = "content_block"
-    cache_prefix = "content_block"
+    # cache_prefix = "content_block"
 
     @cached_property
     def template(self):
@@ -593,56 +582,13 @@ class ContentBlock(
         context["css_class"] = self.css_class
         return context
 
-    def render(self, context=None, request=None):
+    def render(self):
         """
-        Render html for this block and cache
+        Render html for this block and cache.
+        This should only be called by the template and exists to support legacy projects.
+        The {% render_content_block %} template tag should be used in preference.
         """
-        if not self.can_render:
-            return ""
-
-        context = context or {}
-        request = request or context.get("request")
-
-        context[self.context_name] = self.context
-        context["request"] = request
-
-        cache_enabled = (
-            not self.content_block_template.no_cache
-            and not settings.CONTENT_BLOCKS_DISABLE_CACHE
-        )
-
-        html = None
-        if cache_enabled:
-            html = cache.get(self.cache_key)
-
-        if html is None:
-            html = render_to_string(
-                self.template,
-                context,
-                request=request,
-            )
-
-            if cache_enabled:
-                cache.set(self.cache_key, html)
-
-        return html
-
-    def clear_cache(self):
-        """
-        Clear the cache for this block and any parent blocks
-        """
-        super().clear_cache()
-        if self.parent:
-            self.parent.content_block.clear_cache()
-
-    def update_cache(self):
-        if "context" in self.__dict__.keys():
-            # Clear the context cached property if present
-            del self.__dict__["context"]
-
-        super().update_cache()
-        if self.parent:
-            self.parent.content_block.update_cache()
+        return RenderServices.render_content_block(self)
 
     def clone(self, attrs=None):
         """
@@ -805,6 +751,15 @@ class ContentBlockParentModel(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.content_blocks.all().delete()
         return super().delete(using=using, keep_parents=keep_parents)
+
+    @property
+    def content_blocks_sites_field(self):
+        """
+        For use with per site cacheing. Define which field on your model is either a FK or M2M to Site.
+        E.g.
+        return self.sites
+        """
+        return None
 
 
 class ContentBlockCollection(AutoDateModel, ContentBlockParentModel):

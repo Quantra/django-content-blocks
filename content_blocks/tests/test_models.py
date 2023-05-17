@@ -21,6 +21,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from content_blocks.services.content_block import CacheServices
 from content_blocks.tests.storages import SettingsTestStorage
 
 faker = Faker()
@@ -135,46 +136,6 @@ class TestContentBlock:
         }
 
     @pytest.mark.django_db
-    def test_content_block_cache_key(self, content_block):
-        """
-        The cache key should be {cache_prefix}_{id}
-        """
-        assert (
-            content_block.cache_key
-            == f"{content_block.cache_prefix}_{content_block.id}"
-        )
-
-    @pytest.mark.django_db
-    def test_content_block_can_render(
-        self, content_block_template_factory, content_block_factory, text_template
-    ):
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_template.name
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-
-        assert content_block.can_render is True
-
-    @pytest.mark.django_db
-    def test_content_block_cannot_render_no_template(self, content_block):
-        assert content_block.can_render is False
-
-    @pytest.mark.django_db
-    def test_content_block_cannot_render_bad_template(
-        self, content_block_template_factory, content_block_factory
-    ):
-        content_block_template = content_block_template_factory.create(
-            template_filename=faker.file_name(extension=".html")
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-
-        assert content_block.can_render is False
-
-    @pytest.mark.django_db
     def test_content_block_render(
         self,
         content_block_template_factory,
@@ -200,6 +161,7 @@ class TestContentBlock:
         content_block_factory,
         content_block_field_factory,
         text_template,
+        content_block_collection,
     ):
         """
         Test the render method with a content block template with no_cache = True
@@ -215,14 +177,18 @@ class TestContentBlock:
         text = faker.text(256)
         content_block_field_factory.create(text=text, content_block=content_block)
 
+        cache_key = CacheServices.cache_key(content_block)
+
+        content_block_collection.content_blocks.add(content_block)
+
         bad_text = faker.text(256)
-        cache.set(content_block.cache_key, bad_text)
+        cache.set(cache_key, bad_text)
 
         render = content_block.render()
 
         assert render == text
         assert render != bad_text
-        assert cache.get(content_block.cache_key) == bad_text
+        assert cache.get(cache_key) == bad_text
 
     @pytest.mark.django_db
     def test_content_block_render_disable_cache_setting(
@@ -232,6 +198,7 @@ class TestContentBlock:
         content_block_field_factory,
         text_template,
         settings,
+        content_block_collection,
     ):
         """
         Test the render method with a content block template with no_cache = True
@@ -248,66 +215,80 @@ class TestContentBlock:
         text = faker.text(256)
         content_block_field_factory.create(text=text, content_block=content_block)
 
+        cache_key = CacheServices.cache_key(content_block)
+
+        content_block_collection.content_blocks.add(content_block)
+
         bad_text = faker.text(256)
-        cache.set(content_block.cache_key, bad_text)
+        cache.set(cache_key, bad_text)
 
         render = content_block.render()
 
         assert render == text
         assert render != bad_text
-        assert cache.get(content_block.cache_key) == bad_text
+        assert cache.get(cache_key) == bad_text
 
     @pytest.mark.django_db
     def test_content_block_clear_cache(
-        self,
-        nested_content_block,
+        self, nested_content_block, content_block_collection
     ):
         """
         The clear_cache method should clear the cache for this content block and any parents, recursively.
         """
         content_block, nested_content_block = nested_content_block
 
+        cache_key = CacheServices.cache_key(content_block)
+        nested_cache_key = CacheServices.cache_key(nested_content_block)
+
+        content_block_collection.content_blocks.add(content_block)
+
         # Render the parent template
         content_block.render()
         nested_content_block.render()
 
         # Confirm content blocks are in cache
-        assert cache.get(content_block.cache_key) is not None
-        assert cache.get(nested_content_block.cache_key) is not None
+        assert cache.get(cache_key) is not None
+        assert cache.get(nested_cache_key) is None  # nested blocks are not cached
 
         # Clear cache on child content block
-        nested_content_block.clear_cache()
+        CacheServices.delete_cache(nested_content_block)
 
         # Confirm keys are no longer in cache
-        assert cache.get(content_block.cache_key) is None
-        assert cache.get(nested_content_block.cache_key) is None
+        assert cache.get(cache_key) is None
+        assert cache.get(nested_cache_key) is None
 
     @pytest.mark.django_db
-    def test_content_block_update_cache(self, nested_content_block):
+    def test_content_block_update_cache(
+        self, nested_content_block, content_block_collection
+    ):
         """
         The update cache method should update the cache for this content block and any parents, recursively.
         """
         content_block, nested_content_block = nested_content_block
 
+        cache_key = CacheServices.cache_key(content_block)
+        nested_cache_key = CacheServices.cache_key(nested_content_block)
+
+        content_block_collection.content_blocks.add(content_block)
+
         content_block.render()
         nested_content_block.render()
 
         # Confirm content blocks are in cache
-        content_block_cache = cache.get(content_block.cache_key)
-        nested_content_block_cache = cache.get(nested_content_block.cache_key)
+        content_block_cache = cache.get(cache_key)
+        nested_content_block_cache = cache.get(nested_cache_key)
         assert content_block_cache is not None
-        assert nested_content_block_cache is not None
+        assert nested_content_block_cache is None  # nested blocks are not cached
 
         nested_content_block.fields["textfield"].save_value(faker.text(256))
         # Update cache on child content block
-        nested_content_block.update_cache()
+        CacheServices.update_cache(nested_content_block)
 
-        new_content_block_cache = cache.get(content_block.cache_key)
-        new_nested_content_block_cache = cache.get(nested_content_block.cache_key)
+        new_content_block_cache = cache.get(cache_key)
+        new_nested_content_block_cache = cache.get(nested_cache_key)
         assert new_content_block_cache is not None
         assert new_content_block_cache != content_block_cache
-        assert new_nested_content_block_cache is not None
-        assert new_nested_content_block_cache != nested_content_block_cache
+        assert new_nested_content_block_cache is None  # nested blocks are not cached
 
     @pytest.mark.django_db
     def test_content_block_clone(self, nested_content_block):

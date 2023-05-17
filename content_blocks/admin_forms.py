@@ -11,7 +11,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.services.import_export import ImportExportServices
+from content_blocks.services.content_block_template import ImportExportServices
 from content_blocks.widgets import ChoicesWidget, TemplateFilenameAutocompleteWidget
 
 REQUIRED_ERROR_MSG = "This field is required"

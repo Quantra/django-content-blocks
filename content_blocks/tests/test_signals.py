@@ -11,6 +11,7 @@ from faker import Faker
 
 from content_blocks.cache import cache
 from content_blocks.models import ContentBlockCollection, ContentBlockFields
+from content_blocks.services.content_block import CacheServices
 from content_blocks.tests.factories import (
     PopulatedFileContentBlockFieldFactory,
     PopulatedImageContentBlockFieldFactory,
@@ -42,7 +43,7 @@ class TestModelChoiceSignals:
     def test_cache_updated_model_choice(
         self,
         content_block_field,
-        content_block_collection,
+        content_block_collection_factory,
         model_choice_template,
         content_block_template_field_factory,
         settings,
@@ -70,28 +71,35 @@ class TestModelChoiceSignals:
             key="modelchoicefield",
         )
 
+        related_content_block_collection = content_block_collection_factory.create()
+        parent_content_block_collection = content_block_collection_factory.create()
+
         content_block_field.template_field = content_block_template_field
         content_block_field.model_choice_content_type = (
             content_block_template_field.model_choice_content_type
         )
-        content_block_field.model_choice_object_id = content_block_collection.id
+        content_block_field.model_choice_object_id = related_content_block_collection.id
         content_block_field.save()
 
+        parent_content_block_collection.content_blocks.add(content_block)
+
+        cache_key = CacheServices.cache_key(content_block)
+
         html_1 = content_block.render()
-        assert cache.get(content_block.cache_key) == html_1
+        assert cache.get(cache_key) == html_1
 
-        content_block_collection.slug = faker.slug()
-        content_block_collection.save()
+        related_content_block_collection.slug = faker.slug()
+        related_content_block_collection.save()
 
-        html_2 = cache.get(content_block.cache_key)
+        html_2 = cache.get(cache_key)
         assert html_2 is not None
         assert html_2 != html_1
 
-        content_block_collection.delete()
+        related_content_block_collection.delete()
         content_block_field.refresh_from_db()
         assert content_block_field.model_choice is None
 
-        html_3 = cache.get(content_block.cache_key)
+        html_3 = cache.get(cache_key)
         assert html_3 is not None
         assert html_3 != html_2
 
@@ -198,25 +206,29 @@ class TestCleanupMediaSignals:
 class TestDBTemplatesSignals:
     @pytest.mark.django_db
     def test_update_cache_template(
-        self, text_content_block, template_factory, settings
+        self, text_content_block, template_factory, settings, content_block_collection
     ):
         if "dbtemplates" not in settings.INSTALLED_APPS:
             pytest.skip("skipping tests that require dbtemplates")
 
+        content_block_collection.content_blocks.add(text_content_block)
+
+        cache_key = CacheServices.cache_key(text_content_block)
+
         html = text_content_block.render()
-        assert cache.get(text_content_block.cache_key) == html
+        assert cache.get(cache_key) == html
 
         db_template = template_factory.create(
             name=text_content_block.template,
             content="db_template {{ content_block.textfield }}",
         )
 
-        new_html = cache.get(text_content_block.cache_key)
+        new_html = cache.get(cache_key)
         assert new_html is not None
         assert new_html != html
 
         db_template.delete()
-        new_html = cache.get(text_content_block.cache_key)
+        new_html = cache.get(cache_key)
         assert new_html is not None
         assert new_html == html
 

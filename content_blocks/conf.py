@@ -7,6 +7,7 @@ from django.conf import settings as django_settings
 class ContentBlocksSettings:
     # Choose which cache to use for content blocks
     CONTENT_BLOCKS_CACHE = "default"
+    CONTENT_BLOCKS_CACHE_PREFIX = "content_block"
 
     # Disable caching of content blocks
     CONTENT_BLOCKS_DISABLE_CACHE = False
@@ -35,17 +36,17 @@ class ContentBlocksSettings:
     # Set the default status message.  Can be a callable.
     CONTENT_BLOCKS_DEFAULT_STATUS_MESSAGE = ""
 
-    def __getattribute__(self, name):
-        try:
-            return getattr(django_settings, name)
-        except AttributeError:
-            return super().__getattribute__(name)
-
     # Mark context for TextField and ContentField as safe. Useful for allowing html in these fields.
     CONTENT_BLOCKS_MARK_SAFE = False
 
     # Use a textarea widget for TextFields.
     CONTENT_BLOCKS_TEXTFIELD_TEXTAREA = False
+
+    def __getattribute__(self, name):
+        try:
+            return getattr(django_settings, name)
+        except AttributeError:
+            return super().__getattribute__(name)
 
 
 settings = ContentBlocksSettings()

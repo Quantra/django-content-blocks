@@ -12,10 +12,12 @@ from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
     ContentBlockFields,
+    ContentBlockParentModel,
     FileField,
     ImageField,
     VideoField,
 )
+from content_blocks.services.content_block import CacheServices
 
 if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
 
@@ -24,10 +26,6 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
     def update_cache_model_choice(sender, instance, **kwargs):
         """
         Clear the cache for content blocks when related objects are saved. Model choice fields.
-        :param instance:
-        :param sender:
-        :param kwargs:
-        :return:
         """
         if kwargs.get("raw", False):
             # Prevent this signal from running during loaddata.
@@ -43,8 +41,13 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
                 model_choice_object_id=getattr(instance, "id", None),
             ).select_related("content_block")
 
-            for content_block_field in content_block_fields:
-                content_block_field.content_block.update_cache()
+            content_blocks = ContentBlock.objects.filter(
+                content_block_fields__in=content_block_fields
+            )
+
+            CacheServices.update_cache_all(
+                ContentBlockParentModel, queryset=content_blocks
+            )
 
         except (
             OperationalError,
@@ -66,10 +69,6 @@ if "dbtemplates" in settings.INSTALLED_APPS:
     def update_cache_template(sender, instance, **kwargs):
         """
         Clear the cache for content blocks when their db template is saved.
-        :param instance:
-        :param sender:
-        :param kwargs:
-        :return:
         """
         if kwargs.get("raw", False):
             # Prevent this signal from running during loaddata.
@@ -79,18 +78,12 @@ if "dbtemplates" in settings.INSTALLED_APPS:
             content_block_template__template_filename=instance.name.split("/")[-1]
         )
 
-        for content_block in content_blocks:
-            content_block.update_cache()
+        CacheServices.update_cache_all(ContentBlockParentModel, queryset=content_blocks)
 
 
 def cleanup_media(sender, instance, delete=False, **kwargs):
     """
     Delete old media files when no longer needed.
-    :param sender:
-    :param instance:
-    :param delete:
-    :param kwargs:
-    :return:
     """
     if kwargs.get("raw", False):
         # Prevent this signal from running during loaddata.

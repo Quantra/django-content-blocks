@@ -4,6 +4,7 @@ Content blocks template tags.
 from django import template
 
 from content_blocks.models import ContentBlockCollection
+from content_blocks.services.content_block import RenderServices
 
 register = template.Library()
 
@@ -32,9 +33,6 @@ def content_block_collection(context, content_block_collection_slug):
 def render_content_block(context, content_block):
     """
     Allows rendering of content blocks with request context.  Content blocks should have no_cache=True in this case.
-    :param context:
-    :param content_block:
-    :return:
     """
 
     # Because our context might have RequestContext already in it flatten ourselves
@@ -47,4 +45,4 @@ def render_content_block(context, content_block):
 
         context_dict.update(d)
 
-    return content_block.render(context=context_dict)
+    return RenderServices.render_content_block(content_block, context=context_dict)

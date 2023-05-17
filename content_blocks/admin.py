@@ -22,7 +22,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.services.import_export import ImportExportServices
+from content_blocks.services.content_block_template import ImportExportServices
 from content_blocks.views import (
     content_block_create,
     content_block_editor,

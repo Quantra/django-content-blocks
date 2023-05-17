@@ -9,6 +9,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
 )
+from content_blocks.services.content_block import CacheServices
 
 
 class ParentModelForm(forms.Form):
@@ -170,9 +171,9 @@ class ContentBlockForm(forms.Form):
             self.content_block.css_class = self.cleaned_data.get("css_class")
             self.content_block.saved = True
             self.content_block.save()
-            # This is problematic as parent blocks can try to render without nested blocks validating
-            # self.content_block.update_cache()
-            self.content_block.clear_cache()
+
+            # We no longer manage the cache here as drafts and nested blocks are not cached.
+
         return self.content_block
 
 
@@ -189,7 +190,7 @@ class PublishContentBlocksForm(ParentModelForm):
             new_content_block = content_block.clone(attrs={"draft": False})
             self.parent.content_blocks.add(new_content_block)
             # Cache the html
-            new_content_block.render()
+            CacheServices.update_cache_content_block(new_content_block, self.parent)
 
 
 class ResetContentBlocksForm(ParentModelForm):
