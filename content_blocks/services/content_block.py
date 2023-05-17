@@ -255,6 +255,16 @@ class RenderServices:
 
         return RenderServices.render_html(content_block, context)
 
+    class FakeRequest:
+        """
+        If we have a site but no Request object then this acts as a fake one that only has a site attribute.
+        """
+
+        site = None
+
+        def __init__(self, site):
+            self.site = site
+
     @staticmethod
     def render_html(content_block, context=None, site=None):
         """
@@ -268,7 +278,7 @@ class RenderServices:
         context = RenderServices.context(content_block, context=context)
         request = context.get("request")
         if request is None and site is not None:
-            context["request"] = {"site": site}
+            context["request"] = RenderServices.FakeRequest(site)
 
         html = render_to_string(content_block.template, context, request=request)
         return html

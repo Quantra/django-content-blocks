@@ -3,7 +3,6 @@ Content Blocks views.py
 """
 from io import StringIO
 
-from admin_forms import ContentBlockTemplateImportForm
 from django.contrib import messages
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
@@ -15,6 +14,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
+from content_blocks.admin_forms import ContentBlockTemplateImportForm
 from content_blocks.conf import settings
 from content_blocks.forms import (
     ContentBlockForm,
