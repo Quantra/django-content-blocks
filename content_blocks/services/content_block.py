@@ -79,7 +79,7 @@ class CacheServices:
         html = CacheServices.get_cache(content_block, site=site)
 
         if html is None:
-            html = RenderServices.render_html(content_block, context)
+            html = RenderServices.render_html(content_block, context, site=site)
             CacheServices.set_cache(content_block, html, site=site)
 
         return html
@@ -180,7 +180,7 @@ class CacheServices:
             # Clear the context cached property if present
             del content_block.__dict__["context"]
 
-        html = RenderServices.render_html(content_block, context=context)
+        html = RenderServices.render_html(content_block, context=context, site=site)
         CacheServices.set_cache(content_block, html, site=site)
 
         if content_block.parent:
@@ -245,7 +245,6 @@ class RenderServices:
     def render_content_block(content_block, context=None):
         """
         Main render method.  Used by ContentBlock.render and {% render_content_block %}
-        :site: If site is provided use it otherwise try and get from context.
         :return: Rendered html for the content block.
         """
         context = RenderServices.context(content_block, context=context)
@@ -257,19 +256,21 @@ class RenderServices:
         return RenderServices.render_html(content_block, context)
 
     @staticmethod
-    def render_html(content_block, context=None):
+    def render_html(content_block, context=None, site=None):
         """
         :context: Dictionary of context to render the template with.
+        :site: If a Site is supplied and there is no request context set it in the context under request.site
         :return: Rendered html for the content block.
         """
         if not RenderServices.can_render(content_block):
             return ""
 
-        context = context or RenderServices.context(content_block)
+        context = RenderServices.context(content_block, context=context)
+        request = context.get("request")
+        if request is None and site is not None:
+            context["request"] = {"site": site}
 
-        html = render_to_string(
-            content_block.template, context, request=context.get("request")
-        )
+        html = render_to_string(content_block.template, context, request=request)
         return html
 
     @staticmethod

@@ -151,6 +151,38 @@ def text_template(tmp_path_factory):
 
 
 @pytest.fixture
+def text_context_template(tmp_path_factory):
+    """
+    Text template which renders some additional context.
+    """
+    template_content = "{{ content_block.textfield }}_{{ extra_context }}"
+    template = (
+        tmp_path_factory.getbasetemp()
+        / "tmp-templates/content_blocks/content_blocks/_test_text_context.html"
+    )
+    template.parent.mkdir(parents=True, exist_ok=True)
+    template.write_text(template_content)
+    return template
+
+
+@pytest.fixture
+def text_context_site_template(tmp_path_factory):
+    """
+    Text template which renders some additional content and request.site
+    """
+    template_content = (
+        "{{ content_block.textfield }}_{{ extra_context }}_{{ request.site }}"
+    )
+    template = (
+        tmp_path_factory.getbasetemp()
+        / "tmp-templates/content_blocks/content_blocks/_test_text_context_site.html"
+    )
+    template.parent.mkdir(parents=True, exist_ok=True)
+    template.write_text(template_content)
+    return template
+
+
+@pytest.fixture
 def nested_template(tmp_path_factory):
     """
     Nested template for nested content blocks.
