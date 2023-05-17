@@ -26,6 +26,9 @@ from content_blocks.tests.factories import (
     ImageContentBlockTemplateFieldFactory,
     NestedContentBlockFieldFactory,
     NestedContentBlockTemplateFieldFactory,
+    PageFactory,
+    PageSiteFactory,
+    PageSitesFactory,
     PopulatedFileContentBlockFieldFactory,
     PopulatedImageContentBlockFieldFactory,
     PopulatedVideoContentBlockFieldFactory,
@@ -35,6 +38,9 @@ from content_blocks.tests.factories import (
 )
 
 register(SiteFactory)
+register(PageFactory)
+register(PageSiteFactory)
+register(PageSitesFactory)
 
 register(FileContentBlockTemplateFieldFactory)
 register(VideoContentBlockTemplateFieldFactory)

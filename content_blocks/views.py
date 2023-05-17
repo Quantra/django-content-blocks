@@ -203,6 +203,7 @@ def update_position(request):
     """
     Update position after a content block has been dragon dropped.
     """
+    # todo refactor to service class
     positions = request.POST.get("positions", "")
     positions = f"&{positions}".split("&cb[]=")[1:]
     for i, id in enumerate(positions):
@@ -218,6 +219,7 @@ def toggle_visible(request, content_block_id):
     """
     Toggle visible buttons
     """
+    # todo refactor to service class
     content_block = ContentBlock.objects.get(id=content_block_id)
     content_block.visible = not content_block.visible
     content_block.save()
@@ -340,6 +342,7 @@ def content_block_delete(request, content_block_id):
     """
     Delete a content block.
     """
+    # todo refactor to service class
     content_block = ContentBlock.objects.get(id=content_block_id)
 
     create_log_entry(request, content_block, DELETION, "")

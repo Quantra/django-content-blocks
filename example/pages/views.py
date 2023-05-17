@@ -3,7 +3,7 @@ Page app views.py
 """
 from django.shortcuts import get_object_or_404, render
 
-from .models import Page
+from example.pages.models import Page
 
 
 def page_detail(request, page_slug=None, preview=False):

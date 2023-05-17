@@ -50,6 +50,7 @@ class NewContentBlockFormBase(forms.Form):
         raise NotImplementedError  # pragma: no cover
 
     def create_content_block(self, content_block_template, draft=False, **kwargs):
+        # todo refactor to service class
         content_block = ContentBlock.objects.create(
             content_block_template=content_block_template,
             draft=draft,
@@ -89,6 +90,7 @@ class NewContentBlockForm(ParentModelForm, NewContentBlockFormBase):
     auto_id = "new_cb_%s"
 
     def get_available_templates(self):
+        # todo refactor to service class
         try:
             content_type = ContentType.objects.get_for_model(self.parent)
             content_block_availability = ContentBlockAvailability.objects.get(
@@ -102,6 +104,7 @@ class NewContentBlockForm(ParentModelForm, NewContentBlockFormBase):
         self.parent.content_blocks.add(content_block)
 
     def save(self):
+        # todo call service class
         content_block = self.create_content_block(
             self.cleaned_data["content_block_template"], draft=True
         )
@@ -121,6 +124,7 @@ class NewNestedBlockForm(NewContentBlockFormBase):
     auto_id = False
 
     def get_available_templates(self):
+        # todo refactor to service class
         try:
             parent = self.initial["parent"]
             return parent.template_field.nested_templates.visible()
@@ -128,6 +132,7 @@ class NewNestedBlockForm(NewContentBlockFormBase):
             return ContentBlockTemplate.objects.all()
 
     def save(self):
+        # todo call service class
         return self.create_content_block(
             self.cleaned_data["content_block_template"],
             draft=False,
@@ -163,6 +168,7 @@ class ContentBlockForm(forms.Form):
                 self.fields[key] = form_field
 
     def save(self):
+        # todo refactor to service class?
         with transaction.atomic():
             for key, field in self.content_block.fields.items():
                 if key in self.cleaned_data.keys():
@@ -184,6 +190,7 @@ class PublishContentBlocksForm(ParentModelForm):
     """
 
     def save(self):
+        # todo refactor to service class
         self.parent.content_blocks.published().delete()
 
         for content_block in self.parent.content_blocks.drafts():
@@ -199,6 +206,7 @@ class ResetContentBlocksForm(ParentModelForm):
     """
 
     def save(self):
+        # todo refactor to service class
         self.parent.content_blocks.drafts().delete()
 
         for content_block in self.parent.content_blocks.published():
@@ -221,6 +229,7 @@ class ImportContentBlocksForm(ParentModelForm):
         return self.parent._meta.model.objects.exclude(id=self.parent.id)
 
     def save(self):
+        # todo refactor to service class
         self.parent.content_blocks.drafts().delete()
 
         for content_block in self.cleaned_data["master"].content_blocks.drafts():

@@ -25,8 +25,7 @@ class ParentServices:
         if content_blocks_sites_field is None:
             return [None]
 
-        try:
-            iter(content_block_parent.content_blocks_sites_field)
-            return content_block_parent.content_blocks_sites_field
-        except TypeError:
-            return [content_block_parent.content_blocks_sites_field]
+        if hasattr(content_blocks_sites_field, "all"):
+            return content_blocks_sites_field.all()
+
+        return [content_blocks_sites_field]

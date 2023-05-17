@@ -17,6 +17,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from example.pages.models import Page, PageSite, PageSites
 
 
 class SiteFactory(DjangoModelFactory):
@@ -25,6 +26,27 @@ class SiteFactory(DjangoModelFactory):
 
     class Meta:
         model = Site
+
+
+class PageFactory(DjangoModelFactory):
+    slug = factory.Faker("slug")
+
+    class Meta:
+        model = Page
+
+
+class PageSitesFactory(DjangoModelFactory):
+    slug = factory.Faker("slug")
+
+    class Meta:
+        model = PageSites
+
+
+class PageSiteFactory(DjangoModelFactory):
+    slug = factory.Faker("slug")
+
+    class Meta:
+        model = PageSite
 
 
 class ContentBlockTemplateFactory(DjangoModelFactory):

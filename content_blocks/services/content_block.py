@@ -164,7 +164,7 @@ class CacheServices:
         :param content_block_parent_model: ContentBlockParent abstract class.
         """
         if settings.CONTENT_BLOCKS_DISABLE_CACHE:
-            return
+            return  # pragma: no cover (covered by settings tests)
 
         models = ParentServices.parent_models(content_block_parent_model)
 
@@ -234,7 +234,7 @@ class CacheServices:
     @staticmethod
     def update_cache_content_block(content_block, content_block_parent):
         """
-        Update the cache for a content block across all sites given it's parent.
+        Update the cache for a content block across all sites given its parent.
         """
         sites = ParentServices.parent_sites(content_block_parent)
         CacheServices.update_cache_per_site(content_block, sites)

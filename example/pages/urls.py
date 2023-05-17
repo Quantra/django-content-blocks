@@ -3,7 +3,7 @@ Pages app urls.py
 """
 from django.urls import path
 
-from .views import page_detail
+from example.pages.views import page_detail
 
 app = "pages"
 
