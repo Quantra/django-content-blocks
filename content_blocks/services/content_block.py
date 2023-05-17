@@ -244,7 +244,7 @@ class RenderServices:
     @staticmethod
     def render_content_block(content_block, context=None):
         """
-        Main render method.  Used by ContentBlock.render and {% render_content_block %}
+        Main public render method.  Used by ContentBlock.render and {% render_content_block %}
         :return: Rendered html for the content block.
         """
         context = RenderServices.context(content_block, context=context)
@@ -256,10 +256,6 @@ class RenderServices:
         return RenderServices.render_html(content_block, context)
 
     class FakeRequest:
-        """
-        If we have a site but no Request object then this acts as a fake one that only has a site attribute.
-        """
-
         site = None
 
         def __init__(self, site):
@@ -290,6 +286,7 @@ class RenderServices:
         """
         context = context or {}
         context[content_block.context_name] = content_block.context
+        context[f"{content_block.context_name}_object"] = content_block
         return context
 
     @staticmethod
