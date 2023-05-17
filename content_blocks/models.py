@@ -582,6 +582,13 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         context["css_class"] = self.css_class
         return context
 
+    @property
+    def can_render(self):
+        """
+        Expose can_render for use in templates.
+        """
+        return RenderServices.can_render(self)
+
     def render(self):
         """
         Render html for this block and cache.

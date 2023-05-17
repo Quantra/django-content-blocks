@@ -1,3 +1,5 @@
+{% load content_blocks %}
+
 {% for nested_block in content_block.nested %}
-  {{ nested_block.render }}
+  {% render_content_block nested_block %}
 {% endfor %}

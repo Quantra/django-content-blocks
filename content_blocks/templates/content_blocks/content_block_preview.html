@@ -2,8 +2,9 @@
 {# This is so the content block can be shown independent of any other page elements but using the same static assets. #}
 {% extends 'base.html' %}
 {% load static %}
+{% load content_blocks %}
 
 {% block body %}
-  {{ content_block.render }}
+  {% render_content_block content_block %}
   <script type="text/javascript" src="{% static 'content_blocks/iframeresizer/iframeResizer.contentWindow.js' %}"></script>
 {% endblock %}

@@ -244,7 +244,7 @@ class RenderServices:
     @staticmethod
     def render_content_block(content_block, context=None):
         """
-        Main public render method.  Used by ContentBlock.render and {% render_content_block %}
+        Main render method.  Used by ContentBlock.render and {% render_content_block %}
         :return: Rendered html for the content block.
         """
         context = RenderServices.context(content_block, context=context)
