@@ -135,7 +135,7 @@ class TestRenderServices:
         existing context supplied.
         """
         existing_context_name = "existing_context"
-        existing_context = {existing_context_name: "Context which exists"}
+        existing_context = {existing_context_name: faker.text()}
 
         context = RenderServices.context(text_content_block, context=existing_context)
 
@@ -151,6 +151,52 @@ class TestRenderServices:
 
         assert object_context_name in context.keys()
         assert context[object_context_name] == text_content_block
+
+    @pytest.mark.django_db
+    def test_site(self, rf, site):
+        """
+        Should return the site from the given context containing Request with site attribute.
+        """
+        request = rf.get("/")
+        request.site = site
+
+        context_site = RenderServices.site({"request": request})
+        assert context_site == site
+
+    @pytest.mark.django_db
+    def test_site_dummyrequest(self, site):
+        """
+        Should return the site from the given context containing DummyRequest with site attribute.
+        """
+        request = RenderServices.DummyRequest(site)
+
+        context_site = RenderServices.site({"request": request})
+        assert context_site == site
+
+    @pytest.mark.django_db
+    def test_site_none(self, rf):
+        """
+        Should return None when:
+        * There is no request key in context.
+        * The request doesn't have a site attribute.
+        * The request site attribute is None.
+        """
+        context = {}
+
+        context_site = RenderServices.site(context)
+        assert context_site is None
+
+        context["request"] = rf.get("/")
+        context_site = RenderServices.site(context)
+        assert context_site is None
+
+        context["request"].site = None
+        context_site = RenderServices.site(context)
+        assert context_site is None
+
+        context["request"] = RenderServices.DummyRequest(None)
+        context_site = RenderServices.site(context)
+        assert context_site is None
 
     @pytest.mark.django_db
     def test_can_render(
