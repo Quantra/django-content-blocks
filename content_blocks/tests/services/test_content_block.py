@@ -112,6 +112,47 @@ class TestRenderServices:
         assert html == f"{text}_{extra_context_text}_{site}"
 
     @pytest.mark.django_db
+    def test_context(self, text_content_block):
+        """
+        Should return dictionary of context containing the ContentBlock.context and the ContentBlock object.
+        """
+        context = RenderServices.context(text_content_block)
+
+        context_name = text_content_block.context_name
+
+        assert context_name in context.keys()
+        assert context[context_name] == text_content_block.context
+
+        object_context_name = f"{context_name}_object"
+
+        assert object_context_name in context.keys()
+        assert context[object_context_name] == text_content_block
+
+    @pytest.mark.django_db
+    def test_context_update(self, text_content_block):
+        """
+        Should return dictionary of context containing the ContentBlock.context, ContentBlock object and the
+        existing context supplied.
+        """
+        existing_context_name = "existing_context"
+        existing_context = {existing_context_name: "Context which exists"}
+
+        context = RenderServices.context(text_content_block, context=existing_context)
+
+        assert existing_context_name in context.keys()
+        assert context[existing_context_name] == existing_context[existing_context_name]
+
+        context_name = text_content_block.context_name
+
+        assert context_name in context.keys()
+        assert context[context_name] == text_content_block.context
+
+        object_context_name = f"{context_name}_object"
+
+        assert object_context_name in context.keys()
+        assert context[object_context_name] == text_content_block
+
+    @pytest.mark.django_db
     def test_can_render(
         self, content_block_template_factory, content_block_factory, text_template
     ):
