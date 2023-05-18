@@ -9,9 +9,8 @@ from django.core.management import call_command
 from django.db.models.signals import post_delete, post_save
 from faker import Faker
 
-from content_blocks.cache import cache
 from content_blocks.models import ContentBlockCollection, ContentBlockFields
-from content_blocks.services.content_block import CacheServices
+from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.factories import (
     PopulatedFileContentBlockFieldFactory,
     PopulatedImageContentBlockFieldFactory,

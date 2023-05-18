@@ -9,7 +9,6 @@ from django.db import IntegrityError
 from django.forms.utils import pretty_name
 from faker import Faker
 
-from content_blocks.cache import cache
 from content_blocks.conf import settings
 from content_blocks.fields import SVGAndImageFieldFormField
 from content_blocks.models import (
@@ -21,7 +20,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.services.content_block import CacheServices
+from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.storages import SettingsTestStorage
 
 faker = Faker()

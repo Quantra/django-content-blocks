@@ -1,12 +1,14 @@
 """
 Content Blocks views.py
 """
+from functools import wraps
 from io import StringIO
 
 from django.contrib import messages
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -25,8 +27,18 @@ from content_blocks.forms import (
     ResetContentBlocksForm,
 )
 from content_blocks.models import ContentBlock
-from content_blocks.permissions import require_ajax
 from content_blocks.services.content_block_template import ImportExportServices
+
+
+def require_ajax(view):
+    @wraps(view)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return view(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    return _wrapped_view
 
 
 def create_log_entry(request, obj, action_flag, change_message, **kwargs):

@@ -10,8 +10,8 @@ from faker import Faker
 from PIL import Image
 from pytest_factoryboy import register
 
-from content_blocks.cache import cache
 from content_blocks.conf import settings
+from content_blocks.services.content_block import cache
 from content_blocks.tests.factories import (
     ContentBlockAvailabilityFactory,
     ContentBlockCollectionFactory,

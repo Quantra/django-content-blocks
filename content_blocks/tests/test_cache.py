@@ -4,8 +4,8 @@ Content Blocks test_cache.py
 import pytest
 from django.core.cache import caches
 
-from content_blocks.cache import cache
 from content_blocks.conf import settings
+from content_blocks.services.content_block import cache
 
 
 class TestCache:

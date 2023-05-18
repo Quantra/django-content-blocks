@@ -1,9 +1,12 @@
+from django.core.cache import caches
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import get_template, render_to_string
 
-from content_blocks.cache import cache
 from content_blocks.conf import settings
 from content_blocks.services.content_block_parent import ParentServices
+
+# Get the appropriate cache.  Any cache use should import from here.
+cache = caches[settings.CONTENT_BLOCKS_CACHE]
 
 
 class ContentBlockFilters:
@@ -45,11 +48,12 @@ class CacheServices:
         """
         cache_key = f"{settings.CONTENT_BLOCKS_CACHE_PREFIX}_{content_block.id}"
 
-        site_id = getattr(site, "id", None)
-        if site_id is None:
-            return cache_key
+        try:
+            cache_key = f"{cache_key}_site_{site.id}"
+        except AttributeError:
+            pass
 
-        return f"{cache_key}_site_{site_id}"
+        return cache_key
 
     @staticmethod
     def get_cache(content_block, site=None):
@@ -268,8 +272,6 @@ class RenderServices:
         return RenderServices.render_html(content_block, context)
 
     class FakeRequest:
-        site = None
-
         def __init__(self, site):
             self.site = site
 

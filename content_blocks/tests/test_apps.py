@@ -2,8 +2,7 @@ import pytest
 
 import content_blocks
 from content_blocks.apps import ContentBlocksConfig
-from content_blocks.cache import cache
-from content_blocks.services.content_block import CacheServices
+from content_blocks.services.content_block import CacheServices, cache
 
 
 class TestContentBlocksConfig:

@@ -5,14 +5,13 @@ from django.core import serializers
 from django.core.management import call_command
 from faker import Faker
 
-from content_blocks.cache import cache
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
-from content_blocks.services.content_block import CacheServices
+from content_blocks.services.content_block import CacheServices, cache
 
 faker = Faker()
 
