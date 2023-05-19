@@ -107,7 +107,7 @@ class TestManagementCommands:
 
         assert cache.get(cache_key) == text
 
-        call_command("update_content_blocks_cache", verbosity=0)
+        call_command("set_content_blocks_cache", verbosity=0)
 
         assert cache.get(cache_key) == new_text
 

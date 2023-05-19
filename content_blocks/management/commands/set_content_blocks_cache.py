@@ -4,7 +4,7 @@ from content_blocks.services.content_block import CacheServices
 
 
 class Command(BaseCommand):
-    help = "Update content blocks cache"
+    help = "Set content blocks cache"
 
     def handle(self, *args, **options):
         verbosity = int(options["verbosity"])
