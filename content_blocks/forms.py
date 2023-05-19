@@ -197,7 +197,7 @@ class PublishContentBlocksForm(ParentModelForm):
             new_content_block = content_block.clone(attrs={"draft": False})
             self.parent.content_blocks.add(new_content_block)
             # Cache the html
-            CacheServices.update_cache_content_block(new_content_block, self.parent)
+            CacheServices.set_cache_content_block_parent(new_content_block, self.parent)
 
 
 class ResetContentBlocksForm(ParentModelForm):

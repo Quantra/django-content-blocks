@@ -320,7 +320,7 @@ class TestContentBlock:
 
         nested_content_block.fields["textfield"].save_value(faker.text(256))
         # Update cache on child content block
-        CacheServices.update_cache(nested_content_block)
+        CacheServices.set_cache_content_block(nested_content_block)
 
         new_content_block_cache = cache.get(cache_key)
         new_nested_content_block_cache = cache.get(nested_cache_key)

@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         verbosity = int(options["verbosity"])
 
-        CacheServices.update_cache_all()
+        CacheServices.set_cache_all()
 
         if verbosity > 0:
             self.stdout.write("Content blocks cache updated")  # pragma: no cover

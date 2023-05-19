@@ -175,9 +175,9 @@ class CacheServices:
             CacheServices.delete_cache_parent_model(model)
 
     @staticmethod
-    def update_cache(content_block, context=None, site=None):
+    def set_cache_content_block(content_block, context=None, site=None):
         """
-        Update the html stored in the cache for the given content block and any parent recursively.
+        Set the html stored in the cache for the given content block and any parent recursively.
         """
         if "context" in content_block.__dict__.keys():
             # Clear the context cached property if present
@@ -187,22 +187,24 @@ class CacheServices:
         CacheServices.set_cache(content_block, html, site=site)
 
         if content_block.parent:
-            CacheServices.update_cache(
+            CacheServices.set_cache_content_block(
                 content_block.parent.content_block, context=context, site=site
             )
 
     @staticmethod
-    def update_cache_per_site(content_block, sites, context=None):
+    def set_cache_per_site(content_block, sites, context=None):
         """
         Update the cache for the given content block for each site in sites.
         """
         for site in sites:
-            CacheServices.update_cache(content_block, context=context, site=site)
+            CacheServices.set_cache_content_block(
+                content_block, context=context, site=site
+            )
 
     @staticmethod
-    def update_cache_parent_model(content_block_parent_model, queryset=None):
+    def set_cache_parent_model(content_block_parent_model, queryset=None):
         """
-        Update the cache for all content blocks in the parent model objects.
+        Set the cache for all content blocks in the parent model objects.
         :param content_block_parent_model: ContentBlockParentModel subclass.
         :param queryset: ContentBlock queryset to limit the update to.
         """
@@ -217,12 +219,12 @@ class CacheServices:
                 )
 
             for content_block in content_blocks:
-                CacheServices.update_cache_per_site(content_block, sites)
+                CacheServices.set_cache_per_site(content_block, sites)
 
     @staticmethod
-    def update_cache_all(queryset=None):
+    def set_cache_all(queryset=None):
         """
-        Update the cache for all content blocks on a per-site basis.
+        Set the cache for all content blocks on a per-site basis.
         Used by content_blocks_update_cache management command.
         :param queryset: ContentBlock queryset to limit the update to.
         """
@@ -232,15 +234,15 @@ class CacheServices:
         models = ParentServices.parent_models()
 
         for model in models:
-            CacheServices.update_cache_parent_model(model, queryset=queryset)
+            CacheServices.set_cache_parent_model(model, queryset=queryset)
 
     @staticmethod
-    def update_cache_content_block(content_block, content_block_parent):
+    def set_cache_content_block_parent(content_block, content_block_parent):
         """
         Update the cache for a content block across all sites given its parent.
         """
         sites = ParentServices.parent_sites(content_block_parent)
-        CacheServices.update_cache_per_site(content_block, sites)
+        CacheServices.set_cache_per_site(content_block, sites)
 
 
 class RenderServices:
