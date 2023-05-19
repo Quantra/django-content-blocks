@@ -469,7 +469,11 @@ class NestedField(ContentBlockField):
 
 
 class ContentBlockManager(VisibleManager):
+    # todo consider moving some of these to service classes. Only need to keep those used in templates here?
     def get_queryset(self):
+        """
+        Basic optimisation.
+        """
         return (
             super()
             .get_queryset()
@@ -596,6 +600,16 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         except TemplateDoesNotExist:
             return False
 
+    @cached_property
+    def can_cache(self):
+        return (
+            not settings.CONTENT_BLOCKS_DISABLE_CACHE  # Don't cache if disabled in settings
+            and self.can_render  # Can't cache what can't be rendered
+            and not self.draft  # Don't cache drafts
+            and self.parent is None  # Don't cache nested content blocks
+            and not self.content_block_template.no_cache  # Don't cache if the template is marked no_cache
+        )
+
     def render(self):
         """
         Render html for this block and cache.
@@ -610,6 +624,7 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         """
         Clones the given content block and all content block fields.
         """
+        # todo refactor to service class
         new_content_block = self.make_clone(attrs=attrs)
 
         for field in self.content_block_fields.all():

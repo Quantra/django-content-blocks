@@ -2,6 +2,7 @@ from django.core.cache import caches
 from django.template.loader import render_to_string
 
 from content_blocks.conf import settings
+from content_blocks.models import ContentBlock
 from content_blocks.services.content_block_parent import ParentServices
 
 # Get the appropriate cache.  Any cache use should import from here.
@@ -10,20 +11,22 @@ cache = caches[settings.CONTENT_BLOCKS_CACHE]
 
 class ContentBlockFilters:
     @staticmethod
-    def renderable(queryset):
+    def renderable(queryset=None):
         """
         Take a queryset of ContentBlock and filter to top level with a template file.
         """
+        queryset = ContentBlock.objects.all() if queryset is None else queryset
         return queryset.filter(parent__isnull=True).exclude(
             content_block_template__template_filename=""
         )
 
     @staticmethod
-    def cacheable(queryset):
+    def cacheable(queryset=None):
         """
         Take a queryset of ContentBlock and filter to draft=False then filter by renderable.
         The resultant queryset reflects the constraints in CacheServices.can_cache().
         """
+        queryset = ContentBlock.objects.all() if queryset is None else queryset
         content_blocks = queryset.filter(draft=False)
         return ContentBlockFilters.renderable(content_blocks)
 
@@ -67,7 +70,7 @@ class CacheServices:
         """
         Set the cache for the given ContentBlock.
         """
-        if not CacheServices.can_cache(content_block):
+        if not content_block.can_cache:
             return
 
         cache_key = CacheServices.cache_key(content_block, site=site)
@@ -100,14 +103,14 @@ class CacheServices:
     def get_or_set_cache_parent_model(content_block_parent_model):
         """
         Get or set the cache for all content blocks in the given parent model objects.
-        :param content_block_parent_model: ContentBlockParent() (subclass) instance.
+        :param content_block_parent_model: ContentBlockParentModel subclass.
         """
         for obj in content_block_parent_model.objects.all():
             sites = ParentServices.parent_sites(obj)
             content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
 
             for content_block in content_blocks:
-                if CacheServices.can_cache(content_block):
+                if content_block.can_cache:
                     # Early bail out if this shouldn't be cached.
                     CacheServices.get_or_set_cache_per_site(content_block, sites)
 
@@ -239,19 +242,6 @@ class CacheServices:
         sites = ParentServices.parent_sites(content_block_parent)
         CacheServices.update_cache_per_site(content_block, sites)
 
-    @staticmethod
-    def can_cache(content_block):
-        """
-        :return: True if cache enabled and the content block is eligible for cacheing else False.
-        """
-        return (
-            not settings.CONTENT_BLOCKS_DISABLE_CACHE  # Don't cache if disabled in settings
-            and content_block.can_render  # Can't cache what can't be rendered
-            and not content_block.draft  # Don't cache drafts
-            and content_block.parent is None  # Don't cache nested content blocks
-            and not content_block.content_block_template.no_cache  # Don't cache if the template is marked no_cache
-        )
-
 
 class RenderServices:
     @staticmethod
@@ -263,7 +253,7 @@ class RenderServices:
         context = RenderServices.context(content_block, context=context)
         site = RenderServices.site(context)
 
-        if CacheServices.can_cache(content_block):
+        if content_block.can_cache:
             return CacheServices.get_or_set_cache(content_block, context, site=site)
 
         return RenderServices.render_html(content_block, context)

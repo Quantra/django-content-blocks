@@ -46,3 +46,8 @@ def render_content_block(context, content_block):
         context_dict.update(d)
 
     return RenderServices.render_content_block(content_block, context=context_dict)
+
+
+# todo render_content_blocks template tag to render a set of blocks given the parent
+
+# todo render_content_block_previews template tag as above but renders previews

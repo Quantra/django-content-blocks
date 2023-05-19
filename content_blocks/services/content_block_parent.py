@@ -11,7 +11,7 @@ class ParentServices:
     @staticmethod
     def parent_models():
         """
-        Return a list of models that use content blocks.
+        Return a list of models that use content blocks. Ie models that subclass ContentBlockParentModel.
         """
         return [
             model
@@ -22,6 +22,7 @@ class ParentServices:
     @staticmethod
     def parent_sites(content_block_parent):
         """
+        :param content_block_parent: Instance of a ContentBlockParentModel subclass.
         :return: An iterable of related Site objects if possible. If not return a list containing None.
         """
         content_blocks_sites_field = getattr(

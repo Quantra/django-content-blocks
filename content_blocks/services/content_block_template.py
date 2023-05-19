@@ -16,8 +16,6 @@ from content_blocks.models import (
     ContentBlockTemplateField,
 )
 
-# todo imports from models will likely be circular in the future so these will become local imports.
-
 
 class ImportExportServices:
     """
