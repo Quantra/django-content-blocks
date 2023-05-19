@@ -1,6 +1,6 @@
 import pytest
 
-from content_blocks.models import ContentBlockCollection, ContentBlockParentModel
+from content_blocks.models import ContentBlockCollection
 from content_blocks.services.content_block_parent import ParentServices
 from example.pages.models import Page, PageSite, PageSites
 
@@ -13,9 +13,7 @@ class TestParentServices:
         """
         parent_models = [ContentBlockCollection, Page, PageSites, PageSite]
 
-        parent_models_from_service = ParentServices.parent_models(
-            ContentBlockParentModel
-        )
+        parent_models_from_service = ParentServices.parent_models()
 
         assert parent_models_from_service == parent_models
 

@@ -1,6 +1,5 @@
 from django.core.cache import caches
-from django.template.exceptions import TemplateDoesNotExist
-from django.template.loader import get_template, render_to_string
+from django.template.loader import render_to_string
 
 from content_blocks.conf import settings
 from content_blocks.services.content_block_parent import ParentServices
@@ -113,16 +112,15 @@ class CacheServices:
                     CacheServices.get_or_set_cache_per_site(content_block, sites)
 
     @staticmethod
-    def get_or_set_cache_published(content_block_parent_model):
+    def get_or_set_cache_published():
         """
         Get or set the cache for all published content blocks.
         Used to prepopulate the cache in app.ready()
-        :param content_block_parent_model: ContentBlockParent abstract class.
         """
         if settings.CONTENT_BLOCKS_DISABLE_CACHE:
             return
 
-        models = ParentServices.parent_models(content_block_parent_model)
+        models = ParentServices.parent_models()
 
         for model in models:
             CacheServices.get_or_set_cache_parent_model(model)
@@ -160,16 +158,15 @@ class CacheServices:
                 CacheServices.delete_cache_per_site(content_block, sites)
 
     @staticmethod
-    def delete_cache_all(content_block_parent_model):
+    def delete_cache_all():
         """
         Delete the cache for all content blocks on a per-site basis.
         Used to delete the cache via the content_blocks_clear_cache management command.
-        :param content_block_parent_model: ContentBlockParent abstract class.
         """
         if settings.CONTENT_BLOCKS_DISABLE_CACHE:
             return  # pragma: no cover (covered by settings tests)
 
-        models = ParentServices.parent_models(content_block_parent_model)
+        models = ParentServices.parent_models()
 
         for model in models:
             CacheServices.delete_cache_parent_model(model)
@@ -220,17 +217,16 @@ class CacheServices:
                 CacheServices.update_cache_per_site(content_block, sites)
 
     @staticmethod
-    def update_cache_all(content_block_parent_model, queryset=None):
+    def update_cache_all(queryset=None):
         """
         Update the cache for all content blocks on a per-site basis.
         Used by content_blocks_update_cache management command.
-        :param content_block_parent_model: ContentBlockParentModel class.
         :param queryset: ContentBlock queryset to limit the update to.
         """
         if settings.CONTENT_BLOCKS_DISABLE_CACHE:
             return
 
-        models = ParentServices.parent_models(content_block_parent_model)
+        models = ParentServices.parent_models()
 
         for model in models:
             CacheServices.update_cache_parent_model(model, queryset=queryset)
@@ -250,9 +246,10 @@ class CacheServices:
         """
         return (
             not settings.CONTENT_BLOCKS_DISABLE_CACHE  # Don't cache if disabled in settings
-            and not content_block.content_block_template.no_cache  # Don't cache if the template is marked no_cache
+            and content_block.can_render  # Can't cache what can't be rendered
             and not content_block.draft  # Don't cache drafts
             and content_block.parent is None  # Don't cache nested content blocks
+            and not content_block.content_block_template.no_cache  # Don't cache if the template is marked no_cache
         )
 
 
@@ -271,7 +268,11 @@ class RenderServices:
 
         return RenderServices.render_html(content_block, context)
 
-    class FakeRequest:
+    class DummyRequest:
+        """
+        DummyRequest to hold a site attribute. In no other way similar to an actual request.
+        """
+
         def __init__(self, site):
             self.site = site
 
@@ -282,13 +283,13 @@ class RenderServices:
         :site: If a Site is supplied and there is no request context set it in the context under request.site
         :return: Rendered html for the content block.
         """
-        if not RenderServices.can_render(content_block):
+        if not content_block.can_render:
             return ""
 
         context = RenderServices.context(content_block, context=context)
         request = context.get("request")
         if request is None and site is not None:
-            context["request"] = RenderServices.FakeRequest(site)
+            context["request"] = RenderServices.DummyRequest(site)
 
         html = render_to_string(content_block.template, context, request=request)
         return html
@@ -311,16 +312,3 @@ class RenderServices:
         request = context.get("request")
         site = getattr(request, "site", None)
         return site
-
-    @staticmethod
-    def can_render(content_block):
-        """
-        :return: True if the template exists.
-        """
-        if not content_block.template:
-            return False
-        try:
-            get_template(content_block.template)
-            return True
-        except TemplateDoesNotExist:
-            return False

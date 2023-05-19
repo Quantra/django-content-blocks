@@ -1,17 +1,22 @@
 from django.apps import apps
 
+from content_blocks.models import ContentBlockParentModel
+
 
 class ParentServices:
+    """
+    Services for dealing with ContentBlockParentModel subclasses.
+    """
+
     @staticmethod
-    def parent_models(content_block_parent_model):
+    def parent_models():
         """
         Return a list of models that use content blocks.
-        :param content_block_parent_model: ContentBlockParent abstract class.
         """
         return [
             model
             for model in apps.get_models()
-            if issubclass(model, content_block_parent_model)
+            if issubclass(model, ContentBlockParentModel)
         ]
 
     @staticmethod

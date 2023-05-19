@@ -11,6 +11,8 @@ from django.core.files.storage import get_storage_class
 from django.core.validators import RegexValidator
 from django.db import models
 from django.forms.utils import pretty_name
+from django.template.exceptions import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from model_clone import CloneMixin
@@ -27,7 +29,6 @@ from content_blocks.fields import (
     SVGAndImageFieldFormField,
     VideoField,
 )
-from content_blocks.services.content_block import RenderServices
 from content_blocks.widgets import FileWidget
 
 logger = logging.getLogger(__name__)
@@ -582,12 +583,18 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         context["css_class"] = self.css_class
         return context
 
-    @property
+    @cached_property
     def can_render(self):
         """
-        Expose can_render for use in templates.
+        :return: True if the template exists.
         """
-        return RenderServices.can_render(self)
+        if not self.template:
+            return False
+        try:
+            get_template(self.template)
+            return True
+        except TemplateDoesNotExist:
+            return False
 
     def render(self):
         """
@@ -595,6 +602,8 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         This should only be called by the template and exists to support legacy projects.
         The {% render_content_block %} template tag should be used in preference.
         """
+        from content_blocks.services.content_block import RenderServices
+
         return RenderServices.render_content_block(self)
 
     def clone(self, attrs=None):

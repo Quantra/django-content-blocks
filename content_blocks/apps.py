@@ -4,7 +4,6 @@ from django.apps import AppConfig
 from django.db import OperationalError, ProgrammingError
 
 from content_blocks.conf import settings
-from content_blocks.services.content_block import CacheServices
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +25,10 @@ class ContentBlocksConfig(AppConfig):
             from content_blocks.signals import update_cache_template  # noqa
 
         if not settings.CONTENT_BLOCKS_DISABLE_CACHE_ON_START:
-            from content_blocks.models import ContentBlockParentModel
-
             try:
-                CacheServices.get_or_set_cache_published(ContentBlockParentModel)
+                from content_blocks.services.content_block import CacheServices
+
+                CacheServices.get_or_set_cache_published()
 
             except (OperationalError, ProgrammingError):  # pragma: no cover
                 # Migrate hasn't been run yet.

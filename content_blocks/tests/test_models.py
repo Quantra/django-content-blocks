@@ -135,6 +135,45 @@ class TestContentBlock:
         }
 
     @pytest.mark.django_db
+    def test_can_render(
+        self, content_block_template_factory, content_block_factory, text_template
+    ):
+        """
+        Should return True when the ContentBlockTemplate has a template file and it exists.
+        """
+        content_block_template = content_block_template_factory.create(
+            template_filename=text_template.name
+        )
+        content_block = content_block_factory.create(
+            content_block_template=content_block_template
+        )
+
+        assert content_block.can_render is True
+
+    @pytest.mark.django_db
+    def test_cannot_render_no_template(self, content_block):
+        """
+        Should return False when ContentBlockTemplate has not template file
+        """
+        assert content_block.can_render is False
+
+    @pytest.mark.django_db
+    def test_cannot_render_bad_template(
+        self, content_block_template_factory, content_block_factory
+    ):
+        """
+        Should return False when the template file does not exist.
+        """
+        content_block_template = content_block_template_factory.create(
+            template_filename=faker.file_name(extension=".html")
+        )
+        content_block = content_block_factory.create(
+            content_block_template=content_block_template
+        )
+
+        assert content_block.can_render is False
+
+    @pytest.mark.django_db
     def test_content_block_render(
         self,
         content_block_template_factory,

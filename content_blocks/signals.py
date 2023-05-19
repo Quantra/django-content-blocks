@@ -12,7 +12,6 @@ from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
     ContentBlockFields,
-    ContentBlockParentModel,
     FileField,
     ImageField,
     VideoField,
@@ -45,9 +44,7 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
                 content_block_fields__in=content_block_fields
             )
 
-            CacheServices.update_cache_all(
-                ContentBlockParentModel, queryset=content_blocks
-            )
+            CacheServices.update_cache_all(queryset=content_blocks)
 
         except (
             OperationalError,
@@ -78,7 +75,7 @@ if "dbtemplates" in settings.INSTALLED_APPS:
             content_block_template__template_filename=instance.name.split("/")[-1]
         )
 
-        CacheServices.update_cache_all(ContentBlockParentModel, queryset=content_blocks)
+        CacheServices.update_cache_all(queryset=content_blocks)
 
 
 def cleanup_media(sender, instance, delete=False, **kwargs):

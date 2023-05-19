@@ -16,11 +16,15 @@ from content_blocks.models import (
     ContentBlockTemplateField,
 )
 
+# todo imports from models will likely be circular in the future so these will become local imports.
+
 
 class ImportExportServices:
     """
     Service for import and export.
     """
+
+    # todo tests
 
     # Export ContentBlockTemplate
     @staticmethod
@@ -28,7 +32,7 @@ class ImportExportServices:
         """
         Export ContentBlockTemplate and related ContentBlockTemplateField to json.
         :param queryset: Queryset of ContentBlockTemplate defaults to ContentBlockTemplate.objects.all()
-        :param file_like: Any file like object including HttpReponse and StringIO. This is where the serializer will
+        :param file_like: Any file like object including HttpResponse and StringIO. This is where the serializer will
         write to.
         :return: Serializer value.
         """
@@ -116,6 +120,7 @@ class ImportExportServices:
 
             # Update content blocks cache
             if not settings.CONTENT_BLOCKS_DISABLE_CACHE:
+                # todo call service here not management command
                 call_command("update_content_blocks_cache", verbosity=verbosity)
 
     @staticmethod
