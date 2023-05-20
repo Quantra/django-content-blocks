@@ -10,6 +10,10 @@ cache = caches[settings.CONTENT_BLOCKS_CACHE]
 
 
 class ContentBlockFilters:
+    """
+    ContentBlock queryset filters.
+    """
+
     @staticmethod
     def renderable(queryset=None):
         """
@@ -43,6 +47,10 @@ class ContentBlockFilters:
 
 
 class CacheServices:
+    """
+    Services for cacheing ContentBlock.
+    """
+
     @staticmethod
     def cache_key(content_block, site=None):
         """
@@ -82,7 +90,8 @@ class CacheServices:
         Get the html from the cache for the given content. If it isn't in the cache set it.
         :return: The html for the given content block.
         """
-        context = context or RenderServices.context(content_block)
+        site = site or RenderServices.site(context)
+
         html = CacheServices.get_cache(content_block, site=site)
 
         if html is None:
@@ -105,7 +114,9 @@ class CacheServices:
         Get or set the cache for all content blocks in the given parent model objects.
         :param content_block_parent_model: ContentBlockParentModel subclass.
         """
-        for obj in content_block_parent_model.objects.all():
+        for obj in content_block_parent_model.objects.all().prefetch_related(
+            "content_blocks"
+        ):
             sites = ParentServices.parent_sites(obj)
             content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
 
@@ -115,7 +126,7 @@ class CacheServices:
                     CacheServices.get_or_set_cache_per_site(content_block, sites)
 
     @staticmethod
-    def get_or_set_cache_published():
+    def get_or_set_cache_all():
         """
         Get or set the cache for all published content blocks.
         Used to prepopulate the cache in app.ready()
@@ -129,15 +140,12 @@ class CacheServices:
             CacheServices.get_or_set_cache_parent_model(model)
 
     @staticmethod
-    def delete_cache(content_block, site=None, cache_key=None):
+    def delete_cache(content_block, site=None):
         """
-        Clear the html from the cache for the given content_block and any parent recursively.
+        Clear the html from the cache for the given content_block.
         """
-        cache_key = cache_key or CacheServices.cache_key(content_block, site=site)
+        cache_key = CacheServices.cache_key(content_block, site=site)
         cache.delete(cache_key)
-
-        if content_block.parent:
-            CacheServices.delete_cache(content_block.parent.content_block, site=site)
 
     @staticmethod
     def delete_cache_per_site(content_block, sites):
@@ -153,7 +161,9 @@ class CacheServices:
         Delete the cache for all content blocks in the given parent model objects.
         :param content_block_parent_model: ContentBlockParent() (subclass) instance.
         """
-        for obj in content_block_parent_model.objects.all():
+        for obj in content_block_parent_model.objects.all().prefetch_related(
+            "content_blocks"
+        ):
             sites = ParentServices.parent_sites(obj)
             content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
 
@@ -175,31 +185,24 @@ class CacheServices:
             CacheServices.delete_cache_parent_model(model)
 
     @staticmethod
-    def set_cache_content_block(content_block, context=None, site=None):
+    def set_cache_content_block(content_block, site=None):
         """
-        Set the html stored in the cache for the given content block and any parent recursively.
+        Set the html stored in the cache for the given content block.
         """
         if "context" in content_block.__dict__.keys():
             # Clear the context cached property if present
             del content_block.__dict__["context"]
 
-        html = RenderServices.render_html(content_block, context=context, site=site)
+        html = RenderServices.render_html(content_block, site=site)
         CacheServices.set_cache(content_block, html, site=site)
 
-        if content_block.parent:
-            CacheServices.set_cache_content_block(
-                content_block.parent.content_block, context=context, site=site
-            )
-
     @staticmethod
-    def set_cache_per_site(content_block, sites, context=None):
+    def set_cache_per_site(content_block, sites):
         """
         Update the cache for the given content block for each site in sites.
         """
         for site in sites:
-            CacheServices.set_cache_content_block(
-                content_block, context=context, site=site
-            )
+            CacheServices.set_cache_content_block(content_block, site=site)
 
     @staticmethod
     def set_cache_parent_model(content_block_parent_model, queryset=None):
@@ -208,7 +211,9 @@ class CacheServices:
         :param content_block_parent_model: ContentBlockParentModel subclass.
         :param queryset: ContentBlock queryset to limit the update to.
         """
-        for obj in content_block_parent_model.objects.all():
+        for obj in content_block_parent_model.objects.all().prefetch_related(
+            "content_blocks"
+        ):
             sites = ParentServices.parent_sites(obj)
             content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
 
@@ -225,7 +230,7 @@ class CacheServices:
     def set_cache_all(queryset=None):
         """
         Set the cache for all content blocks on a per-site basis.
-        Used by content_blocks_update_cache management command.
+        Used by content_blocks_set_cache management command.
         :param queryset: ContentBlock queryset to limit the update to.
         """
         if settings.CONTENT_BLOCKS_DISABLE_CACHE:
@@ -246,17 +251,19 @@ class CacheServices:
 
 
 class RenderServices:
+    """
+    Services for rendering ContentBlock to html.
+    """
+
     @staticmethod
     def render_content_block(content_block, context=None):
         """
         Main render method.  Used by ContentBlock.render and {% render_content_block %}
+        Will get or set cached html.
         :return: Rendered html for the content block.
         """
-        context = RenderServices.context(content_block, context=context)
-        site = RenderServices.site(context)
-
         if content_block.can_cache:
-            return CacheServices.get_or_set_cache(content_block, context, site=site)
+            return CacheServices.get_or_set_cache(content_block, context)
 
         return RenderServices.render_html(content_block, context)
 
@@ -271,6 +278,7 @@ class RenderServices:
     @staticmethod
     def render_html(content_block, context=None, site=None):
         """
+        Render the html for the given ContentBlock.
         :context: Dictionary of context to render the template with.
         :site: If a Site is supplied and there is no request context set it in the context under request.site
         :return: Rendered html for the content block.
@@ -278,29 +286,33 @@ class RenderServices:
         if not content_block.can_render:
             return ""
 
-        context = RenderServices.context(content_block, context=context)
-        request = context.get("request")
+        render_context = RenderServices.context(content_block, context=context)
+        request = render_context.get("request")
         if request is None and site is not None:
-            context["request"] = RenderServices.DummyRequest(site)
+            render_context["request"] = RenderServices.DummyRequest(site)
 
-        html = render_to_string(content_block.template, context, request=request)
+        html = render_to_string(content_block.template, render_context, request=request)
         return html
 
     @staticmethod
     def context(content_block, context=None):
         """
+        Adds the ContentBlock.context and ContentBlock to supplied context or creates new context.
         :return: Context dictionary to be used when rendering html.
         """
-        context = context or {}
-        context[content_block.context_name] = content_block.context
-        context[f"{content_block.context_name}_object"] = content_block
-        return context
+        render_context = context or {}
+        render_context[content_block.context_name] = content_block.context
+        render_context[f"{content_block.context_name}_object"] = content_block
+        return render_context
 
     @staticmethod
     def site(context):
         """
         :return: The site from the given context if possible.
         """
+        if not context:
+            return None
+
         request = context.get("request")
         site = getattr(request, "site", None)
         return site

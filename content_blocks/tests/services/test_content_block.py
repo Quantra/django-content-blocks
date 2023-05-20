@@ -30,6 +30,79 @@ class TestCacheServices:
             == f"{cache_prefix}_{content_block.id}_site_{site.id}"
         )
 
+    @pytest.mark.django_db
+    def test_get_cache(self, text_content_block):
+        """
+        Should return the cached html for the given ContentBlock.
+        """
+        cache_key = CacheServices.cache_key(content_block=text_content_block)
+
+        html = cache.get(cache_key)
+        assert html is None
+
+        RenderServices.render_content_block(text_content_block)
+        html = cache.get(cache_key)
+        html2 = CacheServices.get_cache(text_content_block)
+
+        assert html is not None
+        assert html == html2
+
+    @pytest.mark.django_db
+    def test_get_cache_site(self, text_content_block, site, rf):
+        """
+        Should return the cached html for the given ContentBlock.
+        """
+        request = rf.get("/")
+        request.site = site
+        context = {"request": request}
+        cache_key = CacheServices.cache_key(text_content_block, site=site)
+
+        html = cache.get(cache_key)
+        assert html is None
+
+        RenderServices.render_content_block(text_content_block, context=context)
+        html = cache.get(cache_key)
+        html2 = CacheServices.get_cache(text_content_block, site=site)
+
+        assert html is not None
+        assert html == html2
+
+    @pytest.mark.django_db
+    def test_set_cache(self, text_content_block):
+        """
+        Should set the provided html in the cache under the key for the ContentBlock.
+        """
+        cache_key = CacheServices.cache_key(text_content_block)
+        html = faker.text()
+
+        cached_html = cache.get(cache_key)
+        assert cached_html is None
+
+        CacheServices.set_cache(text_content_block, html)
+
+        cached_html = cache.get(cache_key)
+
+        assert cached_html is not None
+        assert cached_html == html
+
+    @pytest.mark.django_db
+    def test_set_cache_site(self, text_content_block, site):
+        """
+        Should set the provided html in the cache under the key for the ContentBlock and Site.
+        """
+        cache_key = CacheServices.cache_key(text_content_block, site=site)
+        html = faker.text()
+
+        cached_html = cache.get(cache_key)
+        assert cached_html is None
+
+        CacheServices.set_cache(text_content_block, html, site=site)
+
+        cached_html = cache.get(cache_key)
+
+        assert cached_html is not None
+        assert cached_html == html
+
 
 class TestRenderServices:
     @pytest.mark.django_db

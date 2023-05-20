@@ -542,7 +542,6 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
     saved = models.BooleanField(blank=True, default=False)
 
     context_name = "content_block"
-    # cache_prefix = "content_block"
 
     @cached_property
     def template(self):

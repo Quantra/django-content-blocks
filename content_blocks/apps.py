@@ -28,7 +28,7 @@ class ContentBlocksConfig(AppConfig):
             try:
                 from content_blocks.services.content_block import CacheServices
 
-                CacheServices.get_or_set_cache_published()
+                CacheServices.get_or_set_cache_all()
 
             except (OperationalError, ProgrammingError):  # pragma: no cover
                 # Migrate hasn't been run yet.

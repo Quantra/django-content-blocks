@@ -26,6 +26,10 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
         """
         Clear the cache for content blocks when related objects are saved. Model choice fields.
         """
+        # todo:
+        #  remove this.  updating cache is flakey at best because changes to related objects can also require a
+        #  cache update but this won't trigger it.  It is better to document the need to set no_cache=True for
+        #  ContentBlockTemplate containing ContentBlockModelChoiceField or to manage updating the cache yourself.
         if kwargs.get("raw", False):
             # Prevent this signal from running during loaddata.
             return
@@ -38,7 +42,7 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
             content_block_fields = ContentBlockField.objects.filter(
                 model_choice_content_type=ContentType.objects.get_for_model(sender),
                 model_choice_object_id=getattr(instance, "id", None),
-            ).select_related("content_block")
+            )
 
             content_blocks = ContentBlock.objects.filter(
                 content_block_fields__in=content_block_fields
@@ -65,7 +69,7 @@ if "dbtemplates" in settings.INSTALLED_APPS:
     @receiver(post_delete, sender=Template, dispatch_uid="update_cache_template_delete")
     def update_cache_template(sender, instance, **kwargs):
         """
-        Clear the cache for content blocks when their db template is saved.
+        Update the cache for content blocks when their db template is saved.
         """
         if kwargs.get("raw", False):
             # Prevent this signal from running during loaddata.
