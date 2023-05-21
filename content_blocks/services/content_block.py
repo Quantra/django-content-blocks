@@ -14,6 +14,8 @@ class ContentBlockFilters:
     ContentBlock queryset filters.
     """
 
+    # todo tests
+
     @staticmethod
     def renderable(queryset=None):
         """
@@ -85,6 +87,14 @@ class CacheServices:
         cache.set(cache_key, html)
 
     @staticmethod
+    def delete_cache(content_block, site=None):
+        """
+        Clear the html from the cache for the given content_block.
+        """
+        cache_key = CacheServices.cache_key(content_block, site=site)
+        cache.delete(cache_key)
+
+    @staticmethod
     def get_or_set_cache(content_block, context=None, site=None):
         """
         Get the html from the cache for the given content. If it isn't in the cache set it.
@@ -138,52 +148,6 @@ class CacheServices:
 
         for model in models:
             CacheServices.get_or_set_cache_parent_model(model)
-
-    @staticmethod
-    def delete_cache(content_block, site=None):
-        """
-        Clear the html from the cache for the given content_block.
-        """
-        # todo tests needed for this method and all below
-        cache_key = CacheServices.cache_key(content_block, site=site)
-        cache.delete(cache_key)
-
-    @staticmethod
-    def delete_cache_per_site(content_block, sites):
-        """
-        Delete the cache for the given content block for each site in sites.
-        """
-        for site in sites:
-            CacheServices.delete_cache(content_block, site=site)
-
-    @staticmethod
-    def delete_cache_parent_model(content_block_parent_model):
-        """
-        Delete the cache for all content blocks in the given parent model objects.
-        :param content_block_parent_model: ContentBlockParent() (subclass) instance.
-        """
-        for obj in content_block_parent_model.objects.all().prefetch_related(
-            "content_blocks"
-        ):
-            sites = ParentServices.parent_sites(obj)
-            content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
-
-            for content_block in content_blocks:
-                CacheServices.delete_cache_per_site(content_block, sites)
-
-    @staticmethod
-    def delete_cache_all():
-        """
-        Delete the cache for all content blocks on a per-site basis.
-        Used to delete the cache via the content_blocks_clear_cache management command.
-        """
-        if settings.CONTENT_BLOCKS_DISABLE_CACHE:
-            return  # pragma: no cover (covered by settings tests)
-
-        models = ParentServices.parent_models()
-
-        for model in models:
-            CacheServices.delete_cache_parent_model(model)
 
     @staticmethod
     def set_cache_content_block(content_block, site=None):
@@ -249,6 +213,43 @@ class CacheServices:
         """
         sites = ParentServices.parent_sites(content_block_parent)
         CacheServices.set_cache_per_site(content_block, sites)
+
+    @staticmethod
+    def delete_cache_per_site(content_block, sites):
+        """
+        Delete the cache for the given content block for each site in sites.
+        """
+        for site in sites:
+            CacheServices.delete_cache(content_block, site=site)
+
+    @staticmethod
+    def delete_cache_parent_model(content_block_parent_model):
+        """
+        Delete the cache for all content blocks in the given parent model objects.
+        :param content_block_parent_model: ContentBlockParent() (subclass) instance.
+        """
+        for obj in content_block_parent_model.objects.all().prefetch_related(
+            "content_blocks"
+        ):
+            sites = ParentServices.parent_sites(obj)
+            content_blocks = ContentBlockFilters.cacheable(obj.content_blocks.all())
+
+            for content_block in content_blocks:
+                CacheServices.delete_cache_per_site(content_block, sites)
+
+    @staticmethod
+    def delete_cache_all():
+        """
+        Delete the cache for all content blocks on a per-site basis.
+        Used to delete the cache via the content_blocks_clear_cache management command.
+        """
+        if settings.CONTENT_BLOCKS_DISABLE_CACHE:
+            return  # pragma: no cover (covered by settings tests)
+
+        models = ParentServices.parent_models()
+
+        for model in models:
+            CacheServices.delete_cache_parent_model(model)
 
 
 class RenderServices:

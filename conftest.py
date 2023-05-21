@@ -445,4 +445,4 @@ def cbt_import_export_bad_json_file(tmp_path_factory, cbt_import_export_bad_json
 def request_with_site(rf, site):
     request = rf.get("/")
     request.site = site
-    return site
+    return request

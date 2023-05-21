@@ -33,46 +33,29 @@ class TestCacheServices:
         )
 
     @pytest.mark.django_db
-    def test_get_cache(self, text_content_block):
+    @pytest.mark.parametrize("site_p", [None, lazy_fixture("site")])
+    def test_get_cache(self, text_content_block, site_p):
         """
         Should return the cached html for the given ContentBlock.
         """
-        cache_key = CacheServices.cache_key(content_block=text_content_block)
+        cache_key = CacheServices.cache_key(text_content_block, site=site_p)
 
-        html = cache.get(cache_key)
-        assert html is None
+        cached_html = cache.get(cache_key)
+        assert cached_html is None
 
-        RenderServices.render_content_block(text_content_block)
-        html = cache.get(cache_key)
-        html2 = CacheServices.get_cache(text_content_block)
+        html = faker.text()
+        cache.set(cache_key, html)
 
-        assert html is not None
-        assert html == html2
+        cached_html = CacheServices.get_cache(text_content_block, site=site_p)
 
-    @pytest.mark.django_db
-    def test_get_cache_site(self, text_content_block, site, rf):
-        """
-        Should return the cached html for the given ContentBlock.
-        """
-        request = rf.get("/")
-        request.site = site
-        context = {"request": request}
-        cache_key = CacheServices.cache_key(text_content_block, site=site)
-
-        html = cache.get(cache_key)
-        assert html is None
-
-        RenderServices.render_content_block(text_content_block, context=context)
-        html = cache.get(cache_key)
-        html2 = CacheServices.get_cache(text_content_block, site=site)
-
-        assert html is not None
-        assert html == html2
+        assert cached_html is not None
+        assert cached_html == html
 
     @pytest.mark.django_db
-    def test_set_cache(self, text_content_block):
+    @pytest.mark.parametrize("site_p", [None, lazy_fixture("site")])
+    def test_set_cache(self, text_content_block, site_p):
         """
-        Should set the provided html in the cache under the key for the ContentBlock.
+        Should set the provided html in the cache under the key for the ContentBlock and Site if provided.
         """
         cache_key = CacheServices.cache_key(text_content_block)
         html = faker.text()
@@ -88,22 +71,26 @@ class TestCacheServices:
         assert cached_html == html
 
     @pytest.mark.django_db
-    def test_set_cache_site(self, text_content_block, site):
+    @pytest.mark.parametrize("site_p", [None, lazy_fixture("site")])
+    def test_delete_cache(self, text_content_block, site_p):
         """
-        Should set the provided html in the cache under the key for the ContentBlock and Site.
+        Should delete the provided html in the cache under the key for the ContentBlock and Site if provided.
         """
-        cache_key = CacheServices.cache_key(text_content_block, site=site)
+        cache_key = CacheServices.cache_key(text_content_block, site=site_p)
         html = faker.text()
 
         cached_html = cache.get(cache_key)
         assert cached_html is None
 
-        CacheServices.set_cache(text_content_block, html, site=site)
+        cache.set(cache_key, html)
 
         cached_html = cache.get(cache_key)
-
-        assert cached_html is not None
         assert cached_html == html
+
+        CacheServices.delete_cache(text_content_block, site=site_p)
+
+        cached_html = cache.get(cache_key)
+        assert cached_html is None
 
     @pytest.mark.django_db
     @pytest.mark.parametrize("site_p", [None, lazy_fixture("site")])
@@ -340,19 +327,17 @@ class TestCacheServices:
         """
         settings.CONTENT_BLOCKS_DISABLE_CACHE = disable_cache
         # Setup several text content block and assert cache is empty
-        text_content_blocks_1 = text_content_blocks[::2]
-        text_content_blocks_2 = text_content_blocks[1::2]
 
         def assert_cache_empty(cb):
             cache_key = CacheServices.cache_key(cb)
             cached_html = cache.get(cache_key)
             assert cached_html is None
 
-        for content_block in text_content_blocks_1:
+        for content_block in text_content_blocks[::2]:
             page.content_blocks.add(content_block)
             assert_cache_empty(content_block)
 
-        for content_block in text_content_blocks_2:
+        for content_block in text_content_blocks[1::2]:
             content_block_collection.content_blocks.add(content_block)
             assert_cache_empty(content_block)
 
@@ -381,9 +366,8 @@ class TestCacheServices:
         for content_block in text_content_blocks:
             cache_key = CacheServices.cache_key(content_block)
             cached_html = cache.get(cache_key)
-            if not disable_cache:
-                assert cached_html is not None
-                assert cached_html == htmls[content_block]
+            assert cached_html is not None
+            assert cached_html == htmls[content_block]
 
 
 class TestRenderServices:
