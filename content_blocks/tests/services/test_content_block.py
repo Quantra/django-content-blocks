@@ -5,7 +5,12 @@ Tests for ContentBlock services.
 import pytest
 from faker import Faker
 
-from content_blocks.services.content_block import CacheServices, RenderServices, cache
+from content_blocks.services.content_block import (
+    CacheServices,
+    CloneServices,
+    RenderServices,
+    cache,
+)
 
 faker = Faker()
 
@@ -215,3 +220,25 @@ class TestRenderServices:
         context["request"] = RenderServices.DummyRequest(None)
         context_site = RenderServices.site(context)
         assert context_site is None
+
+
+class TestCloneServices:
+    @pytest.mark.django_db
+    def test_content_block_clone(self, nested_content_block):
+        """
+        The clone method should duplicate the content block and all fields.
+        """
+        content_block, nested_content_block = nested_content_block
+
+        new_content_block = CloneServices.clone_content_block(content_block)
+
+        assert new_content_block.id != content_block.id
+        assert new_content_block.fields.keys() == content_block.fields.keys()
+
+        new_content_block_nested_context = new_content_block.context.pop("nestedfield")
+        content_block_nested_context = content_block.context.pop("nestedfield")
+        assert (
+            new_content_block_nested_context[0].content_block_template
+            == content_block_nested_context[0].content_block_template
+        )
+        assert new_content_block.context == content_block.context

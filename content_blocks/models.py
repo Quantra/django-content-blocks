@@ -622,22 +622,6 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
 
         return RenderServices.render_content_block(self)
 
-    def clone(self, attrs=None):
-        """
-        Clones the given content block and all content block fields.
-        """
-        # todo refactor to service class
-        new_content_block = self.make_clone(attrs=attrs)
-
-        for field in self.content_block_fields.all():
-            new_field = field.make_clone(attrs={"content_block": new_content_block})
-
-            if field.template_field.field_type == ContentBlockFields.NESTED_FIELD:
-                for nested_block in field.content_blocks.all():
-                    nested_block.clone(attrs={"parent": new_field})
-
-        return new_content_block
-
 
 class ContentBlockTemplateManager(VisibleManager):
     def get_by_natural_key(self, name):

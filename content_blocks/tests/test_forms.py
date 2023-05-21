@@ -5,6 +5,7 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from faker import Faker
+from services.content_block import CloneServices
 
 from content_blocks.forms import (
     ContentBlockForm,
@@ -213,7 +214,9 @@ class TestPublishContentBlocksForm:
     @pytest.mark.django_db
     def test_save(self, content_block_collection, content_block):
         content_block_collection.content_blocks.add(content_block)
-        content_block_2 = content_block.clone(attrs={"draft": True})
+        content_block_2 = CloneServices.clone_content_block(
+            content_block, attrs={"draft": True}
+        )
         content_block_collection.content_blocks.add(content_block_2)
 
         assert ContentBlock.objects.count() == 2
@@ -232,7 +235,9 @@ class TestResetContentBlocksForm:
     @pytest.mark.django_db
     def test_save(self, content_block_collection, content_block):
         content_block_collection.content_blocks.add(content_block)
-        content_block_2 = content_block.clone(attrs={"draft": True})
+        content_block_2 = CloneServices.clone_content_block(
+            content_block, attrs={"draft": True}
+        )
         content_block_collection.content_blocks.add(content_block_2)
 
         assert ContentBlock.objects.count() == 2

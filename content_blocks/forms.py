@@ -9,7 +9,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
 )
-from content_blocks.services.content_block import CacheServices
+from content_blocks.services.content_block import CacheServices, CloneServices
 
 
 class ParentModelForm(forms.Form):
@@ -194,7 +194,9 @@ class PublishContentBlocksForm(ParentModelForm):
         self.parent.content_blocks.published().delete()
 
         for content_block in self.parent.content_blocks.drafts():
-            new_content_block = content_block.clone(attrs={"draft": False})
+            new_content_block = CloneServices.clone_content_block(
+                content_block, attrs={"draft": False}
+            )
             self.parent.content_blocks.add(new_content_block)
             # Cache the html
             CacheServices.set_cache_content_block_parent(new_content_block, self.parent)
@@ -210,7 +212,9 @@ class ResetContentBlocksForm(ParentModelForm):
         self.parent.content_blocks.drafts().delete()
 
         for content_block in self.parent.content_blocks.published():
-            new_content_block = content_block.clone(attrs={"draft": True})
+            new_content_block = CloneServices.clone_content_block(
+                content_block, attrs={"draft": True}
+            )
             self.parent.content_blocks.add(new_content_block)
 
 
@@ -233,5 +237,5 @@ class ImportContentBlocksForm(ParentModelForm):
         self.parent.content_blocks.drafts().delete()
 
         for content_block in self.cleaned_data["master"].content_blocks.drafts():
-            new_content_block = content_block.clone()
+            new_content_block = CloneServices.clone_content_block(content_block)
             self.parent.content_blocks.add(new_content_block)

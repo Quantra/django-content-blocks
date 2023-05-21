@@ -2,7 +2,7 @@ from django.core.cache import caches
 from django.template.loader import render_to_string
 
 from content_blocks.conf import settings
-from content_blocks.models import ContentBlock
+from content_blocks.models import ContentBlock, ContentBlockFields
 from content_blocks.services.content_block_parent import ParentServices
 
 # Get the appropriate cache.  Any cache use should import from here.
@@ -46,6 +46,74 @@ class ContentBlockFilters:
         queryset_ids = queryset.values_list("id", flat=True)
         content_blocks = content_blocks.filter(id__in=queryset_ids)
         return content_blocks
+
+
+class RenderServices:
+    """
+    Services for rendering ContentBlock to html.
+    """
+
+    @staticmethod
+    def render_content_block(content_block, context=None):
+        """
+        Main render method.  Used by ContentBlock.render and {% render_content_block %}
+        Will get or set cached html.
+        :return: Rendered html for the content block.
+        """
+        if content_block.can_cache:
+            return CacheServices.get_or_set_cache(content_block, context)
+
+        return RenderServices.render_html(content_block, context)
+
+    class DummyRequest:
+        """
+        DummyRequest to hold a site attribute. In no other way similar to an actual request.
+        """
+
+        def __init__(self, site):
+            self.site = site
+
+    @staticmethod
+    def render_html(content_block, context=None, site=None):
+        """
+        Render the html for the given ContentBlock.
+        :context: Dictionary of context to render the template with.
+        :site: If a Site is supplied and there is no request context set it in the context under request.site
+        :return: Rendered html for the content block.
+        """
+        if not content_block.can_render:
+            return ""
+
+        render_context = RenderServices.context(content_block, context=context)
+        request = render_context.get("request")
+        if request is None and site is not None:
+            render_context["request"] = RenderServices.DummyRequest(site)
+
+        html = render_to_string(content_block.template, render_context, request=request)
+        return html
+
+    @staticmethod
+    def context(content_block, context=None):
+        """
+        Adds the ContentBlock.context and ContentBlock to supplied context or creates new context.
+        :return: Context dictionary to be used when rendering html.
+        """
+        render_context = context or {}
+        render_context[content_block.context_name] = content_block.context
+        render_context[f"{content_block.context_name}_object"] = content_block
+        return render_context
+
+    @staticmethod
+    def site(context):
+        """
+        :return: The site from the given context if possible.
+        """
+        if not context:
+            return None
+
+        request = context.get("request")
+        site = getattr(request, "site", None)
+        return site
 
 
 class CacheServices:
@@ -249,69 +317,25 @@ class CacheServices:
             CacheServices.delete_cache_parent_model(model)
 
 
-class RenderServices:
+class CloneServices:
     """
-    Services for rendering ContentBlock to html.
+    Services for cloning ContentBlock.
     """
 
     @staticmethod
-    def render_content_block(content_block, context=None):
+    def clone_content_block(content_block, attrs=None):
         """
-        Main render method.  Used by ContentBlock.render and {% render_content_block %}
-        Will get or set cached html.
-        :return: Rendered html for the content block.
+        Clones the given content block and all content block fields.
         """
-        if content_block.can_cache:
-            return CacheServices.get_or_set_cache(content_block, context)
+        new_content_block = content_block.make_clone(attrs=attrs)
 
-        return RenderServices.render_html(content_block, context)
+        for field in content_block.content_block_fields.all():
+            new_field = field.make_clone(attrs={"content_block": new_content_block})
 
-    class DummyRequest:
-        """
-        DummyRequest to hold a site attribute. In no other way similar to an actual request.
-        """
+            if field.template_field.field_type == ContentBlockFields.NESTED_FIELD:
+                for nested_block in field.content_blocks.all():
+                    CloneServices.clone_content_block(
+                        nested_block, attrs={"parent": new_field}
+                    )
 
-        def __init__(self, site):
-            self.site = site
-
-    @staticmethod
-    def render_html(content_block, context=None, site=None):
-        """
-        Render the html for the given ContentBlock.
-        :context: Dictionary of context to render the template with.
-        :site: If a Site is supplied and there is no request context set it in the context under request.site
-        :return: Rendered html for the content block.
-        """
-        if not content_block.can_render:
-            return ""
-
-        render_context = RenderServices.context(content_block, context=context)
-        request = render_context.get("request")
-        if request is None and site is not None:
-            render_context["request"] = RenderServices.DummyRequest(site)
-
-        html = render_to_string(content_block.template, render_context, request=request)
-        return html
-
-    @staticmethod
-    def context(content_block, context=None):
-        """
-        Adds the ContentBlock.context and ContentBlock to supplied context or creates new context.
-        :return: Context dictionary to be used when rendering html.
-        """
-        render_context = context or {}
-        render_context[content_block.context_name] = content_block.context
-        render_context[f"{content_block.context_name}_object"] = content_block
-        return render_context
-
-    @staticmethod
-    def site(context):
-        """
-        :return: The site from the given context if possible.
-        """
-        if not context:
-            return None
-
-        request = context.get("request")
-        site = getattr(request, "site", None)
-        return site
+        return new_content_block
