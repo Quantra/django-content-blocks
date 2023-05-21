@@ -7,6 +7,7 @@ import factory
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from factory.django import DjangoModelFactory
+from faker import Faker
 
 from content_blocks.models import (
     ContentBlock,
@@ -19,9 +20,11 @@ from content_blocks.models import (
 )
 from example.pages.models import Page, PageSite, PageSites
 
+faker = Faker()
+
 
 class SiteFactory(DjangoModelFactory):
-    domain = factory.Faker("domain_name")
+    domain = factory.Sequence(lambda n: f"{faker.domain_word()}{n}.{faker.tld()}")
     name = factory.Faker("text")
 
     class Meta:

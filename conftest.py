@@ -259,8 +259,12 @@ def text_content_blocks(
     content_block_factory,
     content_block_field_factory,
 ):
+    """
+    Usage:
+    @pytest.mark.parametrize("text_content_blocks", [3, 6, 9], indirect=True)
+    """
     text_content_blocks = []
-    for i in range(request.param.get("num", 10)):
+    for i in range(getattr(request, "param", 5)):
         content_block = content_block_factory.create(
             content_block_template=text_content_block_template, draft=False
         )
@@ -435,3 +439,10 @@ def cbt_import_export_bad_json_file(tmp_path_factory, cbt_import_export_bad_json
     json_file.parent.mkdir(parents=True, exist_ok=True)
     json_file.write_text(cbt_import_export_bad_json)
     return json_file
+
+
+@pytest.fixture
+def request_with_site(rf, site):
+    request = rf.get("/")
+    request.site = site
+    return site

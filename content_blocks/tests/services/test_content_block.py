@@ -1,8 +1,10 @@
 import pytest
 from faker import Faker
+from pytest_lazyfixture import lazy_fixture
 
-from content_blocks.conf import settings
+from content_blocks.conf import settings as content_blocks_settings
 from content_blocks.services.content_block import CacheServices, RenderServices, cache
+from example.pages.models import Page, PageSite, PageSites
 
 faker = Faker()
 
@@ -13,7 +15,7 @@ class TestCacheServices:
         """
         The cache key should be {cache_prefix}_{id} when no site is supplied.
         """
-        cache_prefix = settings.CONTENT_BLOCKS_CACHE_PREFIX
+        cache_prefix = content_blocks_settings.CONTENT_BLOCKS_CACHE_PREFIX
         assert (
             CacheServices.cache_key(content_block)
             == f"{cache_prefix}_{content_block.id}"
@@ -24,7 +26,7 @@ class TestCacheServices:
         """
         The cache key should be {cache_prefix}_{id}_site_{site_id} when site is supplied.
         """
-        cache_prefix = settings.CONTENT_BLOCKS_CACHE_PREFIX
+        cache_prefix = content_blocks_settings.CONTENT_BLOCKS_CACHE_PREFIX
         assert (
             CacheServices.cache_key(content_block, site)
             == f"{cache_prefix}_{content_block.id}_site_{site.id}"
@@ -102,6 +104,286 @@ class TestCacheServices:
 
         assert cached_html is not None
         assert cached_html == html
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("site_p", [None, lazy_fixture("site")])
+    @pytest.mark.parametrize(
+        "context_p",
+        [None, faker.pydict(), {"request": lazy_fixture("request_with_site")}],
+    )
+    def test_get_or_set_cache(self, text_content_block, site_p, context_p):
+        """
+        Should set the cache the first time it's called and get from cache on the next call.
+        """
+        cache_key = CacheServices.cache_key(text_content_block, site=site_p)
+
+        # Check cache is empty
+        cached_html = cache.get(cache_key)
+        assert cached_html is None
+
+        # Get or set and assert the returned html is in the cache
+        html = CacheServices.get_or_set_cache(
+            text_content_block, context=context_p, site=site_p
+        )
+        cached_html = cache.get(cache_key)
+        assert cached_html is not None
+        assert cached_html == html
+
+        # Change the cached html in the cache directly and assert we get this back
+        cached_html = faker.text()
+        cache.set(cache_key, cached_html)
+        html = CacheServices.get_or_set_cache(
+            text_content_block, context=context_p, site=site_p
+        )
+        assert html == cached_html
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("num_sites", [3, 6, 9])
+    def test_get_or_set_cache_per_site(
+        self, text_content_block, site_factory, num_sites
+    ):
+        """
+        Should set the cache the first time it's called only.
+        The cache should be set for each site.
+        """
+        sites = site_factory.create_batch(num_sites)
+
+        for site in sites:
+            cache_key = CacheServices.cache_key(text_content_block, site=site)
+
+            # Check cache is empty
+            cached_html = cache.get(cache_key)
+            assert cached_html is None
+
+        CacheServices.get_or_set_cache_per_site(text_content_block, sites)
+
+        for site in sites:
+            cache_key = CacheServices.cache_key(text_content_block, site=site)
+            # Assert the cached html matches what would be rendered
+            cached_html = cache.get(cache_key)
+            assert cached_html is not None
+            assert cached_html == RenderServices.render_html(
+                text_content_block, site=site
+            )
+
+        # Change the html in the cache directly
+        html = faker.text()
+        for site in sites:
+            cache_key = CacheServices.cache_key(text_content_block, site=site)
+            cache.set(cache_key, html)
+
+        CacheServices.get_or_set_cache_per_site(text_content_block, sites)
+
+        # Confirm the cache wasn't updated this time
+        for site in sites:
+            cache_key = CacheServices.cache_key(text_content_block, site=site)
+            cached_html = cache.get(cache_key)
+            assert cached_html == html
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("text_content_blocks", [3, 6, 9], indirect=True)
+    @pytest.mark.parametrize("num_sites", [3, 6, 9])
+    def test_get_or_set_cache_parent_model_sites(
+        self, text_content_blocks, page_sites, site_factory, num_sites
+    ):
+        """
+        Should set the cache on first call only.
+        Should cache per site if the parent has a sites_field attribute.
+        Tests the case where the parent model has a M2M to Site.
+        """
+        sites = site_factory.create_batch(num_sites)
+        # Set up a Page/PageSites model with several sites.
+        for site in sites:
+            page_sites.sites.add(site)
+
+        # Set up several text_content_block and add them to the PageSites.
+        for content_block in text_content_blocks:
+            page_sites.content_blocks.add(content_block)
+
+            # Confirm the cache is empty
+            for site in sites:
+                cache_key = CacheServices.cache_key(content_block, site)
+                cached_html = cache.get(cache_key)
+                assert cached_html is None
+
+        CacheServices.get_or_set_cache_parent_model(PageSites)
+
+        # Confirm the cache is not empty and is what is expected
+        htmls = {}
+        for content_block in text_content_blocks:
+            site_htmls = {}
+            for site in sites:
+                cache_key = CacheServices.cache_key(content_block, site)
+                cached_html = cache.get(cache_key)
+                assert cached_html is not None
+                assert cached_html == RenderServices.render_html(
+                    content_block, site=site
+                )
+
+                # Update the cache directly (for the next assertions)
+                html = faker.text()
+                cache.set(cache_key, html)
+                site_htmls[site] = html
+
+            htmls[content_block] = site_htmls
+
+        CacheServices.get_or_set_cache_parent_model(PageSites)
+
+        # Confirm the cache was not updated and is not empty
+        for content_block in text_content_blocks:
+            for site in sites:
+                cache_key = CacheServices.cache_key(content_block, site)
+                cached_html = cache.get(cache_key)
+                assert cached_html is not None
+                assert cached_html == htmls[content_block][site]
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("text_content_blocks", [3, 6, 9], indirect=True)
+    def test_get_or_set_cache_parent_model_site(
+        self, text_content_blocks, page_site_factory, site
+    ):
+        """
+        Should set the cache on first call only.
+        Should cache per site if the parent has a sites_field attribute.
+        Tests the case where the parent model has a FK to Site.
+        """
+        # Set up a PageSite model with several sites.
+        page_site = page_site_factory.create(site=site)
+
+        # Set up several text_content_block and add them to the PageSites.
+        for content_block in text_content_blocks:
+            page_site.content_blocks.add(content_block)
+
+            # Confirm the cache is empty
+            cache_key = CacheServices.cache_key(content_block, site)
+            cached_html = cache.get(cache_key)
+            assert cached_html is None
+
+        CacheServices.get_or_set_cache_parent_model(PageSite)
+
+        # Confirm the cache is not empty and is what is expected
+        htmls = {}
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block, site)
+            cached_html = cache.get(cache_key)
+            assert cached_html is not None
+            assert cached_html == RenderServices.render_html(content_block, site=site)
+
+            # Update the cache directly (for the next assertions)
+            html = faker.text()
+            cache.set(cache_key, html)
+            htmls[content_block] = html
+
+        CacheServices.get_or_set_cache_parent_model(PageSite)
+
+        # Confirm the cache was not updated and is not empty
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block, site)
+            cached_html = cache.get(cache_key)
+            assert cached_html is not None
+            assert cached_html == htmls[content_block]
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("text_content_blocks", [3, 6, 9], indirect=True)
+    def test_get_or_set_cache_parent_model(self, text_content_blocks, page):
+        """
+        Should set the cache on first call only.
+        Should cache per site if the parent has a sites_field attribute.
+        Tests the case where the parent model has no relation to Site.
+        """
+        # Set up several text_content_block and add them to the PageSites.
+        for content_block in text_content_blocks:
+            page.content_blocks.add(content_block)
+
+            # Confirm the cache is empty
+            cache_key = CacheServices.cache_key(content_block)
+            cached_html = cache.get(cache_key)
+            assert cached_html is None
+
+        CacheServices.get_or_set_cache_parent_model(Page)
+
+        # Confirm the cache is not empty and is what is expected
+        htmls = {}
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block)
+            cached_html = cache.get(cache_key)
+            assert cached_html is not None
+            assert cached_html == RenderServices.render_html(content_block)
+
+            # Update the cache directly (for the next assertions)
+            html = faker.text()
+            cache.set(cache_key, html)
+            htmls[content_block] = html
+
+        CacheServices.get_or_set_cache_parent_model(PageSite)
+
+        # Confirm the cache was not updated and is not empty
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block)
+            cached_html = cache.get(cache_key)
+            assert cached_html is not None
+            assert cached_html == htmls[content_block]
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("disable_cache", [False, True])
+    @pytest.mark.parametrize("text_content_blocks", [8, 16, 24], indirect=True)
+    def test_get_or_set_cache_all(
+        self,
+        settings,
+        disable_cache,
+        text_content_blocks,
+        page,
+        content_block_collection,
+    ):
+        """
+        Should set the cache for all ContentBlock on first call and get from cache on next call.
+        """
+        settings.CONTENT_BLOCKS_DISABLE_CACHE = disable_cache
+        # Setup several text content block and assert cache is empty
+        text_content_blocks_1 = text_content_blocks[::2]
+        text_content_blocks_2 = text_content_blocks[1::2]
+
+        def assert_cache_empty(cb):
+            cache_key = CacheServices.cache_key(cb)
+            cached_html = cache.get(cache_key)
+            assert cached_html is None
+
+        for content_block in text_content_blocks_1:
+            page.content_blocks.add(content_block)
+            assert_cache_empty(content_block)
+
+        for content_block in text_content_blocks_2:
+            content_block_collection.content_blocks.add(content_block)
+            assert_cache_empty(content_block)
+
+        CacheServices.get_or_set_cache_all()
+
+        # Assert the cache is correctly populated
+        htmls = {}
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block)
+            cached_html = cache.get(cache_key)
+            rendered_html = RenderServices.render_html(content_block)
+            if not disable_cache:
+                assert cached_html is not None
+                assert cached_html == rendered_html
+            else:
+                assert cached_html is None
+
+            # Update the cache directly (for the next assertions)
+            html = faker.text()
+            cache.set(cache_key, html)
+            htmls[content_block] = html
+
+        CacheServices.get_or_set_cache_all()
+
+        # Assert the cache was not updated
+        for content_block in text_content_blocks:
+            cache_key = CacheServices.cache_key(content_block)
+            cached_html = cache.get(cache_key)
+            if not disable_cache:
+                assert cached_html is not None
+                assert cached_html == htmls[content_block]
 
 
 class TestRenderServices:

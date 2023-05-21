@@ -601,12 +601,15 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
 
     @cached_property
     def can_cache(self):
+        """
+        :return: True if the ContentBlock can be cached.
+        """
         return (
             not settings.CONTENT_BLOCKS_DISABLE_CACHE  # Don't cache if disabled in settings
-            and self.can_render  # Can't cache what can't be rendered
             and not self.draft  # Don't cache drafts
             and self.parent is None  # Don't cache nested content blocks
             and not self.content_block_template.no_cache  # Don't cache if the template is marked no_cache
+            and self.can_render  # Can't cache what can't be rendered
         )
 
     def render(self):
