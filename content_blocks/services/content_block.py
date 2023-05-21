@@ -243,9 +243,6 @@ class CacheServices:
         Delete the cache for all content blocks on a per-site basis.
         Used to delete the cache via the content_blocks_clear_cache management command.
         """
-        if settings.CONTENT_BLOCKS_DISABLE_CACHE:
-            return  # pragma: no cover (covered by settings tests)
-
         models = ParentServices.parent_models()
 
         for model in models:
