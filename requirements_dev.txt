@@ -9,6 +9,7 @@ pytest-lazy-fixture
 coverage
 django-coverage-plugin
 pytest-cov
+faker
 django-cleanup
 django-dbtemplates
 tox
