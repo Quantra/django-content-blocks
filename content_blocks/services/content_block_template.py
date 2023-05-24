@@ -15,6 +15,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from content_blocks.signals import post_import
 
 
 class ImportExportServices:
@@ -120,6 +121,8 @@ class ImportExportServices:
             if not settings.CONTENT_BLOCKS_DISABLE_CACHE:
                 # todo call service here not management command
                 call_command("set_content_blocks_cache", verbosity=verbosity)
+
+        post_import.send(ContentBlockTemplate)
 
     @staticmethod
     def import_content_block_templates_from_file(filepath, verbosity=0):

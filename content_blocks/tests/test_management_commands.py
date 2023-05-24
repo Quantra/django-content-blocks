@@ -1,9 +1,11 @@
 from io import StringIO
+from unittest.mock import MagicMock
 
 import pytest
 from django.core import serializers
 from django.core.management import call_command
 from faker import Faker
+from services.content_block_template import post_import
 
 from content_blocks.models import (
     ContentBlock,
@@ -195,3 +197,14 @@ class TestManagementCommands:
         assert content_blocks_query.count() == 1
         assert content_block_templates_query.count() == 1
         assert content_block_template_field_query.count() == 0
+
+    @pytest.mark.django_db
+    def test_import_content_block_templates_signal_sent(
+        self, cbt_import_export_json_file
+    ):
+        handler = MagicMock()
+        post_import.connect(handler, sender=ContentBlockTemplate)
+
+        call_command("import_content_block_templates", cbt_import_export_json_file)
+
+        handler.assert_called_once()

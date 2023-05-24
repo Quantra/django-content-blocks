@@ -351,3 +351,4 @@ morello_apps/media/
 /example/static/content_blocks/fontawesome/
 /django_content_blocks.egg-info/*
 /.pypirc
+/content_blocks/management/commands/test_command.py

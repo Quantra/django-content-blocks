@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError, OperationalError, ProgrammingError
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
-from django.dispatch import receiver
+from django.dispatch import Signal, receiver
 
 from content_blocks.conf import settings
 from content_blocks.models import (
@@ -17,6 +17,9 @@ from content_blocks.models import (
     VideoField,
 )
 from content_blocks.services.content_block import CacheServices
+
+# A signal we can send after an import finishes.
+post_import = Signal()
 
 if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
 
