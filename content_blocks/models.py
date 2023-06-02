@@ -1,6 +1,7 @@
 """
 Content Blocks models.py
 """
+import functools
 import json
 import logging
 
@@ -468,19 +469,29 @@ class NestedField(ContentBlockField):
         return self.content_blocks.nested()
 
 
-class ContentBlockManager(VisibleManager):
-    # todo consider moving some of these to service classes. Only need to keep those used in templates here?
-    def get_queryset(self):
-        """
-        Basic optimisation.
-        """
+def optimise_queryset(func):
+    """
+    Decorator to optimise queryset.
+    Moved from ContentBlockManager.get_queryset to here such that dumpdata can run without the select_related which
+    causes it to fail when using natural_keys.
+    """
+
+    @functools.wraps(func)
+    def wrapper(self):
         return (
-            super()
-            .get_queryset()
+            func(self)
             .prefetch_related("content_block_fields")
             .select_related("content_block_template")
         )
 
+    return wrapper
+
+
+class ContentBlockManager(VisibleManager):
+    # todo consider moving some of these to service classes. Only need to keep those used in templates here?
+    #   Could also take more care with optimisation and only apply it when needed.
+
+    @optimise_queryset
     def visible(self):
         """
         Visible published only.
@@ -488,6 +499,7 @@ class ContentBlockManager(VisibleManager):
         """
         return super().visible().filter(draft=False)
 
+    @optimise_queryset
     def previews(self):
         """
         Visible drafts only. Exclude those which haven't been saved via the editor yet (empties).
@@ -495,12 +507,14 @@ class ContentBlockManager(VisibleManager):
         """
         return super().visible().filter(draft=True, saved=True)
 
+    @optimise_queryset
     def nested(self):
         """
         Used in the context for NestedField objects. Visible but with unsaved excluded.
         """
         return super().visible().filter(draft=False, saved=True)
 
+    @optimise_queryset
     def published(self):
         """
         All published including visible=False.
@@ -508,6 +522,7 @@ class ContentBlockManager(VisibleManager):
         """
         return self.get_queryset().filter(draft=False)
 
+    @optimise_queryset
     def drafts(self):
         """
         All drafts including visible=False.
