@@ -352,3 +352,6 @@ morello_apps/media/
 /django_content_blocks.egg-info/*
 /.pypirc
 /content_blocks/management/commands/test_command.py
+/postgres_data
+/postgres_backups
+/dumps

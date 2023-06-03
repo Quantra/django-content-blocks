@@ -18,3 +18,5 @@ sphinx-autobuild
 sphinx-rtd-theme
 furo
 sphinxcontrib-images
+django-environ
+psycopg2-binary

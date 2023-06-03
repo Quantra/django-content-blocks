@@ -25,7 +25,7 @@ faker = Faker()
 
 class SiteFactory(DjangoModelFactory):
     domain = factory.Sequence(lambda n: f"{faker.domain_word()}{n}.{faker.tld()}")
-    name = factory.Faker("text")
+    name = factory.Faker("text", max_nb_chars=50)
 
     class Meta:
         model = Site

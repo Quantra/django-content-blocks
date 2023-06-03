@@ -3,3 +3,4 @@
 USE_DOCKER=yes
 IPYTHONDIR=/app/.ipython
 PYTHONPATH=/app:/app/content_blocks:/app/example
+DATABASE_URL=postgres://devuser:devpw@postgres/content_blocks

@@ -1,13 +1,11 @@
-ARG PYTHON_VERSION=3.10-slim-bullseye
-ARG ARCH=amd64
 
-# define an alias for the specfic python version used in this file.
-FROM $ARCH/python:${PYTHON_VERSION} as python
+# define an alias for the specific python version used in this file.
+FROM python:3.11.3-slim-bullseye as python
 
 # Python build stage
 FROM python as python-build-stage
 
-ARG BUILD_ENVIRONMENT=local
+ARG BUILD_ENVIRONMENT=production
 
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -17,18 +15,17 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev
 
 # Requirements are installed here to ensure they will be cached.
-COPY ./requirements.txt .
-COPY ./requirements_dev.txt .
+COPY ./requirements .
 
 # Create Python Dependency and Sub-Dependency Wheels.
 RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r requirements.txt
+  -r ${BUILD_ENVIRONMENT}.txt
 
 
 # Python 'run' stage
 FROM python as python-run-stage
 
-ARG BUILD_ENVIRONMENT=local
+ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
 
 ENV PYTHONUNBUFFERED 1
@@ -37,14 +34,16 @@ ENV BUILD_ENV ${BUILD_ENVIRONMENT}
 
 WORKDIR ${APP_HOME}
 
+RUN addgroup --system django \
+    && adduser --system --ingroup django django
+
+
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
   # Translations dependencies
   gettext \
-  # make
-  make \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -55,17 +54,25 @@ COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
 
 # use wheels to install python dependencies
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-	&& rm -rf /wheels/
+  && rm -rf /wheels/
 
-COPY ./compose/production/django/entrypoint /entrypoint
+
+COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
-COPY ./compose/local/django/start /start
+
+COPY --chown=django:django ./compose/production/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+
 # copy application code to WORKDIR
-COPY . ${APP_HOME}
+COPY --chown=django:django . ${APP_HOME}
+
+# make django owner of the WORKDIR directory as well.
+RUN chown django:django ${APP_HOME}
+
+USER django
 
 ENTRYPOINT ["/entrypoint"]

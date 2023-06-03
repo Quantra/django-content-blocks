@@ -1,6 +1,8 @@
 # Heavily inspired by / copied from https://github.com/tj-django/django-clone/blob/main/Makefile (thank you)
 # Self-Documented Makefile see https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
+# All commands are not expected to work from within the docker container. Run make on the host machine.
+
 .DEFAULT_GOAL := help
 
 # Put it first so that "make" without argument is like "make help".
@@ -13,8 +15,16 @@ help:
 # ------- Commands ---------------------------------------
 # --------------------------------------------------------
 
-coverage:  ## runs pytest and outputs coverage to coverage.xml
-	pytest --cov content_blocks --cov-report xml
+ARCH?=amd64
+docker_arch: ## set the arch environment variable for docker
+	@export ARCH=$(ARCH)
+
+docker_up: docker_arch ## runs docker compose up and waits for postgres to be ready
+	docker-compose -f local.yml up -d django
+	docker-compose -f local.yml exec django /entrypoint
+
+coverage: docker_up  ## runs pytest and outputs coverage to coverage.xml
+	docker-compose -f local.yml exec django pytest --cov content_blocks --cov-report xml
 
 clean: clean-test clean-build clean-pyc  ## remove all build, test, coverage and Python artifacts
 
@@ -49,5 +59,14 @@ release: coverage dist  ## package and upload a release, to make a new release f
 	twine upload --config-file .pypirc dist/*
 	@echo "Package published to pypi! Now commit changes and tag with the new version number. Push to github and create a release via https://github.com/Quantra/django-content-blocks/releases/new."
 
-test_settings:  ## run tests with all test settings files
-	python3 content_blocks/tests/settings_runner.py
+test_settings: docker_up  ## run tests with all test settings files
+	docker-compose -f local.yml exec django python3 content_blocks/tests/settings_runner.py
+
+backupdb: docker_up ## Backup the db to postgres_backups dir
+	docker-compose -f local.yml exec postgres backup
+
+FILENAME?=$(shell ls -at postgres_backups/*.sql.gz | head -n1 | xargs basename)
+restoredb: docker_up ## Restore the latest backup or defined FILENAME in postgres_backups
+	docker-compose -f local.yml stop django
+	docker-compose -f local.yml exec postgres restore $(FILENAME)
+	docker-compose -f local.yml start django

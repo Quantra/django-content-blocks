@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="docker compose up tox" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+  <configuration default="false" name="docs - up" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="envFilePath" value="" />
@@ -13,7 +13,7 @@
         </option>
         <option name="services">
           <list>
-            <option value="tox" />
+            <option value="docs" />
           </list>
         </option>
         <option name="sourceFilePath" value="../django-content-blocks/local.yml" />

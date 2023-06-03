@@ -9,10 +9,13 @@ services:
         - ARCH
     image: django-content-blocks_local_django
     container_name: django-content-blocks-local-django
+    depends_on:
+      - postgres
     volumes:
       - .:/app:z
     env_file:
       - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
     ports:
       - "8000:8000"
     command: "python3 manage.py runserver 0.0.0.0:8000"
@@ -21,11 +24,26 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/tox/Dockerfile
+    depends_on:
+      - postgres
     env_file:
       - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
     volumes:
       - .:/home/runner:z
-    command: tox run-parallel
+    command: tox
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: django-content-blocks_production_postgres
+    container_name: django-content-blocks-local-postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
 
   docs:
     image: django-content-blocks_local_docs
