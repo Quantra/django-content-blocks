@@ -673,8 +673,10 @@ class ContentBlockTemplate(PositionModel, AutoDateModel, VisibleModel):
 
 
 class ContentBlockTemplateFieldManager(models.Manager):
-    def get_by_natural_key(self, key, content_block_template):
-        return self.get(key=key, content_block_template=content_block_template)
+    def get_by_natural_key(self, key, content_block_template_name):
+        return self.get(
+            key=key, content_block_template__name=content_block_template_name
+        )
 
 
 class ContentBlockTemplateField(PositionModel):
@@ -745,10 +747,9 @@ class ContentBlockTemplateField(PositionModel):
         return self.key or super().__str__()
 
     def natural_key(self):
-        return (
-            self.key,
-            self.content_block_template,
-        )
+        return (self.key,) + self.content_block_template.natural_key()
+
+    natural_key.dependencies = ["content_blocks.contentblocktemplate"]
 
 
 class ContentBlockAvailability(AutoDateModel):
