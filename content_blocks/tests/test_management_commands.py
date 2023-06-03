@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from django.core import serializers
 from django.core.management import call_command
+from django.db import connection
 from faker import Faker
 from services.content_block_template import post_import
 
@@ -208,3 +209,67 @@ class TestManagementCommands:
         call_command("import_content_block_templates", cbt_import_export_json_file)
 
         handler.assert_called_once()
+
+
+class TestDjangoManagementCommands:
+    """
+    Tests to confirm some Django management commands work.
+    """
+
+    @pytest.mark.django_db
+    def test_dumpdata_loaddata(
+        self, text_content_block, content_block_collection, tmp_path_factory
+    ):
+        """
+        dumpdata is tested here because use of natural keys + select_related in the model manager causes it to fail.
+        loaddata is tested here because of the polymorphism used on ContentBlockField. When dumped and loaded the
+        sequence for ID will not be reset if our model polymorphs to a proxy model.
+        """
+        json_path = tmp_path_factory.getbasetemp() / "testdata.json"
+        json_path.touch(exist_ok=True)
+
+        content_block_collection.content_blocks.add(text_content_block)
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT nextval(%s);", ["content_blocks_contentblockfield_id_seq"]
+            )
+            sequence = cursor.fetchone()[0]
+
+        assert sequence > 0
+
+        # dumpdata json to temporary file so we can load with loaddata later
+        with json_path.open("w") as f:
+            call_command(
+                "dumpdata",
+                natural_foreign=True,
+                natural_primary=True,
+                indent=2,
+                stdout=f,
+            )
+
+        # Delete our objects
+        content_block_collection.delete()
+        text_content_block.delete()
+
+        # Reset sequences manually
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT setval(%s, 1);", ["content_blocks_contentblockfield_id_seq"]
+            )
+            cursor.execute(
+                "SELECT nextval(%s);", ["content_blocks_contentblockfield_id_seq"]
+            )
+            sequence = cursor.fetchone()[0]
+        assert sequence == 2
+
+        # loaddata
+        call_command("loaddata", str(json_path))
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT nextval(%s);", ["content_blocks_contentblockfield_id_seq"]
+            )
+            sequence = cursor.fetchone()[0]
+
+        assert sequence >= 3

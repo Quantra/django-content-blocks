@@ -45,6 +45,12 @@ else:
         return cls
 
 
+class PolymorphError(Exception):
+    """
+    Raised should polymorph fail.
+    """
+
+
 class ContentBlockFields(models.TextChoices):
     TEXT_FIELD = "TextField"
     CONTENT_FIELD = "ContentField"
@@ -141,17 +147,6 @@ class ContentBlockField(models.Model, CloneMixin):
     class Meta:
         ordering = ["template_field__position"]
 
-    def __init__(self, *args, **kwargs):
-        """
-        Polymorph to the appropriate subclass proxy model.
-        """
-        super().__init__(*args, **kwargs)
-
-        for _class in ContentBlockField.__subclasses__():
-            if self.field_type == _class.__name__:
-                self.__class__ = _class
-                break
-
     def __init_subclass__(subcls):
         """
         Wrap all subclass form_field.__get__ methods with form_field_wrapper
@@ -167,6 +162,38 @@ class ContentBlockField(models.Model, CloneMixin):
             "form_field",
             new_property,
         )
+
+    def __getattribute__(self, item):
+        """
+        Lazy polymorphism.  Only polymorph when accessing certain attrs.
+        """
+        polymorph_attrs = [
+            "form_field",
+            "context_value",
+            "save_value",
+            "template_name",
+            "preview_template_name",
+            "label",
+        ]
+        if item in polymorph_attrs:
+            self.polymorph()
+
+        return super().__getattribute__(item)
+
+    def polymorph(self):
+        """
+        Polymorph this model into a proxy model subclass.
+        """
+        if self.__class__ != ContentBlockField:
+            # Don't polymorph more than once.
+            return
+
+        for subclass in ContentBlockField.__subclasses__():
+            if self.field_type == subclass.__name__:
+                self.__class__ = subclass
+                return
+
+        raise PolymorphError(f"{self} has no subclass {self.field_type}.")
 
     @staticmethod
     def form_field_wrapper(form_field):

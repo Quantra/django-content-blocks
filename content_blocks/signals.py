@@ -39,7 +39,7 @@ if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
 
         if sender == MigrationRecorder.Migration:
             # Do not run the signal for MigrationRecorder.Migration otherwise migrations will fail
-            return
+            return  # pragma: no cover
 
         try:
             content_block_fields = ContentBlockField.objects.filter(
@@ -130,6 +130,7 @@ def cleanup_media(sender, instance, delete=False, **kwargs):
 @receiver(pre_save, sender=ImageField, dispatch_uid="cleanup_image_media_save")
 @receiver(pre_save, sender=FileField, dispatch_uid="cleanup_file_media_save")
 @receiver(pre_save, sender=VideoField, dispatch_uid="cleanup_video_media_save")
+@receiver(pre_save, sender=ContentBlockField, dispatch_uid="cleanup_media_save")
 def cleanup_media_save(sender, instance, **kwargs):
     return cleanup_media(sender, instance, delete=False, **kwargs)
 
@@ -137,5 +138,6 @@ def cleanup_media_save(sender, instance, **kwargs):
 @receiver(pre_delete, sender=ImageField, dispatch_uid="cleanup_image_media_delete")
 @receiver(pre_delete, sender=FileField, dispatch_uid="cleanup_file_media_delete")
 @receiver(pre_delete, sender=VideoField, dispatch_uid="cleanup_video_media_delete")
+@receiver(pre_delete, sender=ContentBlockField, dispatch_uid="cleanup_media_delete")
 def cleanup_media_delete(sender, instance, **kwargs):
     return cleanup_media(sender, instance, delete=True, **kwargs)

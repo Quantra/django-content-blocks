@@ -19,6 +19,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
     ContentBlockTemplateField,
+    PolymorphError,
 )
 from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.storages import SettingsTestStorage
@@ -125,7 +126,7 @@ class TestContentBlock:
         css_class context.
         We also test the value is cached on the object.
         """
-        content_block = content_block_factory.create(css_class=faker.text(256))
+        content_block = content_block_factory.create(css_class=faker.text(64))
         content_block_field = content_block_field_factory.create(
             content_block=content_block, text=faker.text(256)
         )
@@ -310,7 +311,23 @@ class TestContentBlockField:
         """
         Test polymorphism. The object class should match it's field_type choice.
         """
+        content_block_field.polymorph()
         assert content_block_field.__class__.__name__ == content_block_field.field_type
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "content_block_field",
+        [{"field_type": c[0]} for c in ContentBlockFields.choices],
+        indirect=True,
+    )
+    def test_content_block_field_polymorphism_fails(self, content_block_field):
+        """
+        Test polymorphism fails when there is no subclass to polymorph to.
+        """
+        content_block_field.field_type = faker.text(32)
+
+        with pytest.raises(PolymorphError):
+            content_block_field.polymorph()
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
