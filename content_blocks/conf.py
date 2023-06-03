@@ -15,9 +15,6 @@ class ContentBlocksSettings:
     # Disable caching of content blocks on start
     CONTENT_BLOCKS_DISABLE_CACHE_ON_START = False
 
-    # Disable updating cache on related model save
-    CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = False
-
     # Choose the storage backend to use for media files
     # Image, field and video storage settings are use instead of content blocks storage if set.
     CONTENT_BLOCKS_IMAGE_STORAGE = None

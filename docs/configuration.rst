@@ -46,9 +46,6 @@ By default the html produced by content blocks is stored in and served from the 
     ``CONTENT_BLOCKS_DISABLE_CACHE_ON_START``
         All content blocks are cached during the :py:meth:`AppConfig.ready()` method. This works well with a long or permanent cache as it means content blocks are always ready to be served from the cache.  You can disable this functionality by setting this to ``True``.  Defaults to ``False``.
 
-    ``CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE``
-        A signal is used to update the cache for :py:class:`ModelChoice` fields.  This signal runs on the save of `every` model and will make some database queries. You can disable this feature by setting this to ``True``. In this case you should use the `no_cache` option for :py:class:`ContentBlockTemplate` which contain :py:class:`ModelChoice` fields.  Defaults to ``False``
-
 Storage Backend Settings
 ------------------------
 

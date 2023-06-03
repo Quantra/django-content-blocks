@@ -1,9 +1,6 @@
 """
 Content blocks app signals.py
 """
-from django.contrib.contenttypes.models import ContentType
-from django.db import IntegrityError, OperationalError, ProgrammingError
-from django.db.migrations.recorder import MigrationRecorder
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 
@@ -20,49 +17,6 @@ from content_blocks.services.content_block import CacheServices
 
 # A signal we can send after an import finishes.
 post_import = Signal()
-
-if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
-
-    @receiver(post_save, dispatch_uid="update_cache_model_choice_save")
-    @receiver(post_delete, dispatch_uid="update_cache_model_choice_delete")
-    def update_cache_model_choice(sender, instance, **kwargs):
-        """
-        Clear the cache for content blocks when related objects are saved. Model choice fields.
-        """
-        # todo:
-        #  remove this.  updating cache is flakey at best because changes to related objects can also require a
-        #  cache update but this won't trigger it.  It is better to document the need to set no_cache=True for
-        #  ContentBlockTemplate containing ContentBlockModelChoiceField or to manage updating the cache yourself.
-        if kwargs.get("raw", False):
-            # Prevent this signal from running during loaddata.
-            return
-
-        if sender == MigrationRecorder.Migration:
-            # Do not run the signal for MigrationRecorder.Migration otherwise migrations will fail
-            return  # pragma: no cover
-
-        try:
-            content_block_fields = ContentBlockField.objects.filter(
-                model_choice_content_type=ContentType.objects.get_for_model(sender),
-                model_choice_object_id=getattr(instance, "id", None),
-            )
-
-            content_blocks = ContentBlock.objects.filter(
-                content_block_fields__in=content_block_fields
-            )
-
-            CacheServices.set_cache_all(queryset=content_blocks)
-
-        except (
-            OperationalError,
-            ProgrammingError,
-            IntegrityError,
-            ContentType.DoesNotExist,
-        ):  # pragma: no cover
-            """
-            Content blocks not migrated yet.
-            """
-            return
 
 
 if "dbtemplates" in settings.INSTALLED_APPS:

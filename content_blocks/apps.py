@@ -18,9 +18,6 @@ class ContentBlocksConfig(AppConfig):
             cleanup_media_save,
         )
 
-        if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
-            from content_blocks.signals import update_cache_model_choice  # noqa
-
         if "dbtemplates" in settings.INSTALLED_APPS:
             from content_blocks.signals import update_cache_template  # noqa
 

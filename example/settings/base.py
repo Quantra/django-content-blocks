@@ -170,5 +170,3 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-
-CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = False

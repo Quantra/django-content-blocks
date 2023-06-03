@@ -4,12 +4,9 @@ Content blocks test_signals.py
 from pathlib import Path
 
 import pytest
-from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
-from django.db.models.signals import post_delete, post_save
 from faker import Faker
 
-from content_blocks.models import ContentBlockCollection, ContentBlockFields
 from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.factories import (
     PopulatedFileContentBlockFieldFactory,
@@ -18,120 +15,6 @@ from content_blocks.tests.factories import (
 )
 
 faker = Faker()
-
-
-class TestModelChoiceSignals:
-    @pytest.fixture
-    def content_block_field(
-        self, request, content_block_field_factory, content_block_template_field_factory
-    ):
-        field_type = request.param.get("field_type", ContentBlockFields.choices[0][0])
-        return content_block_field_factory(
-            template_field=content_block_template_field_factory(
-                field_type=field_type, key=field_type.lower()
-            ),
-            field_type=field_type,
-        )
-
-    @pytest.mark.django_db
-    @pytest.mark.parametrize(
-        "content_block_field",
-        [{"field_type": ContentBlockFields.MODEL_CHOICE_FIELD}],
-        indirect=True,
-    )
-    def test_cache_updated_model_choice(
-        self,
-        content_block_field,
-        content_block_collection_factory,
-        model_choice_template,
-        content_block_template_field_factory,
-        settings,
-    ):
-        if settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
-            pytest.skip(
-                "Skipping because CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = True"
-            )
-
-        content_block = content_block_field.content_block
-        content_block_template = content_block.content_block_template
-
-        content_block_template.template_filename = model_choice_template.name
-        content_block_template.model_choice_content_type = (
-            ContentType.objects.get_for_model(ContentBlockCollection)
-        )
-        content_block_template.save()
-
-        content_block_template_field = content_block_template_field_factory.create(
-            field_type=ContentBlockFields.MODEL_CHOICE_FIELD,
-            model_choice_content_type=ContentType.objects.get_for_model(
-                ContentBlockCollection
-            ),
-            content_block_template=content_block_template,
-            key="modelchoicefield",
-        )
-
-        related_content_block_collection = content_block_collection_factory.create()
-        parent_content_block_collection = content_block_collection_factory.create()
-
-        content_block_field.template_field = content_block_template_field
-        content_block_field.model_choice_content_type = (
-            content_block_template_field.model_choice_content_type
-        )
-        content_block_field.model_choice_object_id = related_content_block_collection.id
-        content_block_field.save()
-
-        parent_content_block_collection.content_blocks.add(content_block)
-
-        cache_key = CacheServices.cache_key(content_block)
-
-        html_1 = content_block.render()
-        assert cache.get(cache_key) == html_1
-
-        related_content_block_collection.slug = faker.slug()
-        related_content_block_collection.save()
-
-        html_2 = cache.get(cache_key)
-        assert html_2 is not None
-        assert html_2 != html_1
-
-        related_content_block_collection.delete()
-        content_block_field.refresh_from_db()
-        assert content_block_field.model_choice is None
-
-        html_3 = cache.get(cache_key)
-        assert html_3 is not None
-        assert html_3 != html_2
-
-    @pytest.mark.django_db
-    def test_model_choice_cache_signal_disabled(self, text_content_block, settings):
-        if not settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
-            pytest.skip(
-                "Skipping because CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = False. "
-                "Use --ds config.settings.test_disable_update_cache_model_choice to test."
-            )
-
-        # The signal should not be connected
-        post_save_signals = [r[0][0] for r in post_save.receivers]
-        assert "update_cache_model_choice_save" not in post_save_signals
-
-        post_delete_signals = [r[0][0] for r in post_delete.receivers]
-        assert "update_cache_model_choice_delete" not in post_delete_signals
-
-    @pytest.mark.django_db
-    def test_ready_model_choice_cache_signal_connected(
-        self, text_content_block, settings
-    ):
-        if settings.CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE:
-            pytest.skip(
-                "Skipping because CONTENT_BLOCKS_DISABLE_UPDATE_CACHE_MODEL_CHOICE = True"
-            )
-
-        # The signal should be connected
-        post_save_signals = [r[0][0] for r in post_save.receivers]
-        assert "update_cache_model_choice_save" in post_save_signals
-
-        post_delete_signals = [r[0][0] for r in post_delete.receivers]
-        assert "update_cache_model_choice_delete" in post_delete_signals
 
 
 class TestCleanupMediaSignals:
