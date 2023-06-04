@@ -202,6 +202,7 @@ class ContentBlockField(models.Model, CloneMixin):
         :param form_field: the form_field.__get__ method we are wrapping
         """
 
+        @functools.wraps(form_field)
         def wrapper(self):
             field = form_field(self)
             if field is not None:
