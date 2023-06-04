@@ -1,4 +1,5 @@
 import pytest
+from django.apps import apps
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
@@ -102,7 +103,7 @@ class TestContentBlockTemplateAdmin:
         """
         Should return '-' if no template_filename or an html button marked safe.
         """
-        if "dbtemplates" not in settings.INSTALLED_APPS:
+        if not apps.is_installed("dbtemplates"):
             pytest.skip("skipping dbtemplates only tests")
 
         assert (

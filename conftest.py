@@ -5,6 +5,7 @@ Load factories for use in all tests.
 import itertools
 
 import pytest
+from django.apps import apps
 from django.core import serializers
 from faker import Faker
 from PIL import Image
@@ -105,7 +106,7 @@ def use_tmp_templates_dir(settings, tmp_path_factory):
         "django.template.loaders.app_directories.Loader",
     ]
 
-    if "dbtemplates" not in settings.INSTALLED_APPS:
+    if not apps.is_installed("dbtemplates"):
         loaders.remove("dbtemplates.loader.Loader")
 
     settings.TEMPLATES = [

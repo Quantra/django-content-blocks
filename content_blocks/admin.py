@@ -4,7 +4,7 @@ Content blocks admin.py
 from io import StringIO
 
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
-from django.conf import settings
+from django.apps import apps
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect, StreamingHttpResponse
 from django.template import TemplateDoesNotExist
@@ -158,7 +158,7 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
         )
 
 
-if "dbtemplates" in settings.INSTALLED_APPS:
+if apps.is_installed("dbtemplates"):
     from dbtemplates.models import Template
 
     admin.site.unregister(ContentBlockTemplate)

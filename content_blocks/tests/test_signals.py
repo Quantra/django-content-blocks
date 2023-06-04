@@ -4,6 +4,7 @@ Content blocks test_signals.py
 from pathlib import Path
 
 import pytest
+from django.apps import apps
 from django.core.management import call_command
 from faker import Faker
 
@@ -90,7 +91,7 @@ class TestDBTemplatesSignals:
     def test_update_cache_template(
         self, text_content_block, template_factory, settings, content_block_collection
     ):
-        if "dbtemplates" not in settings.INSTALLED_APPS:
+        if not apps.is_installed("dbtemplates"):
             pytest.skip("skipping tests that require dbtemplates")
 
         content_block_collection.content_blocks.add(text_content_block)
@@ -135,7 +136,7 @@ class TestSignals:
         populated_file_content_block_field_factory.create()
 
         call_command_args = ["dumpdata", "content_blocks"]
-        if "dbtemplates" in settings.INSTALLED_APPS:
+        if apps.is_installed("dbtemplates"):
             template_factory.create()
             call_command_args.append("dbtemplates")
 

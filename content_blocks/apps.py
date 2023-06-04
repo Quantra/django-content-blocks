@@ -1,6 +1,6 @@
 import logging
 
-from django.apps import AppConfig
+from django.apps import AppConfig, apps
 from django.db import OperationalError, ProgrammingError
 
 from content_blocks.conf import settings
@@ -18,7 +18,7 @@ class ContentBlocksConfig(AppConfig):
             cleanup_media_save,
         )
 
-        if "dbtemplates" in settings.INSTALLED_APPS:
+        if apps.is_installed("dbtemplates"):
             from content_blocks.signals import update_cache_template  # noqa
 
         if not settings.CONTENT_BLOCKS_DISABLE_CACHE_ON_START:

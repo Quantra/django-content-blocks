@@ -6,6 +6,7 @@ import json
 import logging
 
 from django import forms
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import get_storage_class
@@ -34,9 +35,8 @@ from content_blocks.widgets import FileWidget
 
 logger = logging.getLogger(__name__)
 
-if (
-    "django_cleanup" in settings.INSTALLED_APPS
-    or "django_cleanup.apps.CleanupConfig" in settings.INSTALLED_APPS
+if apps.is_installed("django_cleanup") or apps.is_installed(
+    "django_cleanup.apps.CleanupConfig"
 ):
     from django_cleanup.cleanup import cleanup_ignore
 else:

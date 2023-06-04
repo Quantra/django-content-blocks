@@ -1,10 +1,10 @@
 """
 Content blocks app signals.py
 """
+from django.apps import apps
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 
-from content_blocks.conf import settings
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
@@ -19,7 +19,7 @@ from content_blocks.services.content_block import CacheServices
 post_import = Signal()
 
 
-if "dbtemplates" in settings.INSTALLED_APPS:
+if apps.is_installed("dbtemplates"):
     from dbtemplates.models import Template
 
     @receiver(post_save, sender=Template, dispatch_uid="update_cache_template_save")
