@@ -142,19 +142,19 @@ For more information about the content block editor, please see the :doc:`the_co
 Rendering Content Blocks
 ------------------------
 
-To render a content block on a page, you need to add the following code to the template of the detail view that includes the object:
+To render a content block on a page, you need to add the following code to the template of the detail view for your object:
 
 .. code-block:: django
 
-    ...
+    {% load content_blocks %}
+
     {% for content_block in object.content_blocks.visible %}
-        {{ content_block.render }}
+        {% render_content_block content_block %}
     {% endfor %}
-    ...
 
 In this code, ``object`` refers to the object that the content blocks belong to, and ``content_blocks`` is the related manager for the :py:class:`ContentBlock` model. The :py:meth:`visible` method is called on this manager to retrieve only the content blocks that are marked as visible.
 
-The :py:meth:`render` method of the :py:class:`ContentBlock` model returns the HTML code for the content block based on its associated template and context.
+The ``{% render_content_block %}`` template tag returns the HTML code for the content block based on its associated template and context as well as the current context.
 
 After adding this code, you should be able to view your content block on your site by visiting the detail view for your object.
 

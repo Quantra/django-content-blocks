@@ -46,5 +46,6 @@ Table of Contents
    getting_started
    configuration
    content_block_templates
+   content_block_template_export_and_import
    the_content_block_editor
    example_pages_app

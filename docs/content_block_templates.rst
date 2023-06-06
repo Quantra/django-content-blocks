@@ -218,10 +218,13 @@ The following additional options are available for :py:class:`ContentBlockTempla
 .. code-block:: django
     :caption: Template Usage Example (``key = "nested_content_blocks"``)
 
-    {# If the nested content block template has a template_filename you can use render. #}
+    {# If the nested content block template has a template_filename #}
+    {# you can use the render_content_block template tag. #}
+
+    {% load content_blocks %}
 
     {% for nested_content_block in content_block.nested_content_blocks %}
-        {{ nested_content_block.render }}
+        {% render_content_block nested_content_block %}
     {% endfor %}
 
     {# Or you can reference the context of the nested content block. #}
