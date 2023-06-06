@@ -21,6 +21,7 @@ if os.getenv("READTHEDOCS", default=False) == "True":
     sys.path.insert(0, os.path.abspath("../example"))
     os.environ["DJANGO_READ_DOT_ENV_FILE"] = "True"
     os.environ["USE_DOCKER"] = "no"
+    os.environ["DATABASE_URL"] = "postgres://devuser:devpw@postgres/content_blocks"
 else:
     sys.path.insert(0, os.path.abspath("/app"))
     sys.path.insert(0, os.path.abspath("/app/content_blocks"))
