@@ -26,7 +26,7 @@ else:
     sys.path.insert(0, os.path.abspath("/app/content_blocks"))
     sys.path.insert(0, os.path.abspath("/app/example"))
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "example.settings.test"
+os.environ["DJANGO_SETTINGS_MODULE"] = "example.settings.docs"
 django.setup()
 
 # -- Project information -----------------------------------------------------
