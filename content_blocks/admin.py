@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from content_blocks.admin_forms import (
     ContentBlockTemplateAdminForm,
     ContentBlockTemplateFieldAdminForm,
+    ContentBlockTemplateFieldInlineFormSet,
 )
 from content_blocks.models import (
     ContentBlockAvailability,
@@ -52,6 +53,7 @@ VISIBLE_FIELDSET = ("Visibility", {"fields": VISIBLE_FIELDS})
 class ContentBlockTemplateFieldInline(SortableInlineAdminMixin, admin.StackedInline):
     model = ContentBlockTemplateField
     fk_name = "content_block_template"
+    formset = ContentBlockTemplateFieldInlineFormSet
     form = ContentBlockTemplateFieldAdminForm
     min_num = 0
     extra = 0

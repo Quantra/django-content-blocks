@@ -37,7 +37,7 @@ repos:
     rev: v3.0.0-alpha.9-for-vscode
     hooks:
       - id: prettier
-        args: ['--tab-width', '2', '--single-quote']
+        args: ['--tab-width', '2', '--single-quote', '--print-width', '120']
         files: >
           (?x)^(
             /static/(css|js)/.+\.(css|js)$|

@@ -1,5 +1,6 @@
 import json
 
+from adminsortable2.admin import CustomInlineFormSet
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -12,9 +13,13 @@ from content_blocks.models import (
     ContentBlockTemplateField,
 )
 from content_blocks.services.content_block_template import ImportExportServices
-from content_blocks.widgets import ChoicesWidget, TemplateFilenameAutocompleteWidget
+from content_blocks.widgets import (
+    ChoicesWidget,
+    ContentBlockTemplateFieldDeleteWidget,
+    TemplateFilenameAutocompleteWidget,
+)
 
-REQUIRED_ERROR_MSG = "This field is required"
+REQUIRED_ERROR_MSG = "This field is required."
 
 
 class ContentBlockTemplateAdminForm(forms.ModelForm):
@@ -45,6 +50,10 @@ def validate_choices(choices):
             return False
 
     return True
+
+
+class ContentBlockTemplateFieldInlineFormSet(CustomInlineFormSet):
+    deletion_widget = ContentBlockTemplateFieldDeleteWidget()
 
 
 class ContentBlockTemplateFieldAdminForm(forms.ModelForm):
@@ -95,7 +104,7 @@ class ContentBlockTemplateFieldAdminForm(forms.ModelForm):
                 self.add_error("model_choice_content_type", REQUIRED_ERROR_MSG)
 
         if self.instance.pk and "field_type" in self.changed_data:
-            self.add_error("field_type", "Field type cannot be changed after save")
+            self.add_error("field_type", "Field type cannot be changed.")
 
         return cleaned_data
 

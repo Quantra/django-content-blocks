@@ -60,3 +60,13 @@ class ChoicesWidget(forms.HiddenInput):
     def is_hidden(self):
         # Show the label in the admin change page.
         return False
+
+
+class ContentBlockTemplateFieldDeleteWidget(forms.CheckboxInput):
+    """
+    Add a warning message to the delete checkbox.
+    """
+
+    template_name = (
+        "content_blocks/admin/content_block_template_field_delete_checkbox.html"
+    )
