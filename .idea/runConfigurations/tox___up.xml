@@ -16,7 +16,7 @@
             <option value="tox" />
           </list>
         </option>
-        <option name="sourceFilePath" value="../django-content-blocks/local.yml" />
+        <option name="sourceFilePath" value="local.yml" />
       </settings>
     </deployment>
     <method v="2" />
