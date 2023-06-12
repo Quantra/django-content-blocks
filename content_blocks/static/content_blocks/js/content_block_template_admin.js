@@ -1,24 +1,24 @@
 // Wait for Django jQuery to load, so we can use it.
-window.addEventListener('load', function () {
+window.addEventListener("load", function () {
   let $ = django.jQuery;
 
   const FIELD_TYPES = {
-    NESTED_FIELD: 'NestedField',
-    CHECKBOX_FIELD: 'CheckboxField',
-    CHOICE_FIELD: 'ChoiceField',
-    MODEL_CHOICE_FIELD: 'ModelChoiceField',
-    CONTENT_FIELD: 'ContentField',
+    NESTED_FIELD: "NestedField",
+    CHECKBOX_FIELD: "CheckboxField",
+    CHOICE_FIELD: "ChoiceField",
+    MODEL_CHOICE_FIELD: "ModelChoiceField",
+    CONTENT_FIELD: "ContentField",
   };
 
   const FIELDS = {
-    MODEL_CHOICE_CONTENT_TYPE: '.field-model_choice_content_type',
-    NESTED_TEMPLATE: '.field-nested_templates',
-    CHOICES: '.field-choices',
-    REQUIRED: '.field-required',
-    HELP_TEXT: '.field-help_text',
-    CSS_CLASS: '.field-css_class',
-    MIN_NUM: '.field-min_num',
-    MAX_NUM: '.field-max_num',
+    MODEL_CHOICE_CONTENT_TYPE: ".field-model_choice_content_type",
+    NESTED_TEMPLATE: ".field-nested_templates",
+    CHOICES: ".field-choices",
+    REQUIRED: ".field-required",
+    HELP_TEXT: ".field-help_text",
+    CSS_CLASS: ".field-css_class",
+    MIN_NUM: ".field-min_num",
+    MAX_NUM: ".field-max_num",
   };
 
   const ALWAYS_HIDE = [
@@ -42,7 +42,7 @@ window.addEventListener('load', function () {
   };
 
   function showFields($field_type) {
-    let $parent = $field_type.parents('.field-field_type');
+    let $parent = $field_type.parents(".field-field_type");
     $parent.siblings(ALWAYS_HIDE.toString()).hide();
     $parent.siblings(ALWAYS_SHOW.toString()).show();
 
@@ -66,11 +66,11 @@ window.addEventListener('load', function () {
     }
   }
 
-  $('.field-field_type select').each(function () {
+  $(".field-field_type select").each(function () {
     showFields($(this));
   });
 
-  $(document).on('change', '.field-field_type select', function () {
+  $(document).on("change", ".field-field_type select", function () {
     showFields($(this));
   });
 });
