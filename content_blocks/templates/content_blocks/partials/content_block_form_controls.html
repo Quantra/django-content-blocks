@@ -1,0 +1,47 @@
+<div class="fr controls">
+  <button class="expand"
+          tabindex="-1"
+          data-target=".expander_{{ content_block.id }}"
+  >
+    <i class="fa-solid fa-light fa-chevron-up"></i>
+  </button>
+
+  {% if content_block.can_render %}
+    <button class="preview"
+            tabindex="-1"
+            data-target="#preview_{{ content_block.id }}"
+            data-save="#save_{{ content_block.id }}"
+    >
+      <i class="fa-solid fa-light fa-image"></i>
+    </button>
+  {% endif %}
+
+  <button class="visible"
+          tabindex="-1"
+          data-ajax_url="{% url 'content_blocks:toggle_visible' content_block.id %}"
+          data-label="#title_{{ content_block.id }}"
+  >
+    <i class="fa-solid fa-light {% if content_block.visible %}fa-eye{% else %}fa-eye-slash{% endif %}"></i>
+  </button>
+
+  <button class="delete"
+          tabindex="-1"
+          data-ajax_url="{% url 'content_blocks:content_block_delete' content_block.id %}"
+          data-target="#cb_{{ content_block.id }}"
+          data-label="#title_{{ content_block.id }}"
+          data-loader="#loader_{{ content_block.id }}"
+  >
+    <i class="fa-solid fa-light {% if nested_num <= min_num %}fa-trash-slash{% else %}fa-trash{% endif %}"></i>
+  </button>
+
+  <button class="save {% if saved %}saved{% endif %}"
+          tabindex="-1"
+          id="save_{{ content_block.id }}"
+          data-form="#cb_form_{{ content_block.id }}"
+          data-loader="#loader_{{ content_block.id }}"
+  >
+    <i class="fa-solid fa-light {% if saved %}fa-floppy-disk{% else %}fa-floppy-disk-circle-xmark{% endif %}"></i>
+  </button>
+
+  <button class="move" tabindex="-1"><i class="fa-solid fa-light fa-sort"></i></button>
+</div>

@@ -144,6 +144,12 @@ class ContentBlockField(models.Model, CloneMixin):
     template_name = "content_blocks/partials/fields/default.html"
     preview_template_name = None
 
+    # todo change these into editable fields
+    editor_cols = 1
+    editor_cols_min = 1
+    editor_rows = 1
+    editor_rows_min = 1
+
     class Meta:
         ordering = ["template_field__position"]
 
@@ -231,6 +237,16 @@ class ContentBlockField(models.Model, CloneMixin):
     def key(self):
         return self.template_field.key
 
+    @property
+    def width_css_class(self):
+        cols = max([self.editor_cols, self.editor_cols_min])
+        return f"w{cols}"
+
+    @property
+    def height_css_class(self):
+        rows = max([self.editor_rows, self.editor_rows_min])
+        return f"h{rows}"
+
 
 class TextField(ContentBlockField):
     class Meta:
@@ -316,7 +332,8 @@ class CheckboxField(ContentBlockField):
 
 @cleanup_ignore
 class ImageField(ContentBlockField):
-    preview_template_name = "content_blocks/partials/fields/previews/image.html"
+    template_name = "content_blocks/partials/fields/image.html"
+    editor_cols_min = 2
 
     class Meta:
         proxy = True
@@ -368,7 +385,8 @@ class FileField(ContentBlockField):
 
 @cleanup_ignore
 class VideoField(ContentBlockField):
-    preview_template_name = "content_blocks/partials/fields/previews/video.html"
+    template_name = "content_blocks/partials/fields/video.html"
+    editor_cols_min = 2
 
     class Meta:
         proxy = True
@@ -394,9 +412,8 @@ class VideoField(ContentBlockField):
 
 
 class EmbeddedVideoField(ContentBlockField):
-    preview_template_name = (
-        "content_blocks/partials/fields/previews/embedded_video.html"
-    )
+    template_name = "content_blocks/partials/fields/embedded_video.html"
+    editor_cols_min = 2
 
     class Meta:
         proxy = True

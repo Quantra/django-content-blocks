@@ -20,6 +20,77 @@ POSITIONING ELEMENTS
 
 /*
 -------------------------------------
+GRID ELEMENTS
+-------------------------------------
+*/
+
+.grid {
+  display: grid;
+  grid-auto-rows: max-content;
+}
+.grid-1-1 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.grid-1-2 {
+  grid-template-columns: 1fr 2fr;
+}
+.grid-1-1-1-1 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.gap,
+.gap-x {
+  column-gap: 20px;
+}
+.gap,
+.gap-y {
+  row-gap: 20px;
+}
+
+.center-grid {
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 100%;
+  place-items: center;
+}
+
+/*w1 - w4 represent the width of the cell*/
+
+.w1 {
+  grid-column: span 1;
+}
+.w2 {
+  grid-column: span 2;
+}
+.w3 {
+  grid-column: span 3;
+}
+.w4 {
+  grid-column: span 4;
+}
+
+/* h1 - h4 represent the height of the cell */
+
+.h1 {
+  min-height: 30px;
+}
+.h2 {
+  min-height: 60px;
+}
+.h3 {
+  min-height: 120px;
+}
+.h4 {
+  min-height: 240px;
+}
+.h5 {
+  min-height: 360px;
+}
+.h6 {
+  min-height: 480px;
+}
+
+/*
+-------------------------------------
 FLOATING ELEMENTS
 -------------------------------------
 */
@@ -40,77 +111,6 @@ FLOATING ELEMENTS
   clear: right;
 }
 
-/*
--------------------------------------
-RESPONSIVE
--------------------------------------
-*/
-
-@media (min-width: 1449px) {
-  .cl-4 {
-    clear: left;
-  }
-
-  .col {
-    width: 25%;
-  }
-}
-
-@media (max-width: 1448px) {
-  .cl-4 {
-    clear: none;
-  }
-
-  .cl-3 {
-    clear: left;
-  }
-
-  .col {
-    width: 33.3%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .cl-3 {
-    clear: none;
-  }
-
-  .cl-2 {
-    clear: left;
-  }
-
-  .col {
-    width: 50%;
-  }
-
-  .title-bar .field-wrapper.title {
-    width: auto;
-  }
-}
-
-@media (max-width: 767px) {
-  .cl-2 {
-    clear: none;
-  }
-
-  .col {
-    width: 100%;
-  }
-
-  div.status {
-    display: none;
-  }
-
-  .publish-bar i {
-    display: none;
-  }
-
-  body .popup.small .popup-wrapper {
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
 .cb-editor * {
   box-sizing: border-box;
 }
@@ -122,51 +122,9 @@ CLEARFIX
 */
 
 .clearfix::after {
-  content: '';
+  content: "";
   clear: both;
   display: table;
-}
-
-/*
--------------------------------------
-CENTRE HOVER
--------------------------------------
-*/
-
-.cenrel {
-  position: relative;
-}
-
-.cenabs {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 500;
-}
-
-.cenabs.fr {
-  right: 0;
-  left: auto;
-  float: none;
-}
-
-.cenabs.fl {
-  left: 0;
-  right: auto;
-  float: none;
-}
-
-.centab {
-  display: table;
-  width: 100%;
-  height: 100%;
-}
-
-.cencell {
-  display: table-cell;
-  vertical-align: middle;
 }
 
 /*
@@ -186,31 +144,16 @@ Content Block Editor
   padding-top: 10px;
 }
 
-.cb-create-form,
-.cb-nested-create-form {
-  clear: both;
-}
 .cb-create-form {
   margin-top: 20px;
 }
 
-.cb-import-form select,
-.cb-create-form select,
-.nested-create-form select {
-  width: 49.5% !important;
-  float: left;
-  margin: 0;
-}
-
-.cb-import-form button[type='submit'],
-.cb-create-form button[type='submit'],
-.nested-create-form button[type='submit'] {
+.cb-import-form button[type="submit"],
+.cb-create-form button[type="submit"],
+.nested-create-form button[type="submit"] {
   height: 30px;
-  width: 49.5%;
-  float: right;
   border: none;
   transition: all 0.3s;
-  margin: 0;
 }
 
 .content-blocks {
@@ -250,7 +193,7 @@ BUTTONS
 button {
   cursor: pointer;
   vertical-align: middle;
-  font-family: 'Roboto', 'Lucida Grande', Verdana, Arial, sans-serif;
+  font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
   font-weight: normal;
   font-size: 13px;
 }
@@ -262,9 +205,7 @@ CONTROLS
 */
 
 .controls {
-  position: absolute;
-  top: 5px;
-  right: 0;
+  margin-top: 5px;
 }
 
 .controls button {
@@ -295,10 +236,6 @@ CONTROLS
   clear: both;
 }
 
-.content-blocks .wrapper-controls {
-  padding: 20px 0 0 0;
-}
-
 .root-wrapper-controls.controls {
   padding-top: 0;
 }
@@ -308,7 +245,7 @@ CONTROLS
     color: var(--link-fg);
   }
 }
-html[data-theme='light'] .wrapper-controls button {
+html[data-theme="light"] .wrapper-controls button {
   color: var(--link-fg);
 }
 
@@ -320,9 +257,8 @@ NESTED TITLE
 
 h3.nested-title {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  padding-bottom: 0;
+  bottom: 1px;
+  left: 1px;
 }
 
 /*
@@ -355,24 +291,12 @@ FORM
 -------------------------------------
 */
 
-.field-wrapper {
-  padding: 10px 10px 0 10px;
-  max-width: 100%;
+.fields {
+  padding: 10px;
 }
 
 label {
-  width: 32%;
   padding: 7px 28px 0 0;
-}
-.field {
-  width: 68%;
-}
-
-.col-1-1 label {
-  width: 7.7%;
-}
-.col-1-1 .field {
-  width: 92.3%;
 }
 
 input,
@@ -381,11 +305,11 @@ textarea {
   width: 100%;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   width: auto;
 }
 
-input[type='file'] {
+input[type="file"] {
   height: 30px;
   padding: 3px 0 0 0;
 }
@@ -399,9 +323,12 @@ textarea {
   resize: vertical;
 }
 
+.field-wrapper.checkbox {
+  display: block;
+  padding-top: 7px;
+}
 label.checkbox {
   width: 100%;
-  padding: 0;
 }
 label.checkbox span {
   bottom: 0;
@@ -448,6 +375,7 @@ FORM ERRORS
 
 .field-errors {
   margin: 0;
+  grid-column-end: span 2;
 }
 
 ul.errorlist {
@@ -466,6 +394,11 @@ ul.errorlist li {
 IMAGE WIDGET
 -------------------------------------
 */
+.field-wrapper.imagefield,
+.field-wrapper.embeddedvideofield,
+.field-wrapper.videofield {
+  grid-template-columns: 1fr;
+}
 
 label.currently {
   width: 100%;
@@ -581,8 +514,11 @@ LOADERS
   left: 0;
   z-index: 90;
 }
+.loader .bg.visible {
+  display: grid;
+}
 .loader .bg:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -647,6 +583,10 @@ POPUPS
 -------------------------------------
 */
 
+#popup_base {
+  display: none;
+}
+
 html.noscroll {
   position: fixed;
   overflow-y: scroll;
@@ -660,10 +600,10 @@ html.noscroll {
   top: 0;
   left: 0;
   z-index: 9000;
-  display: none;
+  transition: opacity 0.3s;
 }
 .popup:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -672,16 +612,13 @@ html.noscroll {
   background-color: var(--darkened-bg);
   opacity: 0.8;
 }
-.popup.small .popup-wrapper {
-  width: 500px;
-  margin: 0 auto;
-}
 
 .popup-wrapper {
   position: relative;
   background-color: var(--body-bg);
   padding: 50px;
   border: 1px solid var(--hairline-color);
+  max-width: 500px;
 }
 
 .popup-controls {

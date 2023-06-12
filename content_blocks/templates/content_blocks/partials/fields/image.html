@@ -1,0 +1,9 @@
+{% extends 'content_blocks/partials/fields/field_preview_base.html' %}
+
+{% block preview %}
+  {% if field.value %}
+    <img class="image-preview" src="{{ field.value.url }}" alt="" />
+  {% else %}
+    <i class="fa-solid fa-thin fa-image-slash fa-2x no-image-preview"></i>
+  {% endif %}
+{% endblock %}

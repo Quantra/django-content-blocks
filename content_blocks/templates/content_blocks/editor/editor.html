@@ -1,4 +1,5 @@
 {% extends 'content_blocks/editor/base.html' %}
+{% load static %}
 {% load admin_urls %}
 {% load i18n %}
 {% load content_block_admin %}
@@ -16,6 +17,7 @@
       });
     });
   </script>
+  <script type="text/javascript" src="{% static 'content_blocks/js/grid.js' %}"></script>
 {% endblock %}
 
 <!-- BREADCRUMBS -->
@@ -68,7 +70,7 @@
           <form
             action="{% url opts|admin_urlname:'import_content_blocks' parent.id %}"
             method="post"
-            class="import-form clearfix"
+            class="import-form clearfix grid grid-1-1 gap-x"
             data-loader="#loader_root"
           >
             {% for field in import_content_blocks_form %}
@@ -84,8 +86,10 @@
       {% include 'content_blocks/editor/content_block_forms.html' %}
     </div>
 
-    <div class="cb-create-form clearfix">
-      <form action="{% url opts|admin_urlname:'content_block_create' parent.id %}" method="post" class="create-form">
+    <div class="cb-create-form">
+      <form action="{% url opts|admin_urlname:'content_block_create' parent.id %}"
+            method="post"
+            class="create-form grid grid-1-1 gap-x">
         {% for field in new_content_block_form %}
           {{ field }}
         {% endfor %}
@@ -132,4 +136,8 @@
   {% include 'content_blocks/partials/popup.html' %}
   {% include 'content_blocks/partials/delete_popup.html' %}
   {% include 'content_blocks/partials/reset_popup.html' %}
+
+  <script type="text/javascript">
+    initContentBlockGrid();
+  </script>
 {% endblock %}
