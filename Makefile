@@ -15,7 +15,7 @@ help:
 # ------- Commands ---------------------------------------
 # --------------------------------------------------------
 
-ARCH?=amd64
+ARCH?=arm64v8
 docker_arch: ## set the arch environment variable for docker
 	@export ARCH=$(ARCH)
 

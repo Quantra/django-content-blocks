@@ -6,7 +6,6 @@ from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from faker import Faker
-from tests.test_management_commands import _test_imported_json
 
 from content_blocks.models import (
     ContentBlockCollection,
@@ -14,6 +13,7 @@ from content_blocks.models import (
     ContentBlockTemplate,
     ContentBlockTemplateField,
 )
+from content_blocks.tests.test_management_commands import _test_imported_json
 
 faker = Faker()
 

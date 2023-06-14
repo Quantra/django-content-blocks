@@ -5,7 +5,6 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from faker import Faker
-from services.content_block import CloneServices
 
 from content_blocks.forms import (
     ContentBlockForm,
@@ -22,6 +21,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
 )
+from content_blocks.services.content_block import CloneServices
 
 faker = Faker()
 
