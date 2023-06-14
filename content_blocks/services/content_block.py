@@ -72,6 +72,7 @@ class RenderServices:
 
         def __init__(self, site):
             self.site = site
+            self.META = {}
 
     @staticmethod
     def render_html(content_block, context=None, site=None):
