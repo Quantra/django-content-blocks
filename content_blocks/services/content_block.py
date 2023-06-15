@@ -73,6 +73,7 @@ class RenderServices:
         def __init__(self, site):
             self.site = site
             self.META = {}
+            self.session = {}
 
     @staticmethod
     def render_html(content_block, context=None, site=None):
