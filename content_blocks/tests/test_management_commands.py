@@ -6,7 +6,6 @@ from django.core import serializers
 from django.core.management import call_command
 from django.db import connection
 from faker import Faker
-from services.content_block_template import post_import
 
 from content_blocks.models import (
     ContentBlock,
@@ -15,6 +14,7 @@ from content_blocks.models import (
     ContentBlockTemplateField,
 )
 from content_blocks.services.content_block import CacheServices, cache
+from content_blocks.services.content_block_template import post_import
 
 faker = Faker()
 
