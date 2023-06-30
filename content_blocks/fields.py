@@ -8,7 +8,6 @@ from django.core.validators import (
     get_available_image_extensions,
 )
 from django.db import models
-from django.db.models import FileField
 from django.db.models.fields.files import FieldFile
 
 
@@ -59,7 +58,7 @@ class FieldVideo(FieldFile):
         return Path(self.name).suffix[1:]
 
 
-class VideoField(FileField):
+class VideoField(models.FileField):
     attr_class = FieldVideo
 
     def __init__(self, *args, **kwargs):
