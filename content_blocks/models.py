@@ -141,7 +141,7 @@ class ContentBlockField(models.Model, CloneMixin):
         "model_choice_content_type", "model_choice_object_id"
     )
 
-    template_name = "content_blocks/partials/fields/default.html"
+    template_name = "content_blocks/editor/partials/fields/default.html"
     preview_template_name = None
 
     # todo change these into editable fields
@@ -306,7 +306,7 @@ class ContentField(ContentBlockField):
 
 
 class CheckboxField(ContentBlockField):
-    template_name = "content_blocks/partials/fields/checkbox.html"
+    template_name = "content_blocks/editor/partials/fields/checkbox.html"
 
     class Meta:
         proxy = True
@@ -332,7 +332,7 @@ class CheckboxField(ContentBlockField):
 
 @cleanup_ignore
 class ImageField(ContentBlockField):
-    template_name = "content_blocks/partials/fields/image.html"
+    template_name = "content_blocks/editor/partials/fields/image.html"
     editor_cols_min = 2
 
     class Meta:
@@ -385,7 +385,7 @@ class FileField(ContentBlockField):
 
 @cleanup_ignore
 class VideoField(ContentBlockField):
-    template_name = "content_blocks/partials/fields/video.html"
+    template_name = "content_blocks/editor/partials/fields/video.html"
     editor_cols_min = 2
 
     class Meta:
@@ -412,7 +412,7 @@ class VideoField(ContentBlockField):
 
 
 class EmbeddedVideoField(ContentBlockField):
-    template_name = "content_blocks/partials/fields/embedded_video.html"
+    template_name = "content_blocks/editor/partials/fields/embedded_video.html"
     editor_cols_min = 2
 
     class Meta:

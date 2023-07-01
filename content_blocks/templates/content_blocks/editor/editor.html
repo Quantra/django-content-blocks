@@ -51,7 +51,7 @@
 {% endblock %}
 
 {% block main %}
-  {% include 'content_blocks/partials/loader.html' with loader_id='root' %}
+  {% include 'content_blocks/editor/partials/loader.html' with loader_id='root' %}
 
   <div class="cb-wrapper">
     <div class="controls wrapper-controls root-wrapper-controls">
@@ -100,7 +100,7 @@
 
   <div class="publish-bar">
 
-    <div class="status">{{ status_message|safe }}</div>
+    <div id="statusMessage">{{ status_message|safe }}</div>
 
     <button class="button" id="save_exit" data-return_url="{{ return_url }}" data-loader="#loader_root">
       <i class="fa-solid fa-light fa-floppy-disk-circle-arrow-right"></i> Exit
@@ -133,9 +133,9 @@
     <button class="button" id="save_continue" data-loader="#loader_root"><i class="fa-solid fa-light fa-floppy-disk"></i> Save</button>
   </div>
 
-  {% include 'content_blocks/partials/popup.html' %}
-  {% include 'content_blocks/partials/delete_popup.html' %}
-  {% include 'content_blocks/partials/reset_popup.html' %}
+  {% include 'content_blocks/editor/partials/popup.html' %}
+  {% include 'content_blocks/editor/partials/delete_popup.html' %}
+  {% include 'content_blocks/editor/partials/reset_popup.html' %}
 
   <script type="text/javascript">
     initContentBlockGrid();

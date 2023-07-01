@@ -1,8 +1,8 @@
 {#Base template for fields with inline previews: image, video, embedded video#}
-<div class="grid grid-1-1 gap-x" data-max-cols="2">
+<div class="grid grid-auto gap-x">
   <div class="field-wrapper grid grid-1-2 gap-x">
     {% block field %}
-      {% include 'content_blocks/partials/fields/default.html' %}
+      {% include 'content_blocks/editor/partials/fields/default.html' %}
     {% endblock %}
   </div>
 

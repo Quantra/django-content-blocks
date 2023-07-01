@@ -340,11 +340,11 @@ class TestContentBlockField:
         The template name should be default for everything except checkboxes.
         """
         template_names = {
-            ContentBlockFields.CHECKBOX_FIELD: "content_blocks/partials/fields/checkbox.html"
+            ContentBlockFields.CHECKBOX_FIELD: "content_blocks/editor/partials/fields/checkbox.html"
         }
         template_name = template_names.get(
             content_block_field.field_type,
-            "content_blocks/partials/fields/default.html",
+            "content_blocks/editor/partials/fields/default.html",
         )
         assert content_block_field.template_name == template_name
 
@@ -359,9 +359,10 @@ class TestContentBlockField:
         The template name should be None except for Image, Video and Embedded Video fields
         """
         preview_template_names = {
-            ContentBlockFields.IMAGE_FIELD: "content_blocks/partials/fields/previews/image.html",
-            ContentBlockFields.VIDEO_FIELD: "content_blocks/partials/fields/previews/video.html",
-            ContentBlockFields.EMBEDDED_VIDEO_FIELD: "content_blocks/partials/fields/previews/embedded_video.html",
+            ContentBlockFields.IMAGE_FIELD: "content_blocks/editor/partials/fields/previews/image.html",
+            ContentBlockFields.VIDEO_FIELD: "content_blocks/editor/partials/fields/previews/video.html",
+            ContentBlockFields.EMBEDDED_VIDEO_FIELD: "content_blocks/editor/partials/fields/previews/embedded_video"
+            ".html",
         }
         preview_template_name = preview_template_names.get(
             content_block_field.field_type

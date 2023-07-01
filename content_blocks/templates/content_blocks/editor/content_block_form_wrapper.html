@@ -4,7 +4,7 @@
 
 <div class="content-block-form pos-rel clearfix" id="cb_{{ content_block.id }}">
 
-  {% include 'content_blocks/partials/loader.html' with loader_id=content_block.id %}
+  {% include 'content_blocks/editor/partials/loader.html' with loader_id=content_block.id %}
 
   <div class="preview" id="preview_{{ content_block.id }}">
     <iframe data-src="{% url opts|admin_urlname:'content_block_preview' parent.id content_block.id %}"></iframe>
