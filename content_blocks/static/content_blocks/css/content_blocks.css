@@ -28,6 +28,9 @@ GRID ELEMENTS
   display: grid;
   grid-auto-rows: max-content;
 }
+.grid-auto {
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+}
 .grid-1-1 {
   grid-template-columns: repeat(2, 1fr);
 }
@@ -68,7 +71,7 @@ GRID ELEMENTS
   grid-column: span 4;
 }
 
-/* h1 - h4 represent the height of the cell */
+/* h1 - h6 represent the height of the cell */
 
 .h1 {
   min-height: 30px;

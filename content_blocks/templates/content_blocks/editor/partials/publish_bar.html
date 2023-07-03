@@ -1,0 +1,35 @@
+{% load admin_urls %}
+<div class="publish-bar">
+
+  <div id="statusMessage">{{ status_message|safe }}</div>
+
+  <button class="button" id="save_exit" data-return_url="{{ return_url }}" data-loader="#loader_root">
+    <i class="fa-solid fa-light fa-floppy-disk-circle-arrow-right"></i> Exit
+  </button>
+
+  <form action="{% url opts|admin_urlname:'discard_changes' parent.id %}"
+        method="post"
+        id="discard_form"
+        data-return_url="{{ return_url }}"
+        data-loader="#loader_root"
+  >
+    {% for field in discard_form %}
+      {{ field }}
+    {% endfor %}
+    <button class="button" type="submit"><i class="fa-solid fa-light fa-arrow-rotate-left"></i> Reset</button>
+  </form>
+
+  <form action="{% url opts|admin_urlname:'publish_content_blocks' parent.id %}"
+        method="post"
+        id="publish_form"
+        data-return_url="{{ return_url }}"
+        data-loader="#loader_root"
+  >
+    {% for field in publish_form %}
+      {{ field }}
+    {% endfor %}
+    <button class="button" type="submit"><i class="fa-solid fa-light fa-cloud-arrow-up"></i> Publish</button>
+  </form>
+
+  <button class="button" id="save_continue" data-loader="#loader_root"><i class="fa-solid fa-light fa-floppy-disk"></i> Save</button>
+</div>

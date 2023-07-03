@@ -1,9 +1,17 @@
-<div class="popup {{ css_class }} center-grid" id="popup_base">
-  <div class="popup-wrapper">
-    <div class="popup-content"></div>
+<div class="popup {{ css_class }} center-grid" id="popupBase">
+  <div class="popup-wrapper" id="popupContentWrapper">
+    <div class="popup-content" id="popupContent"></div>
+
     <div class="popup-controls">
-      <button class="close-popup button"><i class="fa-solid fa-light fa-times-circle"></i> Cancel</button>
-      <button class="confirm button"><i class="fa-solid fa-light fa-check-circle"></i> Confirm</button>
+
+      <button class="close-popup button popup-btn">
+        <i class="fa-solid fa-light fa-times-circle"></i> Cancel
+      </button>
+
+      <button class="confirm button popup-btn" id="popupConfirm">
+        <i class="fa-solid fa-light fa-check-circle"></i> Confirm
+      </button>
+
     </div>
   </div>
 </div>

@@ -2,6 +2,49 @@
 // todo make all buttons which are using forms not use forms (replace with service classes).
 // todo replace dragon drop with sortableJS
 
+// Ajax forms:
+// content block
+// new content block
+// new nested block
+// import content blocks
+//
+// Ajax buttons:
+// save
+// publish
+// reset + popup
+// visible
+// delete + popup
+//
+// JS buttons:
+// expand
+// expand all
+// preview
+// save all
+//
+// Special:
+// dragon drop
+
+document.addEventListener("click", function () {
+  // Handle all button clicks here and hand off to the appropriate function.
+});
+
+document.addEventListener("submit", function () {
+  // Handle all form submits here and hand off to the appropriate function.
+});
+
+function ajaxForm(formEle, successCallback) {
+  // Take a form and submit it.  On success call successCallback.
+}
+
+function ajaxButton(btnEle, successCallback) {
+  // Take a button and submit it.  On success call successCallback.
+}
+
+function popupButton(btnEle, confirmCallback, successCallback) {
+  // Open a popup for the btnEle.  Call confirmCallback when confirm button pressed and successCallback when the ajax
+  // returns success.
+}
+
 (function ($) {
   $.fn.ContentBlockEditor = function (options) {
     let settings = $.extend({}, options);
