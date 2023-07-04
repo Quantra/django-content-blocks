@@ -1,3 +1,5 @@
+from io import StringIO
+
 from django.core.management import BaseCommand
 
 from content_blocks.services.content_block_template import ImportExportServices
@@ -11,4 +13,6 @@ class Command(BaseCommand):
         Export ContentBlockTemplate and associated ContentBlockTemplateField to json via stdout.
         The output can be used for import_content_block_templates management command.
         """
-        ImportExportServices.export_content_block_templates(file_like=self.stdout)
+        buffer = StringIO()
+        ImportExportServices.export_content_block_templates(file_like=buffer)
+        self.stdout.write(buffer.getvalue())
