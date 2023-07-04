@@ -276,6 +276,7 @@ class TextField(ContentBlockField):
             required=self.template_field.required,
             help_text=self.template_field.help_text,
             widget=widget,
+            max_length=256,
         )
 
 
@@ -434,6 +435,7 @@ class EmbeddedVideoField(ContentBlockField):
             initial=self.embedded_video,
             required=self.template_field.required,
             help_text=self.template_field.help_text,
+            max_length=256,
         )
 
 
