@@ -79,6 +79,7 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
     readonly_fields = AUTO_DATE_FIELDS
     inlines = [ContentBlockTemplateFieldInline]
     actions = ["export_content_block_templates"]
+    save_as = True
 
     class Media:
         css = {"all": ["content_blocks/css/content_block_template_admin.css"]}
