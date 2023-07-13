@@ -5,16 +5,6 @@ from django.conf import settings as django_settings
 
 
 class ContentBlocksSettings:
-    # Choose which cache to use for content blocks
-    CONTENT_BLOCKS_CACHE = "default"
-    CONTENT_BLOCKS_CACHE_PREFIX = "content_block"
-
-    # Disable caching of content blocks
-    CONTENT_BLOCKS_DISABLE_CACHE = False
-
-    # Disable caching of content blocks on start
-    CONTENT_BLOCKS_DISABLE_CACHE_ON_START = False
-
     # Choose the storage backend to use for media files
     # Image, field and video storage settings are use instead of content blocks storage if set.
     CONTENT_BLOCKS_IMAGE_STORAGE = None

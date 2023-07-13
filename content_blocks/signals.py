@@ -1,42 +1,19 @@
 """
 Content blocks app signals.py
 """
-from django.apps import apps
-from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import Signal, receiver
 
 from content_blocks.models import (
-    ContentBlock,
     ContentBlockField,
     ContentBlockFields,
     FileField,
     ImageField,
     VideoField,
 )
-from content_blocks.services.content_block import CacheServices
 
 # A signal we can send after an import finishes.
 post_import = Signal()
-
-
-if apps.is_installed("dbtemplates"):
-    from dbtemplates.models import Template
-
-    @receiver(post_save, sender=Template, dispatch_uid="update_cache_template_save")
-    @receiver(post_delete, sender=Template, dispatch_uid="update_cache_template_delete")
-    def update_cache_template(sender, instance, **kwargs):
-        """
-        Update the cache for content blocks when their db template is saved.
-        """
-        if kwargs.get("raw", False):
-            # Prevent this signal from running during loaddata.
-            return
-
-        content_blocks = ContentBlock.objects.filter(
-            content_block_template__template_filename=instance.name.split("/")[-1]
-        )
-
-        CacheServices.set_cache_all(queryset=content_blocks)
 
 
 def cleanup_media(sender, instance, delete=False, **kwargs):

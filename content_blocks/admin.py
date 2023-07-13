@@ -90,7 +90,7 @@ class ContentBlockTemplateAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     @property
     def content_block_template_fields(self):
-        return ["name", "template_filename", "no_cache"]
+        return ["name", "template_filename"]
 
     def get_fieldsets(self, request, obj=None):
         return (

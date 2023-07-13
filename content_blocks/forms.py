@@ -9,7 +9,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
 )
-from content_blocks.services.content_block import CacheServices, CloneServices
+from content_blocks.services.content_block import CloneServices
 
 
 class ParentModelForm(forms.Form):
@@ -198,8 +198,7 @@ class PublishContentBlocksForm(ParentModelForm):
                 content_block, attrs={"draft": False}
             )
             self.parent.content_blocks.add(new_content_block)
-            # Cache the html
-            CacheServices.set_cache_content_block_parent(new_content_block, self.parent)
+        # todo pre render here
 
 
 class ResetContentBlocksForm(ParentModelForm):

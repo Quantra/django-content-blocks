@@ -5,23 +5,16 @@ Tests for ContentBlock services.
 import pytest
 from faker import Faker
 
-from content_blocks.services.content_block import (
-    CacheServices,
-    CloneServices,
-    RenderServices,
-    cache,
-)
+from content_blocks.services.content_block import CloneServices, RenderServices
 
 faker = Faker()
 
 
 class TestRenderServices:
     @pytest.mark.django_db
-    @pytest.mark.parametrize("no_cache", [False, True])
     @pytest.mark.parametrize("context", [None, {"extra_context": faker.text()}])
     def test_render_content_block(
         self,
-        no_cache,
         context,
         content_block_factory,
         content_block_field_factory,
@@ -31,11 +24,10 @@ class TestRenderServices:
         """
         Should render the content block and set it in the cache if possible.
         Test covers cases where:
-        * The ContentBlock can and cannot be cached.
         * Context is/isn't supplied.
         """
         content_block_template = content_block_template_factory.create(
-            template_filename=text_context_template.name, no_cache=no_cache
+            template_filename=text_context_template.name
         )
         content_block = content_block_factory.create(
             content_block_template=content_block_template
@@ -43,17 +35,9 @@ class TestRenderServices:
         text = faker.text(256)
         extra_context_text = "" if context is None else context["extra_context"]
         content_block_field_factory.create(text=text, content_block=content_block)
-        cache_key = CacheServices.cache_key(content_block)
-
-        cached_html = cache.get(cache_key)
-        assert cached_html is None
 
         html = RenderServices.render_content_block(content_block, context=context)
         assert html == f"{text}_{extra_context_text}"
-
-        cached_html = cache.get(cache_key)
-        assert cached_html == f"{text}_{extra_context_text}" or no_cache
-        assert cached_html is None or not no_cache
 
     @pytest.mark.django_db
     def test_render_html(

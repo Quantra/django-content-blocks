@@ -644,22 +644,9 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         except TemplateDoesNotExist:
             return False
 
-    @cached_property
-    def can_cache(self):
-        """
-        :return: True if the ContentBlock can be cached.
-        """
-        return (
-            not settings.CONTENT_BLOCKS_DISABLE_CACHE  # Don't cache if disabled in settings
-            and not self.draft  # Don't cache drafts
-            and self.parent is None  # Don't cache nested content blocks
-            and not self.content_block_template.no_cache  # Don't cache if the template is marked no_cache
-            and self.can_render  # Can't cache what can't be rendered
-        )
-
     def render(self):
         """
-        Render html for this block and cache.
+        Render html for this block.
         This should only be called by the template and exists to support legacy projects.
         The {% render_content_block %} template tag should be used in preference.
         """
@@ -684,11 +671,6 @@ class ContentBlockTemplate(PositionModel, AutoDateModel, VisibleModel):
     name = models.CharField(max_length=256, unique=True)
 
     template_filename = models.CharField(max_length=256, blank=True)
-
-    no_cache = models.BooleanField(
-        default=False,
-        help_text="Disable caching for content blocks created with this template.",
-    )
 
     def __str__(self):
         return self.name
@@ -814,15 +796,6 @@ class ContentBlockParentModel(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.content_blocks.all().delete()
         return super().delete(using=using, keep_parents=keep_parents)
-
-    @property
-    def content_blocks_sites_field(self):
-        """
-        For use with per site cacheing. Define which field on your model is either a FK or M2M to Site.
-        E.g.
-        return self.sites
-        """
-        return None
 
 
 class ContentBlockCollection(AutoDateModel, ContentBlockParentModel):

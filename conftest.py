@@ -11,8 +11,6 @@ from faker import Faker
 from PIL import Image
 from pytest_factoryboy import register
 
-from content_blocks.conf import settings
-from content_blocks.services.content_block import cache
 from content_blocks.tests.factories import (
     ContentBlockAvailabilityFactory,
     ContentBlockCollectionFactory,
@@ -77,20 +75,6 @@ except ImportError:
 
 
 faker = Faker()
-
-
-@pytest.fixture(autouse=True)
-def reset_cache():
-    """
-    Clear the cache between every test.
-    """
-    yield
-
-    assert (
-        settings.CACHES[settings.CONTENT_BLOCKS_CACHE]["BACKEND"]
-        == "django.core.cache.backends.locmem.LocMemCache"
-    )
-    cache.clear()
 
 
 @pytest.fixture(autouse=True)

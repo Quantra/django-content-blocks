@@ -21,7 +21,6 @@ from content_blocks.models import (
     ContentBlockTemplateField,
     PolymorphError,
 )
-from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.storages import SettingsTestStorage
 
 faker = Faker()
@@ -192,80 +191,6 @@ class TestContentBlock:
         content_block_field_factory.create(text=text, content_block=content_block)
 
         assert content_block.render() == text
-
-    @pytest.mark.django_db
-    def test_content_block_render_no_cache(
-        self,
-        content_block_template_factory,
-        content_block_factory,
-        content_block_field_factory,
-        text_template,
-        content_block_collection,
-    ):
-        """
-        Test the render method with a content block template with no_cache = True
-        Manually set the cache for the content block and assert the output is not taking this.
-        :return:
-        """
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_template.name, no_cache=True
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-        text = faker.text(256)
-        content_block_field_factory.create(text=text, content_block=content_block)
-
-        cache_key = CacheServices.cache_key(content_block)
-
-        content_block_collection.content_blocks.add(content_block)
-
-        bad_text = faker.text(256)
-        cache.set(cache_key, bad_text)
-
-        render = content_block.render()
-
-        assert render == text
-        assert render != bad_text
-        assert cache.get(cache_key) == bad_text
-
-    @pytest.mark.django_db
-    def test_content_block_render_disable_cache_setting(
-        self,
-        content_block_template_factory,
-        content_block_factory,
-        content_block_field_factory,
-        text_template,
-        settings,
-        content_block_collection,
-    ):
-        """
-        Test the render method with a content block template with no_cache = True
-        Manually set the cache for the content block and assert the output is not taking this.
-        :return:
-        """
-        settings.CONTENT_BLOCKS_DISABLE_CACHE = True
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_template.name
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-        text = faker.text(256)
-        content_block_field_factory.create(text=text, content_block=content_block)
-
-        cache_key = CacheServices.cache_key(content_block)
-
-        content_block_collection.content_blocks.add(content_block)
-
-        bad_text = faker.text(256)
-        cache.set(cache_key, bad_text)
-
-        render = content_block.render()
-
-        assert render == text
-        assert render != bad_text
-        assert cache.get(cache_key) == bad_text
 
 
 class TestContentBlockField:

@@ -8,7 +8,6 @@ from django.core import serializers
 from django.core.management import call_command
 from django.db import transaction
 
-from content_blocks.conf import settings
 from content_blocks.models import (
     ContentBlock,
     ContentBlockField,
@@ -117,11 +116,6 @@ class ImportExportServices:
                 "reorder", "content_blocks.ContentBlockTemplate", verbosity=verbosity
             )
 
-            # Update content blocks cache
-            if not settings.CONTENT_BLOCKS_DISABLE_CACHE:
-                # todo call service here not management command
-                call_command("set_content_blocks_cache", verbosity=verbosity)
-
         post_import.send(ContentBlockTemplate)
 
     @staticmethod
@@ -129,7 +123,6 @@ class ImportExportServices:
         """
         Takes a filepath and opens the file and imports it.
         :param filepath: String. The path is relative to
-        :return:
         """
         filepath = Path(filepath)
 

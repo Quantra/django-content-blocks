@@ -8,7 +8,6 @@ from django.apps import apps
 from django.core.management import call_command
 from faker import Faker
 
-from content_blocks.services.content_block import CacheServices, cache
 from content_blocks.tests.factories import (
     PopulatedFileContentBlockFieldFactory,
     PopulatedImageContentBlockFieldFactory,
@@ -84,36 +83,6 @@ class TestCleanupMediaSignals:
 
         file_field_2.save_value(faker.file_name(extension=extension))
         assert not file_path.is_file()
-
-
-class TestDBTemplatesSignals:
-    @pytest.mark.django_db
-    def test_update_cache_template(
-        self, text_content_block, template_factory, settings, content_block_collection
-    ):
-        if not apps.is_installed("dbtemplates"):
-            pytest.skip("skipping tests that require dbtemplates")
-
-        content_block_collection.content_blocks.add(text_content_block)
-
-        cache_key = CacheServices.cache_key(text_content_block)
-
-        html = text_content_block.render()
-        assert cache.get(cache_key) == html
-
-        db_template = template_factory.create(
-            name=text_content_block.template,
-            content="db_template {{ content_block.textfield }}",
-        )
-
-        new_html = cache.get(cache_key)
-        assert new_html is not None
-        assert new_html != html
-
-        db_template.delete()
-        new_html = cache.get(cache_key)
-        assert new_html is not None
-        assert new_html == html
 
 
 class TestSignals:
