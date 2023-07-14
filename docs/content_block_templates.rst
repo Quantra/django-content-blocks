@@ -18,10 +18,6 @@ You can create :py:class:`ContentBlockTemplate` objects in the admin site.
 
         If this is not provided content blocks made from this template cannot be rendered. This may be suitable for nested content blocks.
 
-    .. py:attribute:: no_cache
-
-        Prevent this content block from being cached.  This can be useful if your template contains a template tag which provides content that shouldn't be cached or if you are using :py:class:`ModelChoiceField`.
-
 :py:class:`ContentBlockTemplateField`
 -------------------------------------
 
@@ -239,9 +235,6 @@ The following additional options are available for :py:class:`ContentBlockTempla
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :py:class:`ModelChoiceField` let's us reference objects from other models in your project via the `Django contenttypes framework <https://docs.djangoproject.com/en/4.2/ref/contrib/contenttypes/>`_. When created in the admin site we choose the :py:attr:`model_choice_content_type`. When used in the content block editor the choices are ``model_choice.content_type.objects.all()``.
-
-.. warning::
-    When using :py:class:`ModelChoiceField` you should set ``no_cache=True`` on the :py:class:`ContentBlockTemplate` or manage the cache when updating related objects yourself.
 
 .. py:class:: ModelChoiceField
 

@@ -32,20 +32,6 @@ Page Previews
 
 To enable page previews in the content block editor you need to add a :py:attr:`preview_url` property to your parent model which returns a valid url to preview the page.  You will also need to provide a view for this url.  This view is responsible for providing :py:meth:`content_blocks.previews()` instead of :py:meth:`content_blocks.visible()`.  For an example see the :doc:`example_pages_app` documentation.
 
-Cache Settings
---------------
-
-By default the html produced by content blocks is stored in and served from the cache.  The following settings are provided to control caching behaviour.
-
-    ``CONTENT_BLOCKS_CACHE``
-        Choose which cache to use for content blocks.  Must be set to a valid key in the ``CACHES`` `setting <https://docs.djangoproject.com/en/4.2/ref/settings/#caches>`_.  Defaults to ``"default"``.
-
-    ``CONTENT_BLOCKS_DISABLE_CACHE``
-        Disable caching of content blocks. Defaults to ``False``.
-
-    ``CONTENT_BLOCKS_DISABLE_CACHE_ON_START``
-        All content blocks are cached during the :py:meth:`AppConfig.ready()` method. This works well with a long or permanent cache as it means content blocks are always ready to be served from the cache.  You can disable this functionality by setting this to ``True``.  Defaults to ``False``.
-
 Storage Backend Settings
 ------------------------
 
