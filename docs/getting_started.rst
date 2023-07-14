@@ -6,21 +6,20 @@ This guide will walk you through the installation process of Django Content Bloc
 Installation
 ------------
 
-To install Django Content Blocks, you can use pip:
+To install Django Content Blocks with pip:
 
 .. code-block:: bash
 
     $ pip install django-content-blocks
-
-After installation, add content_blocks to your INSTALLED_APPS list in the project's settings.py file:
 
 Open ``settings.py`` and add ``content_blocks`` to your ``INSTALLED_APPS``:
 
 .. code-block:: python
 
     INSTALLED_APPS = (
-        ...
+        # ...
         "content_blocks",
+        # ...
     )
 
 Add URL patterns in your project's ``urls.py`` file:
@@ -30,18 +29,18 @@ Add URL patterns in your project's ``urls.py`` file:
     from django.conf.urls import include
 
     urlpatterns = [
-        ...
+        # ...
         path("content-blocks/", include("content_blocks.urls")),
-        ...
+        # ...
     ]
 
-Finally, run the migration command:
+Migrate the database:
 
 .. code-block:: bash
 
     $ python3 manage.py migrate
 
-If `required <https://docs.djangoproject.com/en/4.2/howto/static-files/>`_, collect the static files by running the command:
+If `required <https://docs.djangoproject.com/en/4.2/howto/static-files/>`_, collect the static files:
 
 .. code-block:: bash
 
@@ -60,9 +59,9 @@ To add content block functionality to an existing model, you should extend your 
     from content_blocks.models import ContentBlockParentModel
 
     class Page(ContentBlockParentModel):
-        ...
+        # ...
 
-This will add a field for the content blocks to your model so you will then need to:
+This will add a field for the content blocks to your model so you will then need to make migrations and migrate the database:
 
 .. code-block:: shell
 
@@ -87,9 +86,9 @@ To show the content block editor button in the admin site extend :py:class:`Cont
             (
                 "Page",
                 {"fields": [
-                    ...
+                    # ...
                     "content_blocks_button"
-                    ...
+                    # ...
                     ]
                 },
             ),

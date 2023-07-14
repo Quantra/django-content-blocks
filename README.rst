@@ -35,8 +35,6 @@ Django content blocks is already in use in a number of production websites howev
 
 Major development plans/ideas include:
 
-* Rework the cacheing system to make it a lot simpler
-    * Currently content blocks are pre cached on publish. This becomes complex when sites are considered. The intention is to remove pre-cacheing and only cache on render, greatly simplifying the cacheing system.
 * Content block editor HTML, CSS and JS rework.
     * This all needs updating to use modern HTML and CSS (flex, grid etc) and vanilla JS.
     * Currently using jQuery which isn't the end of the world as it comes with django.contrib.admin so not an extra dependency.

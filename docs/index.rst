@@ -39,13 +39,14 @@ Table of Contents
 -----------------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   Introduction <self>
-   getting_started
-   configuration
-   content_block_templates
-   content_block_template_export_and_import
-   the_content_block_editor
-   example_pages_app
+    Introduction <self>
+    getting_started
+    configuration
+    content_block_templates
+    content_block_template_export_and_import
+    cacheing_content_blocks
+    the_content_block_editor
+    example_pages_app
