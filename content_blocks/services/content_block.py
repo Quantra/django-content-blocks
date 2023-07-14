@@ -14,28 +14,8 @@ class RenderServices:
     Services for rendering ContentBlock to html.
     """
 
-    # todo review this. render_content_block/render_html can be combined.  Addition of sites is probably not needed.
-
     @staticmethod
     def render_content_block(content_block, context=None):
-        """
-        Main render method.  Used by ContentBlock.render and {% render_content_block %}
-        :return: Rendered html for the content block.
-        """
-        return RenderServices.render_html(content_block, context)
-
-    class DummyRequest:
-        """
-        DummyRequest to hold a site attribute. In no other way similar to an actual request.
-        """
-
-        def __init__(self, site):
-            self.site = site
-            self.META = {}
-            self.session = {}
-
-    @staticmethod
-    def render_html(content_block, context=None, site=None):
         """
         Render the html for the given ContentBlock.
         :context: Dictionary of context to render the template with.
@@ -45,36 +25,20 @@ class RenderServices:
         if not content_block.can_render:
             return ""
 
-        render_context = RenderServices.context(content_block, context=context)
-        request = render_context.get("request")
-        if request is None and site is not None:
-            render_context["request"] = RenderServices.DummyRequest(site)
-
-        html = render_to_string(content_block.template, render_context, request=request)
+        context = RenderServices.context(content_block, context=context)
+        html = render_to_string(content_block.template, context)
         return html
 
     @staticmethod
     def context(content_block, context=None):
         """
-        Adds the ContentBlock.context and ContentBlock to supplied context or creates new context.
+        Adds the ``ContentBlock.context`` and ``ContentBlock`` to supplied context or creates new context.
         :return: Context dictionary to be used when rendering html.
         """
-        render_context = context or {}
-        render_context[content_block.context_name] = content_block.context
-        render_context[f"{content_block.context_name}_object"] = content_block
-        return render_context
-
-    @staticmethod
-    def site(context):
-        """
-        :return: The site from the given context if possible.
-        """
-        if not context:
-            return None
-
-        request = context.get("request")
-        site = getattr(request, "site", None)
-        return site
+        context = context or {}
+        context[content_block.context_name] = content_block.context
+        context[f"{content_block.context_name}_object"] = content_block
+        return context
 
 
 class CloneServices:

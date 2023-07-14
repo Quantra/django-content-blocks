@@ -1,1 +1,4 @@
-<h3 class="{{ content_block.css_class }}">{{ content_block.text }}</h3>
+{% load cache %}
+{% cache 30 "text_content_block" content_block_object.id %}
+  <h3 class="{{ content_block.css_class }}">{{ content_block.text }}</h3>
+{% endcache %}

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
+from content_blocks.conf import settings
 from content_blocks.models import (
     ContentBlock,
     ContentBlockAvailability,
@@ -9,7 +10,7 @@ from content_blocks.models import (
     ContentBlockFields,
     ContentBlockTemplate,
 )
-from content_blocks.services.content_block import CloneServices
+from content_blocks.services.content_block import CloneServices, RenderServices
 
 
 class ParentModelForm(forms.Form):
@@ -51,31 +52,32 @@ class NewContentBlockFormBase(forms.Form):
 
     def create_content_block(self, content_block_template, draft=False, **kwargs):
         # todo refactor to service class
-        content_block = ContentBlock.objects.create(
-            content_block_template=content_block_template,
-            draft=draft,
-            position=self.cleaned_data.get("position", 0),
-            **kwargs,
-        )
-
-        for (
-            template_field
-        ) in content_block_template.content_block_template_fields.all():
-            content_block_field = ContentBlockField.objects.create(
-                content_block=content_block,
-                template_field=template_field,
-                field_type=template_field.field_type,
-                model_choice_content_type=template_field.model_choice_content_type,
+        with transaction.atomic():
+            content_block = ContentBlock.objects.create(
+                content_block_template=content_block_template,
+                draft=draft,
+                position=self.cleaned_data.get("position", 0),
+                **kwargs,
             )
 
-            # create min_num nested blocks
-            if template_field.field_type == ContentBlockFields.NESTED_FIELD:
-                for j in range(template_field.min_num):
-                    self.create_content_block(
-                        template_field.nested_templates.first(),
-                        draft=False,
-                        parent=content_block_field,
-                    )
+            for (
+                template_field
+            ) in content_block_template.content_block_template_fields.all():
+                content_block_field = ContentBlockField.objects.create(
+                    content_block=content_block,
+                    template_field=template_field,
+                    field_type=template_field.field_type,
+                    model_choice_content_type=template_field.model_choice_content_type,
+                )
+
+                # create min_num nested blocks
+                if template_field.field_type == ContentBlockFields.NESTED_FIELD:
+                    for j in range(template_field.min_num):
+                        self.create_content_block(
+                            template_field.nested_templates.first(),
+                            draft=False,
+                            parent=content_block_field,
+                        )
 
         return content_block
 
@@ -191,14 +193,17 @@ class PublishContentBlocksForm(ParentModelForm):
 
     def save(self):
         # todo refactor to service class
-        self.parent.content_blocks.published().delete()
+        with transaction.atomic():
+            self.parent.content_blocks.published().delete()
 
-        for content_block in self.parent.content_blocks.drafts():
-            new_content_block = CloneServices.clone_content_block(
-                content_block, attrs={"draft": False}
-            )
-            self.parent.content_blocks.add(new_content_block)
-        # todo pre render here
+            for content_block in self.parent.content_blocks.drafts():
+                new_content_block = CloneServices.clone_content_block(
+                    content_block, attrs={"draft": False}
+                )
+                self.parent.content_blocks.add(new_content_block)
+
+                if settings.CONTENT_BLOCKS_PRE_RENDER:
+                    RenderServices.render_content_block(new_content_block)
 
 
 class ResetContentBlocksForm(ParentModelForm):
@@ -208,13 +213,14 @@ class ResetContentBlocksForm(ParentModelForm):
 
     def save(self):
         # todo refactor to service class
-        self.parent.content_blocks.drafts().delete()
+        with transaction.atomic():
+            self.parent.content_blocks.drafts().delete()
 
-        for content_block in self.parent.content_blocks.published():
-            new_content_block = CloneServices.clone_content_block(
-                content_block, attrs={"draft": True}
-            )
-            self.parent.content_blocks.add(new_content_block)
+            for content_block in self.parent.content_blocks.published():
+                new_content_block = CloneServices.clone_content_block(
+                    content_block, attrs={"draft": True}
+                )
+                self.parent.content_blocks.add(new_content_block)
 
 
 class ImportContentBlocksForm(ParentModelForm):
@@ -233,8 +239,9 @@ class ImportContentBlocksForm(ParentModelForm):
 
     def save(self):
         # todo refactor to service class
-        self.parent.content_blocks.drafts().delete()
+        with transaction.atomic():
+            self.parent.content_blocks.drafts().delete()
 
-        for content_block in self.cleaned_data["master"].content_blocks.drafts():
-            new_content_block = CloneServices.clone_content_block(content_block)
-            self.parent.content_blocks.add(new_content_block)
+            for content_block in self.cleaned_data["master"].content_blocks.drafts():
+                new_content_block = CloneServices.clone_content_block(content_block)
+                self.parent.content_blocks.add(new_content_block)

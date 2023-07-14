@@ -8,8 +8,8 @@ class ContentBlocksSettings:
     # Choose the storage backend to use for media files
     # Image, field and video storage settings are use instead of content blocks storage if set.
     CONTENT_BLOCKS_IMAGE_STORAGE = None
-    CONTENT_BLOCKS_FILE_STORAGE = None
     CONTENT_BLOCKS_VIDEO_STORAGE = None
+    CONTENT_BLOCKS_FILE_STORAGE = None
     # Use default storage if not set.
     # Support provided here for Django 3.2
     CONTENT_BLOCKS_STORAGE = getattr(django_settings, "STORAGES", {}).get(
@@ -28,6 +28,10 @@ class ContentBlocksSettings:
 
     # Use a textarea widget for TextFields.
     CONTENT_BLOCKS_TEXTFIELD_TEXTAREA = False
+
+    # Pre render content blocks on publish.
+    # Useful for populating the cache and/or pre generating django-lazy-srcset images.
+    CONTENT_BLOCKS_PRE_RENDER = True
 
     def __getattribute__(self, name):
         try:

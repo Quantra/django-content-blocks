@@ -22,7 +22,7 @@ class TestRenderServices:
         text_context_template,
     ):
         """
-        Should render the content block and set it in the cache if possible.
+        Should render the content block to html.
         Test covers cases where:
         * Context is/isn't supplied.
         """
@@ -38,85 +38,6 @@ class TestRenderServices:
 
         html = RenderServices.render_content_block(content_block, context=context)
         assert html == f"{text}_{extra_context_text}"
-
-    @pytest.mark.django_db
-    def test_render_html(
-        self,
-        content_block_factory,
-        content_block_field_factory,
-        content_block_template_factory,
-        text_template,
-    ):
-        """
-        Should render the template.
-        """
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_template.name
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-        text = faker.text(256)
-        content_block_field_factory.create(text=text, content_block=content_block)
-
-        html = RenderServices.render_html(content_block)
-
-        assert html == text
-
-    @pytest.mark.django_db
-    def test_render_html_context(
-        self,
-        content_block_factory,
-        content_block_field_factory,
-        content_block_template_factory,
-        text_context_template,
-    ):
-        """
-        Should render the template with the supplied context.
-        """
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_context_template.name
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-        text = faker.text(256)
-        content_block_field_factory.create(text=text, content_block=content_block)
-
-        extra_context_text = faker.text()
-        context = {"extra_context": extra_context_text}
-
-        html = RenderServices.render_html(content_block, context=context)
-
-        assert html == f"{text}_{extra_context_text}"
-
-    @pytest.mark.django_db
-    def test_render_html_context_site(
-        self,
-        content_block_factory,
-        content_block_field_factory,
-        content_block_template_factory,
-        text_context_site_template,
-        site,
-    ):
-        """
-        Should render the template with the supplied context + site.
-        """
-        content_block_template = content_block_template_factory.create(
-            template_filename=text_context_site_template.name
-        )
-        content_block = content_block_factory.create(
-            content_block_template=content_block_template
-        )
-        text = faker.text(256)
-        content_block_field_factory.create(text=text, content_block=content_block)
-
-        extra_context_text = faker.text()
-        context = {"extra_context": extra_context_text}
-
-        html = RenderServices.render_html(content_block, context=context, site=site)
-
-        assert html == f"{text}_{extra_context_text}_{site}"
 
     @pytest.mark.django_db
     def test_context(self, text_content_block):
@@ -158,52 +79,6 @@ class TestRenderServices:
 
         assert object_context_name in context.keys()
         assert context[object_context_name] == text_content_block
-
-    @pytest.mark.django_db
-    def test_site(self, rf, site):
-        """
-        Should return the site from the given context containing Request with site attribute.
-        """
-        request = rf.get("/")
-        request.site = site
-
-        context_site = RenderServices.site({"request": request})
-        assert context_site == site
-
-    @pytest.mark.django_db
-    def test_site_dummyrequest(self, site):
-        """
-        Should return the site from the given context containing DummyRequest with site attribute.
-        """
-        request = RenderServices.DummyRequest(site)
-
-        context_site = RenderServices.site({"request": request})
-        assert context_site == site
-
-    @pytest.mark.django_db
-    def test_site_none(self, rf):
-        """
-        Should return None when:
-        * There is no request key in context.
-        * The request doesn't have a site attribute.
-        * The request site attribute is None.
-        """
-        context = {}
-
-        context_site = RenderServices.site(context)
-        assert context_site is None
-
-        context["request"] = rf.get("/")
-        context_site = RenderServices.site(context)
-        assert context_site is None
-
-        context["request"].site = None
-        context_site = RenderServices.site(context)
-        assert context_site is None
-
-        context["request"] = RenderServices.DummyRequest(None)
-        context_site = RenderServices.site(context)
-        assert context_site is None
 
 
 class TestCloneServices:
