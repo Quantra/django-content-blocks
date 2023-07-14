@@ -340,7 +340,7 @@ def content_block_preview(request, object_id, content_block_id, model_admin=None
     response = render(
         request,
         "content_blocks/content_block_preview.html",
-        {"content_block": content_block, "parent": parent},
+        {"content_block": content_block, "parent": parent, "cache_timeout": 0},
     )
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
 

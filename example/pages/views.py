@@ -16,11 +16,13 @@ def page_detail(request, page_slug=None, preview=False):
     content_blocks = (
         page.content_blocks.previews() if preview else page.content_blocks.visible()
     )
+    cache_timeout = 0 if preview else 5 * 60
     return render(
         request,
         "pages/page_detail.html",
         {
             "page": page,
             "content_blocks": content_blocks,
+            "cache_timeout": cache_timeout,
         },
     )
