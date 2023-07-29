@@ -6,7 +6,7 @@ This guide will walk you through the installation process of Django Content Bloc
 Installation
 ------------
 
-To install Django Content Blocks with pip:
+Install Django Content Blocks with pip:
 
 .. code-block:: bash
 
@@ -15,6 +15,7 @@ To install Django Content Blocks with pip:
 Open ``settings.py`` and add ``content_blocks`` to your ``INSTALLED_APPS``:
 
 .. code-block:: python
+    :caption: settings.py
 
     INSTALLED_APPS = (
         # ...
@@ -25,6 +26,7 @@ Open ``settings.py`` and add ``content_blocks`` to your ``INSTALLED_APPS``:
 Add URL patterns in your project's ``urls.py`` file:
 
 .. code-block:: python
+    :caption: urls.py
 
     from django.conf.urls import include
 
@@ -40,7 +42,7 @@ Migrate the database:
 
     $ python3 manage.py migrate
 
-If `required <https://docs.djangoproject.com/en/4.2/howto/static-files/>`_, collect the static files:
+If `required <https://docs.djangoproject.com/en/4.2/howto/static-files/>`_, collect static files:
 
 .. code-block:: bash
 

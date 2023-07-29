@@ -65,7 +65,7 @@ test_settings: docker_up  ## run tests with all test settings files
 backupdb: docker_up ## Backup the db to postgres_backups dir
 	docker-compose -f local.yml exec postgres backup
 
-FILENAME?=$(shell ls -at postgres_backups/*.sql | head -n1 | xargs basename)
+FILENAME?=$(shell ls -at postgres_backups/*.sql.gz | head -n1 | xargs basename)
 restoredb: docker_up ## Restore the latest backup or defined FILENAME in postgres_backups
 	docker-compose -f local.yml stop django
 	docker-compose -f local.yml exec postgres restore $(FILENAME)

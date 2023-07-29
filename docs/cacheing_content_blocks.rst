@@ -28,6 +28,7 @@ With this the views from the :doc:`example pages app <example_pages_app>` become
             page.content_blocks.previews() if preview else page.content_blocks.visible()
         )
 
+        # Setup a cache_timeout of 5 mins.
         cache_timeout = 0 if preview else 5 * 60
 
         return render(
@@ -36,7 +37,7 @@ With this the views from the :doc:`example pages app <example_pages_app>` become
             {
                 "page": page,
                 "content_blocks": content_blocks,
-                "cache_timeout": cache_timeout
+                "cache_timeout": cache_timeout  # Add the cache_timeout to context.
             },
         )
 
