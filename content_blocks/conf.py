@@ -32,6 +32,8 @@ class ContentBlocksSettings:
     # Pre render content blocks on publish.
     # Useful for populating the cache and/or pre generating django-lazy-srcset images.
     CONTENT_BLOCKS_PRE_RENDER = True
+    # Set the cache_timeout when pre rendering
+    CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT = None
 
     def __getattribute__(self, name):
         try:

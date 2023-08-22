@@ -61,7 +61,12 @@ For example to add cacheing to the content block in :doc:`getting started <getti
 .. warning::
     If your content block uses data from a :py:class:`ModelChoiceField` or related data from another object you should either not cache the content block or add another argument to the ``{% cache %}`` template tag which varies when the related object is updated.
 
-By default content blocks are pre rendered on publish, this will populate the cache ready for your visitors.  If you are using `django-lazy-srcset <https://github.com/Quantra/django-lazy-srcset>`_ this will also pre generate responsive images. If you want to disable pre rendering you can do so in your settings:
+By default content blocks are pre rendered on publish, this will populate the cache ready for your visitors.  If you are using `django-lazy-srcset <https://github.com/Quantra/django-lazy-srcset>`_ this will also pre generate responsive images. If you want to disable pre rendering or change the ``cache_timeout`` used when pre rendering you can do so in your settings:
 
     ``CONTENT_BLOCKS_PRE_RENDER``
         When ``True`` content blocks are rendered on publish.
+
+    ``CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT``
+        The timeout in seconds used when pre rendering. Set to ``None`` to cache indefinitely.
+
+        Defaults to ``None``

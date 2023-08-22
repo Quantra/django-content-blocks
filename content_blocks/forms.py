@@ -203,7 +203,12 @@ class PublishContentBlocksForm(ParentModelForm):
                 self.parent.content_blocks.add(new_content_block)
 
                 if settings.CONTENT_BLOCKS_PRE_RENDER:
-                    RenderServices.render_content_block(new_content_block)
+                    RenderServices.render_content_block(
+                        new_content_block,
+                        context={
+                            "cache_timeout": settings.CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT
+                        },
+                    )
 
 
 class ResetContentBlocksForm(ParentModelForm):
