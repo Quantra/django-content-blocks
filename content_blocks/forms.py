@@ -150,7 +150,7 @@ class ContentBlockForm(forms.Form):
     """
 
     css_class = forms.CharField(
-        max_length=256,
+        max_length=64,
         required=False,
         label="CSS Class",
         help_text="For advanced styling.",
