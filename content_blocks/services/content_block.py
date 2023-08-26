@@ -19,7 +19,6 @@ class RenderServices:
         """
         Render the html for the given ContentBlock.
         :context: Dictionary of context to render the template with.
-        :site: If a Site is supplied and there is no request context set it in the context under request.site
         :return: Rendered html for the content block.
         """
         if not content_block.can_render:

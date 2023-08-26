@@ -1,4 +1,5 @@
 from django import forms
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
@@ -11,6 +12,9 @@ from content_blocks.models import (
     ContentBlockTemplate,
 )
 from content_blocks.services.content_block import CloneServices, RenderServices
+
+if apps.is_installed("django.contrib.sites"):
+    from django.contrib.sites.models import Site
 
 
 class ParentModelForm(forms.Form):
@@ -194,6 +198,11 @@ class PublishContentBlocksForm(ParentModelForm):
     def save(self):
         # todo refactor to service class
         with transaction.atomic():
+            sites = (
+                list(Site.objects.all())
+                if apps.is_installed("django.contrib.sites")
+                else [None]
+            )
             self.parent.content_blocks.published().delete()
 
             for content_block in self.parent.content_blocks.drafts():
@@ -203,12 +212,14 @@ class PublishContentBlocksForm(ParentModelForm):
                 self.parent.content_blocks.add(new_content_block)
 
                 if settings.CONTENT_BLOCKS_PRE_RENDER:
-                    RenderServices.render_content_block(
-                        new_content_block,
-                        context={
-                            "cache_timeout": settings.CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT
-                        },
-                    )
+                    for site in sites:
+                        RenderServices.render_content_block(
+                            new_content_block,
+                            context={
+                                "cache_timeout": settings.CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT,
+                                "site": site,
+                            },
+                        )
 
 
 class ResetContentBlocksForm(ParentModelForm):
