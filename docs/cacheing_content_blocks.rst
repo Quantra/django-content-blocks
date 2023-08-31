@@ -66,6 +66,8 @@ By default content blocks are pre rendered on publish, this will populate the ca
     ``CONTENT_BLOCKS_PRE_RENDER``
         When ``True`` content blocks are rendered on publish.
 
+        Defaults to ``True``
+
     ``CONTENT_BLOCKS_PRE_RENDER_CACHE_TIMEOUT``
         The timeout in seconds used when pre rendering. Set to ``None`` to cache indefinitely.
 
