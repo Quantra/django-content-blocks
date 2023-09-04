@@ -810,5 +810,8 @@ class ContentBlockCollection(AutoDateModel, ContentBlockParentModel):
 
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self):
         return self.name or self.slug
