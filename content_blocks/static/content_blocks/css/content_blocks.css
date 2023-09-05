@@ -122,7 +122,7 @@ CLEARFIX
 */
 
 .clearfix::after {
-  content: '';
+  content: "";
   clear: both;
   display: table;
 }
@@ -202,9 +202,9 @@ Content Block Editor
   margin: 0;
 }
 
-.cb-import-form button[type='submit'],
-.cb-create-form button[type='submit'],
-.nested-create-form button[type='submit'] {
+.cb-import-form button[type="submit"],
+.cb-create-form button[type="submit"],
+.nested-create-form button[type="submit"] {
   height: 30px;
   width: 49.5%;
   float: right;
@@ -250,7 +250,7 @@ BUTTONS
 button {
   cursor: pointer;
   vertical-align: middle;
-  font-family: 'Roboto', 'Lucida Grande', Verdana, Arial, sans-serif;
+  font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
   font-weight: normal;
   font-size: 13px;
 }
@@ -308,7 +308,7 @@ CONTROLS
     color: var(--link-fg);
   }
 }
-html[data-theme='light'] .wrapper-controls button {
+html[data-theme="light"] .wrapper-controls button {
   color: var(--link-fg);
 }
 
@@ -381,11 +381,11 @@ textarea {
   width: 100%;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   width: auto;
 }
 
-input[type='file'] {
+input[type="file"] {
   height: 30px;
   padding: 3px 0 0 0;
 }
@@ -582,7 +582,7 @@ LOADERS
   z-index: 90;
 }
 .loader .bg:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -663,7 +663,7 @@ html.noscroll {
   display: none;
 }
 .popup:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
