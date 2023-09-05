@@ -257,8 +257,8 @@ class TestImportContentBlocksForm:
     def two_content_block_collections(self, content_block_collection_factory):
         content_block_collection_factory.create_batch(2)
         return (
-            ContentBlockCollection.objects.first(),
-            ContentBlockCollection.objects.last(),
+            ContentBlockCollection.objects.all()[0],
+            ContentBlockCollection.objects.all()[1],
         )
 
     @pytest.mark.django_db
