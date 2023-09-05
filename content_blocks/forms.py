@@ -55,12 +55,14 @@ class NewContentBlockFormBase(forms.Form):
         raise NotImplementedError  # pragma: no cover
 
     def create_content_block(self, content_block_template, draft=False, **kwargs):
+        kwargs["position"] = kwargs.get(
+            "position", self.cleaned_data.get("position", 0)
+        )
         # todo refactor to service class
         with transaction.atomic():
             content_block = ContentBlock.objects.create(
                 content_block_template=content_block_template,
                 draft=draft,
-                position=self.cleaned_data.get("position", 0),
                 **kwargs,
             )
 
@@ -81,6 +83,7 @@ class NewContentBlockFormBase(forms.Form):
                             template_field.nested_templates.first(),
                             draft=False,
                             parent=content_block_field,
+                            position=j,
                         )
 
         return content_block
