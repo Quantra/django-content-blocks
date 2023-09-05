@@ -506,7 +506,10 @@
 
       let num_blocks = $content_block_wrapper.children(".content-block-form").length;
 
-      let delete_buttons = $content_block_wrapper.children(".content-block-form").find("button.delete");
+      let delete_buttons = $content_block_wrapper
+        .children(".content-block-form")
+        .find("button.delete")
+        .not(".content-block-form button.delete");
       if (num_blocks <= min_num) {
         // Min num reached so disabled delete button.
         delete_buttons.children("i").removeClass(delete_active_class).addClass(delete_disabled_class);
