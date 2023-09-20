@@ -15,16 +15,20 @@
 Django Content Blocks
 =====================
 
-Django Content Blocks is a reusable Django app that allows users to create and manage custom content blocks for their website. Via the django admin site it provides an easy-to-use interface for creating content blocks that can be related to any other object. This allows you to provide rich, dynamic, editable content for your existing models such as pages, products, projects or whatever your project has.
+Django Content Blocks is a reusable Django app that allows users to create and manage custom content blocks for their website. It aims to provide content management and page building features from within the admin site without being a full CMS app or reinventing the admin site.
 
-The templates used to render content blocks are made in the same way as any other template in your project, giving you access to the full power of your chosen template engine.
-
-Content blocks can contain any type of content, including text, images, videos, and more, and can be arranged in any order. Additionally, Django Content Blocks includes support for drafts and previews, allowing users to see how their changes will look before publishing them.
+The content block editor is a simple page builder that integrates seamlessly into the admin site, it provides an easy-to-use interface for creating content blocks.
 
 .. figure:: https://github.com/Quantra/django-content-blocks/raw/master/docs/images/content_block_editor_dark.png
     :alt: The content block editor in the Django admin site.
 
     The content block editor in the Django admin site.
+
+Content blocks can be related to any other object. This allows you to provide rich, dynamic, editable content for your existing models such as pages, products, projects or whatever models you have.
+
+The templates used to render content blocks are made in the same way as any other template in your project, giving you access to the full power of your chosen template engine. You define the fields that are available to edit your content blocks in the content block editor. This means you can build a content block template once and reuse it over and over again.
+
+Content blocks can contain any type of content, including text, images, videos, and more, and can be arranged in any order. Additionally, Django Content Blocks includes support for drafts and previews, allowing users to see how their changes will look before publishing them.
 
 Installation instructions and detailed documentation can be found on `ReadTheDocs <https://django-content-blocks.readthedocs.io>`_.
 
