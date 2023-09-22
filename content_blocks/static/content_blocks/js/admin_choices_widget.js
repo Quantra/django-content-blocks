@@ -55,7 +55,11 @@ window.addEventListener("load", function () {
       choices.push([val_1, val_2]);
     });
 
-    choices = JSON.stringify(choices);
+    if (choices.length) {
+      choices = JSON.stringify(choices);
+    } else {
+      choices = "";
+    }
 
     $choices_widget.find("input[type=hidden]").val(choices);
   }
