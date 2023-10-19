@@ -608,6 +608,13 @@ class ContentBlock(PositionModel, AutoDateModel, VisibleModel, CloneMixin):
         null=True,
     )
 
+    name = models.CharField(
+        max_length=320,
+        blank=True,
+        help_text="Used to identify content blocks in the content block editor. Defaults to "
+        "<content_block_template_name> #<content_block_id>",
+    )
+
     css_class = models.CharField(max_length=64, blank=True)
 
     draft = models.BooleanField(blank=True, default=False)

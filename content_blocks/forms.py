@@ -65,6 +65,8 @@ class NewContentBlockFormBase(forms.Form):
                 draft=draft,
                 **kwargs,
             )
+            content_block.name = f"{content_block_template.name} #{content_block.id}"
+            content_block.save()
 
             for (
                 template_field
@@ -156,6 +158,10 @@ class ContentBlockForm(forms.Form):
     On save each content block field is updated and saved.
     """
 
+    name = forms.CharField(
+        max_length=320,
+    )
+
     css_class = forms.CharField(
         max_length=64,
         required=False,
@@ -169,6 +175,7 @@ class ContentBlockForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.set_fields()
         self.fields["css_class"].initial = self.content_block.css_class
+        self.fields["name"].initial = self.content_block.name
 
     def set_fields(self):
         for key, field in self.content_block.fields.items():
@@ -184,6 +191,7 @@ class ContentBlockForm(forms.Form):
                     field.save_value(self.cleaned_data.get(key))
 
             self.content_block.css_class = self.cleaned_data.get("css_class")
+            self.content_block.name = self.cleaned_data.get("name")
             self.content_block.saved = True
             self.content_block.save()
 

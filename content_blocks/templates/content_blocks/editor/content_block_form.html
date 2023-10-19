@@ -4,11 +4,11 @@
       enctype="multipart/form-data"
       class="cb-form" id="cb_form_{{ content_block.id }}"
       data-target="#cb_form_wrapper_{{ content_block.id }}"
-      data-btn="#save_{{ content_block.id }}"
->
+      data-btn="#save_{{ content_block.id }}">
+
   <div class="title-bar clearfix">
     <div class="field-wrapper title col fl cl" id="title_{{ content_block.id }}">
-      <h2>{{ content_block.content_block_template }} #{{ content_block.id }}</h2>
+      {{ form.name }}
     </div>
 
     <div class="field-wrapper col fl clearfix">
@@ -27,7 +27,7 @@
 
   <div class="fields clearfix expander expander_{{ content_block.id }}">
     {% for field in form %}
-      {% if field.html_name != 'css_class' %}
+      {% if field.html_name != 'css_class' and field.html_name != 'name' %}
         {% cycle 'cl-4 4c1' '4c2' '4c3' '4c4' as col4 silent %}
         {% cycle 'cl-3 3c1' '3c2' '3c3' as col3 silent %}
         {% cycle 'cl-2 2c1' '2c2' as col2 silent %}

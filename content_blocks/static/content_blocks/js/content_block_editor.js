@@ -117,7 +117,7 @@
     $(document).on("click", "button.visible", function () {
       let $btn = $(this);
       let ajax_url = $btn.data("ajax_url");
-      let label = $($btn.data("label")).text();
+      let label = $($btn.data("label")).children("input").val();
 
       $.ajax({
         type: "POST",
@@ -130,7 +130,7 @@
             showStatus(label + " shown");
           } else {
             $icon.addClass("fa-eye-slash");
-            showStatus(label + "hidden");
+            showStatus(label + " hidden");
           }
         },
       });
@@ -162,7 +162,7 @@
       let ajax_url = $btn.data("ajax_url");
 
       let $popup_content = $($("#delete_popup_content").html());
-      let label = $($btn.data("label")).text();
+      let label = $($btn.data("label")).children("input").val();
       $popup_content.find(".label").text(label);
 
       showPopup($btn, {
