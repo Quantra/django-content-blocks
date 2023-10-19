@@ -359,7 +359,7 @@
       let $target = $($form.data("target"));
       let $loader = $($btn.data("loader"));
       showLoader($loader);
-      let title = $form.find(".title h2").html();
+      let title = $form.find(".title input").val();
       showStatus("Saving " + title);
       $form.ajaxSubmit({
         success: function (data) {
