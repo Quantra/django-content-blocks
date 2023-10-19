@@ -287,6 +287,7 @@ class TestContentBlockField:
             ContentBlockFields.IMAGE_FIELD: "content_blocks/partials/fields/previews/image.html",
             ContentBlockFields.VIDEO_FIELD: "content_blocks/partials/fields/previews/video.html",
             ContentBlockFields.EMBEDDED_VIDEO_FIELD: "content_blocks/partials/fields/previews/embedded_video.html",
+            ContentBlockFields.IFRAME_FIELD: "content_blocks/partials/fields/previews/iframe.html",
         }
         preview_template_name = preview_template_names.get(
             content_block_field.field_type
@@ -314,6 +315,7 @@ class TestContentBlockField:
             ContentBlockFields.FILE_FIELD: forms.FileField,
             ContentBlockFields.VIDEO_FIELD: forms.FileField,
             ContentBlockFields.EMBEDDED_VIDEO_FIELD: forms.CharField,
+            ContentBlockFields.IFRAME_FIELD: forms.CharField,
         }
         form_field = form_fields.get(content_block_field.field_type)
         assert content_block_field.form_field.__class__ == form_field
@@ -347,6 +349,10 @@ class TestContentBlockField:
             ContentBlockFields.MODEL_CHOICE_FIELD: {
                 "value": "1",
                 "field": "model_choice",
+            },
+            ContentBlockFields.IFRAME_FIELD: {
+                "value": faker.uri(),
+                "field": "iframe",
             },
         }
 

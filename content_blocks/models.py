@@ -62,6 +62,7 @@ class ContentBlockFields(models.TextChoices):
     FILE_FIELD = "FileField"
     VIDEO_FIELD = "VideoField"
     EMBEDDED_VIDEO_FIELD = "EmbeddedVideoField"
+    IFRAME_FIELD = "IframeField"
 
 
 class ContentBlockFieldManager(models.Manager):
@@ -132,6 +133,7 @@ class ContentBlockField(models.Model, CloneMixin):
         upload_to="content-blocks/videos", blank=True, storage=video_storage
     )
     embedded_video = models.CharField(max_length=256, blank=True)
+    iframe = models.CharField(max_length=256, blank=True)
 
     model_choice_content_type = models.ForeignKey(
         ContentType, on_delete=models.SET_NULL, blank=True, null=True
@@ -416,6 +418,32 @@ class EmbeddedVideoField(ContentBlockField):
         # noinspection PyTypeChecker
         return forms.CharField(
             initial=self.embedded_video,
+            required=self.template_field.required,
+            help_text=self.template_field.help_text,
+            max_length=256,
+        )
+
+
+class IframeField(ContentBlockField):
+    preview_template_name = "content_blocks/partials/fields/previews/iframe.html"
+
+    class Meta:
+        proxy = True
+
+    @property
+    def context_value(self):
+        return self.iframe
+
+    def save_value(self, value):
+        self.iframe = value
+        self.save()
+        return value
+
+    @property
+    def form_field(self):
+        # noinspection PyTypeChecker
+        return forms.CharField(
+            initial=self.iframe,
             required=self.template_field.required,
             help_text=self.template_field.help_text,
             max_length=256,

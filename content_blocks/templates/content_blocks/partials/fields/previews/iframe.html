@@ -1,0 +1,9 @@
+{% extends 'content_blocks/partials/fields/previews/base.html' %}
+
+{% block main %}
+  {% if field.value %}
+    <iframe src="{{ field.value }}" class="embedded-preview"></iframe>
+  {% else %}
+    <i class="fa-solid fa-thin fa-nfc-slash fa-2x no-image-preview"></i>
+  {% endif %}
+{% endblock %}
