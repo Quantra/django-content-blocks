@@ -78,7 +78,7 @@ class TestContentBlockSave:
                 "content_blocks:content_block_save",
                 args=[content_block_field.content_block.id],
             ),
-            {"textfield": faker.text(256)},
+            {"textfield": faker.text(256), "name": faker.text(256)},
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         assert response.status_code == 200

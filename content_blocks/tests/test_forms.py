@@ -172,7 +172,9 @@ class TestContentBlockForm:
         content_block = content_block_field.content_block
         text = faker.text(256)
 
-        form = ContentBlockForm({"textfield": text}, content_block=content_block)
+        form = ContentBlockForm(
+            {"textfield": text, "name": content_block.name}, content_block=content_block
+        )
         assert form.is_valid()
         form.save()
 
@@ -185,6 +187,7 @@ class TestContentBlockForm:
         content_block = content_block_field.content_block
 
         form = ContentBlockForm(
+            {"name": content_block.name},
             files={"imagefield": File(svg_file.open("rb"), name=svg_file.name)},
             content_block=content_block,
         )
@@ -200,6 +203,7 @@ class TestContentBlockForm:
         content_block = content_block_field.content_block
 
         form = ContentBlockForm(
+            {"name": content_block.name},
             files={"imagefield": File(png_file.open("rb"), name=png_file.name)},
             content_block=content_block,
         )

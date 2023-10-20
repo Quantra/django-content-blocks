@@ -105,6 +105,7 @@ class VideoContentBlockTemplateFieldFactory(ContentBlockTemplateFieldFactory):
 
 class ContentBlockFactory(DjangoModelFactory):
     content_block_template = factory.SubFactory(ContentBlockTemplateFactory)
+    name = factory.Faker("text")
 
     class Meta:
         model = ContentBlock
