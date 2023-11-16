@@ -343,8 +343,10 @@ TITLE BAR
   background: transparent;
   font-weight: 600;
   margin: 0;
+  color: var(--header-link-color);
 }
 .title-bar .title input:focus {
+  color: var(--body-fg);
   border-color: var(--body-quiet-color);
   background-color: var(--body-bg);
 }
@@ -357,6 +359,7 @@ TITLE BAR
   position: absolute;
   right: 17px;
   top: 12px;
+  color: var(--header-link-color);
 }
 
 .title-bar .field-wrapper {
