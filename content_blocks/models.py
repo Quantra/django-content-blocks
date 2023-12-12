@@ -119,7 +119,7 @@ class ContentBlockField(models.Model, CloneMixin):
     # select_related working in the __init__
     field_type = models.CharField(max_length=32)
 
-    text = models.CharField(max_length=256, blank=True)
+    text = models.TextField(blank=True)
     content = models.TextField(blank=True)
     checkbox = models.BooleanField(blank=True, default=False)
     image = SVGAndImageField(
@@ -262,7 +262,6 @@ class TextField(ContentBlockField):
             required=self.template_field.required,
             help_text=self.template_field.help_text,
             widget=widget,
-            max_length=256,
         )
 
 
