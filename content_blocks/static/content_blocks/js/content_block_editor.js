@@ -397,7 +397,6 @@
       saving_all = true;
       showLoader($loader);
       showStatus("Saving all content blocks");
-      expandAll();
       let $buttons = $("button.save").not(".saved");
       return saveNext($buttons, callback, $loader);
     }
@@ -419,7 +418,17 @@
         saving_all = false;
         let $unsaved = $buttons.not(".saved");
         if ($unsaved.length) {
+          // Expand all content blocks with errors
+          $unsaved.each(function () {
+            let $expander_button = $(this).siblings(".expand");
+            if ($expander_button.find("i").hasClass(expand_closed_class)) {
+              $expander_button.click();
+            }
+          });
+
+          // Scroll to first content block with errors
           $("html").animate({ scrollTop: $unsaved.first().offset().top - scroll_offset }, 220);
+
           showStatus("Please correct the errors");
         } else {
           showStatus("All content blocks saved");
@@ -446,6 +455,11 @@
         success: function (data) {
           setSaveState($btn, data.saved);
           renderAjaxResponse(data, $target, false, function () {
+            let $expander_btn = $btn.siblings(".expand");
+            if ($expander_btn.find("i").hasClass(expand_closed_class)) {
+              $($expander_btn.data("target")).hide();
+            }
+
             if ($inline_loader) hideLoader($inline_loader);
             saveNext($buttons, callback, $loader, buttons);
           });
