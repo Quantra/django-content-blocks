@@ -202,6 +202,7 @@ def content_block_save(request, content_block_id):
             else form,
             "content_block": content_block,
             "saved": form_is_valid,
+            "ajax": True,
         },
     )
 

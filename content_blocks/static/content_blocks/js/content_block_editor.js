@@ -418,12 +418,15 @@
         saving_all = false;
         let $unsaved = $buttons.not(".saved");
         if ($unsaved.length) {
-          // Expand all content blocks with errors
+          // Expand all content blocks (and their parents) with errors
           $unsaved.each(function () {
-            let $expander_button = $(this).siblings(".expand");
-            if ($expander_button.find("i").hasClass(expand_closed_class)) {
-              $expander_button.click();
-            }
+            let $parents = $(this).parents(".content-block-form");
+            $parents.each(function () {
+              let $expander_button = $(this).children(".pos-rel").children(".controls").children(".expand");
+              if ($expander_button.children("i").hasClass(expand_closed_class)) {
+                $expander_button.click();
+              }
+            });
           });
 
           // Scroll to first content block with errors
