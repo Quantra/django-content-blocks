@@ -138,6 +138,7 @@ def content_block_create_base(request, form, parent, log_name="content block"):
             "content_block": content_block,
             "opts": parent._meta,
             "parent": parent,
+            "start_open": True,
         },
     )
 
@@ -202,7 +203,7 @@ def content_block_save(request, content_block_id):
             else form,
             "content_block": content_block,
             "saved": form_is_valid,
-            "ajax": True,
+            "start_open": True,
         },
     )
 

@@ -16,7 +16,7 @@
               tabindex="-1"
               data-target=".expander_{{ content_block.id }}"
       >
-        <i class="fa-solid fa-light {{ nested|yesno:'fa-chevron-up,fa-chevron-down' }}"></i>
+        <i class="fa-solid fa-light {{ start_open|yesno:'fa-chevron-up,fa-chevron-down' }}"></i>
       </button>
 
       {% if content_block.can_render %}
@@ -63,7 +63,7 @@
       {% include 'content_blocks/editor/content_block_form.html' %}
     </div>
 
-    <div class="expander expander_{{ content_block.id }}" {% if not nested and not ajax %}style="display: none;"{% endif %}>
+    <div class="expander expander_{{ content_block.id }}" {% if not start_open %}style="display: none;"{% endif %}>
             {#	Nested fields #}
       {% for field in content_block.nested_fields.values %}
         <div class="controls wrapper-controls">
@@ -89,7 +89,7 @@
           >
             {% for nested_block in field_content_blocks %}
               {% content_block_form nested_block as content_block_form %}
-              {% include 'content_blocks/editor/content_block_form_wrapper.html' with form=content_block_form content_block=nested_block saved=nested_block.saved nested_num=field_content_blocks|length min_num=field.template_field.min_num nested=True %}
+              {% include 'content_blocks/editor/content_block_form_wrapper.html' with form=content_block_form content_block=nested_block saved=nested_block.saved nested_num=field_content_blocks|length min_num=field.template_field.min_num start_open=True %}
             {% endfor %}
           </div>
 

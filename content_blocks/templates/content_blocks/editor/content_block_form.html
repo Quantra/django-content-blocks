@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <div class="fields clearfix expander expander_{{ content_block.id }}" {% if not nested and not ajax %}style="display:none;"{% endif %}>
+  <div class="fields clearfix expander expander_{{ content_block.id }}" {% if not start_open %}style="display:none;"{% endif %}>
     {% for field in form %}
       {% if field.html_name != 'css_class' and field.html_name != 'name' %}
         {% cycle 'cl-4 4c1' '4c2' '4c3' '4c4' as col4 silent %}
